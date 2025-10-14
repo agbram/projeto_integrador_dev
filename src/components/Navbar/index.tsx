@@ -2,7 +2,6 @@
 import { ReactNode } from "react";
 import Nav from 'react-bootstrap/Nav';
 
-//commite
 export default function Navbar(){
     return(
         <Nav variant="pills" defaultActiveKey="/home">

@@ -27,5 +27,3 @@ function ButtonExample() {
     </>
   );
 }
-
-export default ButtonExample;

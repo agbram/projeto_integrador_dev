@@ -1,0 +1,18 @@
+.header {
+  background: linear-gradient(90deg,  #f5d4a9, #e1c582);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 15px 40px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* sombra sutil */
+}
+
+.cabecalho {
+  flex-grow: 1;
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: white;
+  font-family: "Segoe UI", Roboto, sans-serif;
+  letter-spacing: 1px;
+}

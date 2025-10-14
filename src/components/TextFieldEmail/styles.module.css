@@ -1,0 +1,12 @@
+.labelLeft {
+    text-align: left;
+    display: block;
+    width: 100%;
+  }
+  .formLabel {
+    display: block;
+    text-align: left;
+    margin-bottom: 0.25rem; /* diminui a distância */
+    font-weight: 500;
+  }
+  

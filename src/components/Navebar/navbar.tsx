@@ -1,13 +1,17 @@
 "use client";
 import { ReactNode } from "react";
+import 'bootstrap/dist/css/bootstrap.min.css';
 import Nav from 'react-bootstrap/Nav';
 
 //commite
 export default function Navbar(){
     return(
-        <Nav variant="pills" defaultActiveKey="/home">
+        <Nav variant="pills" defaultActiveKey="/home" >
             <Nav.Item>
                 <Nav.Link href="/home">Active</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+                <Nav.Link href="/home">Produtos</Nav.Link>
             </Nav.Item>
             <Nav.Item>
                 <Nav.Link eventKey="link-1">Option 2</Nav.Link>

@@ -1,49 +1,34 @@
 .container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+.painelBoasVindas {
+  display: none;
+  background-color: blue;
+  flex-grow: 2;
+}
+
+.painelLogin {
+  background-color: red;
+  flex-grow: 1;
   align-items: center;
-  height: 100vh; /* ocupa a tela toda */
-  background-color: #fffdfa;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  padding: 1rem; /* evita que encoste nas bordas no celular */
-}
-
-.box {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 16px;
+  height: 100vh;
   padding: 2rem;
-  width: 100%;
-  max-width: 380px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  text-align: center;
 }
 
-/* Textos */
-.box h1 {
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
-  color: #0d6efd;
-}
-
-.box h3 {
-  font-size: 1.2rem;
-  margin-bottom: 1.5rem;
-  color: #333;
-}
-
-/* Responsivo (telas menores que 400px) */
-@media (max-width: 400px) {
-  .box {
-    padding: 1.5rem;
+@media (min-width: 768px) {
+  .container {
+    flex-direction: row;
   }
 
-  .box h1 {
-    font-size: 1.5rem;
+  .painelBoasVindas {
+    display: block;
   }
 
-  .box h3 {
-    font-size: 1rem;
+  .painelLogin .logotipo {
+    display: none;
   }
 }

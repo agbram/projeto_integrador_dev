@@ -7,16 +7,23 @@
 
 .painelBoasVindas {
   display: none;
-  background-color: blue;
-  flex-grow: 2;
+  background: linear-gradient(135deg, #a47c5b 0%, #d9b896 50%, #f5e6cc 100%);
+  flex-grow: 4.5;
+  position: relative;
+  height: 100vh;
+  box-shadow: 10px 0 30px -10px rgba(0, 0, 0, 0.25);
 }
 
+
 .painelLogin {
-  background-color: red;
+  background-color: #ffffff;
   flex-grow: 1;
   align-items: center;
   height: 100vh;
   padding: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 @media (min-width: 768px) {

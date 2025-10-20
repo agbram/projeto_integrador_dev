@@ -1,19 +1,18 @@
 "use client";
-import Textfield from "@/components/TextField";
-import React from "react";
-import ButtonLoading from "@/components/Buttons/ButtonLoading";
-import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
+import FormLogin from "../../../components/FormLogin";
+import WelcomeLogin from "@/components/WelcomeLogin";
 
-export default function Login() {
+export default function Page() {
   return (
     <div className={styles.container}>
-      <div className={styles.box}>
-        <h1>Bem Vindo á</h1>
+      <div className={styles.painelBoasVindas}>
         
-        <Textfield label="Email" type="email" />
-        <Textfield label="Password" type="password" />
-        <ButtonLoading />
+        <span className={styles.logotipo}></span>
+      </div>
+      <div className={styles.painelLogin}>
+        <WelcomeLogin />
+        <FormLogin />
       </div>
     </div>
   );

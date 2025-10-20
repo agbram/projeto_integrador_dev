@@ -3,7 +3,6 @@ import { ReactNode } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Nav from 'react-bootstrap/Nav';
 
-//commite
 export default function Navbar(){
     return(
         <Nav variant="pills" defaultActiveKey="/home" >
@@ -11,7 +10,7 @@ export default function Navbar(){
                 <Nav.Link href="/home">Active</Nav.Link>
             </Nav.Item>
             <Nav.Item>
-                <Nav.Link href="/home">Produtos</Nav.Link>
+                <Nav.Link href="/1">Produtos</Nav.Link>
             </Nav.Item>
             <Nav.Item>
                 <Nav.Link eventKey="link-1">Option 2</Nav.Link>

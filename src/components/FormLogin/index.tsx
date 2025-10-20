@@ -4,6 +4,10 @@ import styles from "./styles.module.css";
 import React, { useState } from "react";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
+import React from "react";
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
 import Image from "next/image";
 import ButtonLogin from "../Buttons/ButtonLogin";
 import { useRouter } from "next/navigation";
@@ -75,22 +79,20 @@ function FormTextLogin() {
   }
   return (
     <>
-      <FloatingLabel controlId="floatingInput" label="Email address" className="mb-3">
-        <Form.Control
-          type="email"
-          placeholder="name@example.com"
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-        />
+      <FloatingLabel
+        controlId="floatingInput"
+        label="Email address"
+        className="mb-3"
+      >
+        <Form.Control type="email" placeholder="name@example.com" />
       </FloatingLabel>
 
-      <FloatingLabel controlId="floatingPassword" label="Password" className="mb-3">
-        <Form.Control
-          type="password"
-          placeholder="Password"
-          value={password} 
-          onChange={(e) => setPassword(e.target.value)}
-        />
+      <FloatingLabel 
+      controlId="floatingPassword" 
+      label="Password"
+      className="mb-3"
+      >
+        <Form.Control type="password" placeholder="Password" />
       </FloatingLabel>
 
       {mensagemAlerta}
@@ -98,5 +100,15 @@ function FormTextLogin() {
       <ButtonLogin 
       onClick={entrar}/>
     </>
+  );
+}
+
+function ButtonLogin() {
+  return (
+    <div className="d-grid gap-2">
+      <Button variant="primary" size="lg">
+        Entrar
+      </Button>
+    </div>
   );
 }

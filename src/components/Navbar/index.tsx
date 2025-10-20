@@ -44,7 +44,7 @@ export default function Navbar() {
             <Nav.Link href="/4">Relatórios</Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link href="/5">Pedidos</Nav.Link>
+            <Nav.Link href="/5">Pedidosaa</Nav.Link>
           </Nav.Item>
           <Nav.Item>
             <Nav.Link eventKey="link-1">Option 2</Nav.Link>

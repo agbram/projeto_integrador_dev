@@ -73,8 +73,6 @@ function FormTextLogin() {
       <Alert variant="success">{sucess}</Alert>
     );
   }
-
- 
   return (
     <>
       <FloatingLabel controlId="floatingInput" label="Email address" className="mb-3">

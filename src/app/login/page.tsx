@@ -1,6 +1,6 @@
 "use client";
 import styles from "./styles.module.css";
-import FormLogin from "../../../components/FormLogin";
+import FormLogin from "../../components/FormLogin";
 import WelcomeLogin from "@/components/WelcomeLogin";
 
 export default function Page() {

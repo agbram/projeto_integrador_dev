@@ -1,0 +1,19 @@
+.root{
+    display: flex;
+    flex-direction: column;
+    border: 3px solid #0000004d;
+    color: black;
+    background-color:#814900a8;
+    width: 250px;
+    height: auto;
+    border-radius: 16px;
+    align-items: center;
+}
+
+.nome{
+    padding: 16px;
+}
+
+.fotoUrl{
+    padding: 5px;
+}

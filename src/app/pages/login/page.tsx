@@ -7,11 +7,10 @@ export default function Page() {
   return (
     <div className={styles.container}>
       <div className={styles.painelBoasVindas}>
-        
+        <WelcomeLogin />
         <span className={styles.logotipo}></span>
       </div>
       <div className={styles.painelLogin}>
-        <WelcomeLogin />
         <FormLogin />
       </div>
     </div>

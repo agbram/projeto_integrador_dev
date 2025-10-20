@@ -2,7 +2,6 @@ import styles from "./styles.module.css";
 import React from "react";
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
-
 import Button from 'react-bootstrap/Button';
 import Image from "next/image";
 
@@ -24,7 +23,7 @@ function FormTextLogin() {
     <>
       <FloatingLabel
         controlId="floatingInput"
-        label="Email address"
+        label="Email"
         className="mb-3"
       >
         <Form.Control type="email" placeholder="name@example.com" />
@@ -32,7 +31,7 @@ function FormTextLogin() {
 
       <FloatingLabel 
       controlId="floatingPassword" 
-      label="Password"
+      label="Senha"
       className="mb-3"
       >
         <Form.Control type="password" placeholder="Password" />
@@ -44,7 +43,7 @@ function FormTextLogin() {
 function ButtonLogin() {
   return (
     <div className="d-grid gap-2">
-      <Button variant="primary" size="lg">
+      <Button className={styles.ButtonLogin} variant="dark" size="lg">
         Entrar
       </Button>
     </div>

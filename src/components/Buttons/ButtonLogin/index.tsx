@@ -1,5 +1,3 @@
-import { useAuth } from '@/hooks/useAuth';
-import { useRouter } from 'next/router';
 import Button from 'react-bootstrap/Button';
 
 type Props = {

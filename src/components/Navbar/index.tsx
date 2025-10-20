@@ -32,13 +32,13 @@ export default function Navbar() {
             <Nav.Link href="/home">Homepage</Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link href="/1">Produtos</Nav.Link>
+            <Nav.Link href="">Produtos</Nav.Link>
           </Nav.Item>
           <Nav.Item>
             <Nav.Link href="/2">Estoque</Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link href="/3">Clientes</Nav.Link>
+            <Nav.Link href="/clientes">Clientes</Nav.Link>
           </Nav.Item>
           <Nav.Item>
             <Nav.Link href="/4">Relatórios</Nav.Link>

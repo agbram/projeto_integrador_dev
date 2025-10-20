@@ -1,23 +1,19 @@
 'use client'
 
-import styles from "./styles.module.css";
 import React, { useState } from "react";
+import 'bootstrap/dist/css/bootstrap.min.css';
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
-import React from "react";
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
 import Image from "next/image";
-import ButtonLogin from "../Buttons/ButtonLogin";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Alert } from "react-bootstrap";
+import styles from "./styles.module.css";
+import ButtonLogin from "../Buttons/ButtonLogin"; // se esse for seu botão personalizado
 
 export default function FormLogin() {
-
   return (
-    <form className={styles.container}>
+    <div className={styles.container}>
       <span className={styles.logotipo}>
         <Image
           src="/imgs/logo.png"
@@ -30,85 +26,63 @@ export default function FormLogin() {
       <h2>Bem-vinda de volta!</h2>
 
       <FormTextLogin />
-      
-    </form>
+    </div>
   );
 }
 
 function FormTextLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
   const router = useRouter();
   const auth = useAuth();
-  const [error, setError] = useState<string | null>(null);
-  const [sucess, setSucess] = useState<string | null>(null);
 
-  function entrarSucesso(){
+  function entrarSucesso() {
     setError(null);
-    setSucess('Login realizado com sucesso!');
-    
-    setTimeout(() => {
-      router.push('/');
-    }, 1500);
+    setSuccess("Login realizado com sucesso!");
+    setTimeout(() => router.push("/"), 1500);
   }
 
-  function entrarFalha(error: string){
-    setSucess(null);
+  function entrarFalha() {
+    setSuccess(null);
     setError("Email ou senha inválidos!");
   }
 
-  function entrar(): void {
-    auth
-    .login(email, password)
-    .then(entrarSucesso)
-    .catch(entrarFalha);
+  function entrar() {
+    auth.login(email, password).then(entrarSucesso).catch(entrarFalha);
   }
 
-  let mensagemAlerta = null;
+  const mensagemAlerta = error ? (
+    <Alert variant="danger">{error}</Alert>
+  ) : success ? (
+    <Alert variant="success">{success}</Alert>
+  ) : null;
 
-  if(error){
-    mensagemAlerta = (
-      <Alert variant="danger">
-        {error}
-      </Alert>
-    );
-  } else if(sucess){
-    mensagemAlerta = (
-      <Alert variant="success">{sucess}</Alert>
-    );
-  }
   return (
     <>
-      <FloatingLabel
-        controlId="floatingInput"
-        label="Email address"
-        className="mb-3"
-      >
-        <Form.Control type="email" placeholder="name@example.com" />
+      <FloatingLabel controlId="floatingInput" label="Email address" className="mb-3">
+        <Form.Control
+          type="email"
+          placeholder="name@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
       </FloatingLabel>
 
-      <FloatingLabel 
-      controlId="floatingPassword" 
-      label="Password"
-      className="mb-3"
-      >
-        <Form.Control type="password" placeholder="Password" />
+      <FloatingLabel controlId="floatingPassword" label="Password" className="mb-3">
+        <Form.Control
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
       </FloatingLabel>
 
       {mensagemAlerta}
 
-      <ButtonLogin 
-      onClick={entrar}/>
+      <ButtonLogin onClick={entrar} />
     </>
-  );
-}
-
-function ButtonLogin() {
-  return (
-    <div className="d-grid gap-2">
-      <Button variant="primary" size="lg">
-        Entrar
-      </Button>
-    </div>
   );
 }

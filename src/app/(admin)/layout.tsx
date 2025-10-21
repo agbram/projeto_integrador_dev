@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import PrivateRouter from "@/components/PrivateRouter";
+import Header from "@/components/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,9 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
       
         <AuthProvider>
         {children}

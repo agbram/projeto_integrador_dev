@@ -7,9 +7,6 @@ export default function Home() {
   return (
     <>
     <Header/>
-    <PrivateRouter>
-    <Header/>
-    </PrivateRouter>
     </>
   );
 }

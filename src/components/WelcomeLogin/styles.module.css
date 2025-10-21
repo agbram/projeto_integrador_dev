@@ -1,62 +1,46 @@
-/* Exclusivo para LoginInvisibleText — não afeta o resto do app */
+.WelcomeLogin {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-grow: 1;
+  max-width: 500px;
+  position: relative;
+  color: white;
+  z-index: 1;
 
-.invisibleBox {
-    position: absolute;     /* posicionamento relativo ao pai (.painelLogin) */
-    left: 48px;             /* ajuste se quiser reposicionar */
-    top: 48px;              /* ajuste se quiser reposicionar */
-    max-width: 480px;
-    padding: 0;
-    z-index: 10;
-    color: #ffffff;
-  
-    /* legibilidade sobre imagem */
-    -webkit-backdrop-filter: blur(6px) saturate(120%);
-    backdrop-filter: blur(6px) saturate(120%);
-  
-    /* sombra no texto para contraste */
-    text-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-  
-    /* decorativa (não clicável). Remova se quiser selecionar texto */
-    pointer-events: none;
-  }
-  
-  /* Título (marca) */
-  .title {
-    margin: 0;
-    font-family: "Playfair Display", Georgia, serif;
-    font-weight: 700;
-    font-size: 2.4rem;
-    line-height: 1.02;
-    letter-spacing: -0.02em;
-    color: #ffffff;
-  }
-  
-  /* Subtítulo */
-  .subtitle {
-    margin-top: 0.35rem;
-    font-family: "Poppins", "Inter", sans-serif;
-    font-weight: 500;
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.92);
-  }
-  
-  /* Texto explicativo */
-  .body {
-    margin-top: 1rem;
-    font-family: "Inter", "Poppins", sans-serif;
-    font-size: 0.92rem;
-    color: rgba(255, 255, 255, 0.88);
-    max-width: 420px;
-    line-height: 1.45;
-  }
-  
-  /* variação compacta (caso queira ativar adicionando a classe .compact dinamicamente) */
-  .compact {
-    left: 20px;
-    top: 20px;
-    max-width: 260px;
-  }
-  .compact .title { font-size: 1.1rem; }
-  .compact .subtitle,
-  .compact .body { display: none; }
-  
+}
+
+
+.welcomeContent {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.welcomeIcon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.welcomeTitle {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.highlight {
+  color: #ffe8c2;
+}
+
+.welcomeText {
+  font-size: 1rem;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.welcomeFooter {
+  font-size: 0.8rem;
+  opacity: 0.7; 
+}

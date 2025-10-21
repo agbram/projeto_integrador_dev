@@ -1,15 +1,15 @@
 'Use Client';
 
 import Header from "@/components/Header";
-import ProductList from "@/components/teste/TestesProdut";
-import produtos from "@/mockstestes/proTestes";
-
-
+import PrivateRouter from "@/components/PrivateRouter";
 
 export default function Home() {
   return (
     <>
     <Header/>
+    <PrivateRouter>
+    <Header/>
+    </PrivateRouter>
     </>
   );
 }

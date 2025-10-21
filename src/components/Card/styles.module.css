@@ -1,0 +1,81 @@
+.container {
+  background: linear-gradient(135deg, #f9e8b3, #f6d87a);
+  color: #1e1e1e;
+  width: 90%;
+  max-width: 700px;
+  margin: 50px auto;
+  padding: 40px 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-family: 'Poppins', Arial, Helvetica, sans-serif;
+  transition: all 0.3s ease-in-out;
+}
+
+.container:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #2b2b2b;
+  letter-spacing: 0.5px;
+}
+
+.text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #333;
+  max-width: 600px;
+  margin-bottom: 10px;
+}
+
+/* Estilização adicional para formulários (se usar no mesmo componente) */
+.form label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: #2b2b2b;
+}
+
+.form input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 6px;
+  transition: all 0.3s ease;
+}
+
+.form input:focus {
+  border-color: #f1b233;
+  box-shadow: 0 0 5px rgba(241, 178, 51, 0.5);
+  outline: none;
+}
+
+.button {
+  background: linear-gradient(90deg, #f1b233, #e7a623);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.button:hover {
+  background: linear-gradient(90deg, #e7a623, #d8951f);
+  transform: scale(1.03);
+  box-shadow: 0 5px 15px rgba(231, 166, 35, 0.4);
+}

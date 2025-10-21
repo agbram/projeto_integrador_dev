@@ -1,5 +1,6 @@
 .container {
   background-color: #fff;
+  color: #FF6063;
   border-radius: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   width: 350px;
@@ -18,8 +19,18 @@
   align-items: center;
 }
 
+.ButtonLogin{
+  font-size: 1.1rem;
+}
+
+
 @media (min-width: 768px) {
   .painelLogin .logotipo {
     display: none;
+  }
+
+  .container{
+    background-color: #ffffff00;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0);
   }
 }

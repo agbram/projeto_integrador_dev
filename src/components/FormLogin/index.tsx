@@ -54,6 +54,11 @@ function FormTextLogin() {
     auth.login(email, password).then(entrarSucesso).catch(entrarFalha);
   }
 
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>){
+    e.preventDefault()
+    entrar();
+  }
+
   const mensagemAlerta = error ? (
     <Alert variant="danger">{error}</Alert>
   ) : success ? (

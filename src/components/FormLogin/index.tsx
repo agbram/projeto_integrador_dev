@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Alert } from "react-bootstrap";
 import styles from "./styles.module.css";
-import ButtonLogin from "../Buttons/ButtonLogin"; // se esse for seu botão personalizado
+import ButtonLogin from "../Buttons/ButtonLogin"; 
 
 export default function FormLogin() {
   return (
@@ -31,8 +31,8 @@ export default function FormLogin() {
 }
 
 function FormTextLogin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("adm@gmail.com");
+  const [password, setPassword] = useState("123");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -55,7 +55,7 @@ function FormTextLogin() {
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>){
-    e.preventDefault()
+    e.preventDefault();
     entrar();
   }
 
@@ -67,13 +67,14 @@ function FormTextLogin() {
 
   return (
     <>
+    <form onSubmit={handleSubmit}>
       <FloatingLabel controlId="floatingInput" label="Email address" className="mb-3">
         <Form.Control
           type="email"
           placeholder="name@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-        />
+          />
       </FloatingLabel>
 
       <FloatingLabel controlId="floatingPassword" label="Password" className="mb-3">
@@ -82,12 +83,13 @@ function FormTextLogin() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-        />
+          />
       </FloatingLabel>
 
       {mensagemAlerta}
 
-      <ButtonLogin onClick={entrar} />
+      <ButtonLogin type="submit" />
+    </form>
     </>
   );
 }

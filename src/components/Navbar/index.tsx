@@ -3,9 +3,10 @@ import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Nav from "react-bootstrap/Nav";
 import { Button } from "react-bootstrap";
-import { PackageIcon, House, ClipboardText, Users, ChartBar, ShoppingCart } from "@phosphor-icons/react";
+import { PackageIcon, HouseIcon, ClipboardTextIcon, UsersIcon, ChartBarIcon, ShoppingCartIcon } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import styles from "./styles.module.css";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -32,32 +33,32 @@ export default function Navbar() {
         >
           <Nav.Item>
             <Nav.Link as={Link} href="/" eventKey="/">
-              <House size={20} className="me-2" />Homepage
+              <HouseIcon size={20} className={styles.Icon} />Homepage
             </Nav.Link>
           </Nav.Item>
           <Nav.Item>
             <Nav.Link as={Link} href="/produtos" eventKey="/produtos">
-              <PackageIcon size={20} className="me-2" />Produtos
+              <PackageIcon size={20} className={styles.Icon} />Produtos
             </Nav.Link>
           </Nav.Item>
           <Nav.Item>
             <Nav.Link as={Link} href="/estoque" eventKey="/estoque">
-              <ClipboardText size={20} className="me-2" />Estoque
+              <ClipboardTextIcon size={20} className={styles.Icon} />Estoque
             </Nav.Link>
           </Nav.Item>
           <Nav.Item>
             <Nav.Link as={Link} href="/clientes" eventKey="/clientes">
-              <Users size={20} className="me-2" />Clientes
+              <UsersIcon size={20} className={styles.Icon} />Clientes
             </Nav.Link>
           </Nav.Item>
           <Nav.Item>
             <Nav.Link as={Link} href="/relatorios" eventKey="/relatorios">
-              <ChartBar size={20} className="me-2" />Relatórios
+              <ChartBarIcon size={20} className={styles.Icon} />Relatórios
             </Nav.Link>
           </Nav.Item>
           <Nav.Item>
             <Nav.Link as={Link} href="/pedidos" eventKey="/pedidos">
-              <ShoppingCart size={20} className="me-2" />Pedidos
+              <ShoppingCartIcon size={20} className={styles.Icon} />Pedidos
             </Nav.Link>
           </Nav.Item>
         </Nav>

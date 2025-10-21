@@ -5,11 +5,11 @@ import ProductList from "@/components/teste/TestesProdut";
 import produtos from "@/mockstestes/proTestes";
 
 
-
-export default function Home() {
+export default function ProdutosTela() {
   return (
     <>
     <Header/>
+    <h1>Testes</h1>
     </>
   );
 }

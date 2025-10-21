@@ -6,7 +6,6 @@ import PrivateRouter from "@/components/PrivateRouter";
 export default function Home() {
   return (
     <>
-    <Header/>
     </>
   );
 }

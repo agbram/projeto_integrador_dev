@@ -15,7 +15,6 @@ export default function Navbar() {
   return (
     <div className="p-2">
       <div className="d-flex justify-content-between align-items-center">
-        <h5 className="m-0 fw-bold">Menu</h5>
         <Button
           variant="outline-secondary"
           className="d-md-none"
@@ -37,6 +36,7 @@ export default function Navbar() {
             </Nav.Link>
           </Nav.Item>
           <Nav.Item>
+            <Nav.Link href="/produtos">Produtos</Nav.Link>
             <Nav.Link as={Link} href="/produtos" eventKey="/produtos">
               <PackageIcon size={20} className={styles.Icon} />Produtos
             </Nav.Link>

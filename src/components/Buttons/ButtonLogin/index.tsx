@@ -7,7 +7,7 @@ export default function ButtonLogin(props: Props) {
 
   return (
     <div className="d-grid gap-2">
-      <Button variant="primary" size="lg" onClick={props.onClick}>
+      <Button variant="danger" size="lg" onClick={props.onClick}>
         Entrar
       </Button>
     </div>

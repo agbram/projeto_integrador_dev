@@ -3,6 +3,7 @@
 import { createContext, useState, ReactNode, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import api from '@/services/api';
+import axios from 'axios';
 
 type JwtPayload = {
   sub: string;
@@ -34,8 +35,8 @@ export function AuthProvider(props: Props) {
 
   function login(email: string, password: string): Promise<void> {
     return new Promise<void>(function (resolve, reject) {
-      api
-        .post('/users/login', { email, senha: password })
+      axios
+        .post('http://localhost:4000/users/login', { email, senha: password })
         .then(function (res) {
           const token = res.data.token;
           localStorage.setItem('token', token);

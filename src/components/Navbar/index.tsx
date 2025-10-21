@@ -6,6 +6,7 @@ import { Button } from "react-bootstrap";
 import { PackageIcon, House, ClipboardText, Users, ChartBar, ShoppingCart } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import styles from "./styles.module.css"
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -14,7 +15,6 @@ export default function Navbar() {
   return (
     <div className="p-2">
       <div className="d-flex justify-content-between align-items-center">
-        <h5 className="m-0 fw-bold">Menu</h5>
         <Button
           variant="outline-secondary"
           className="d-md-none"

@@ -1,9 +1,48 @@
 .header {
-  background: linear-gradient(90deg, #e7c9a4, #d1b074);
-  display: flex;
+  background: linear-gradient(90deg, #ff9966, #ff5e62, #ffb347);
+  color: #fff8e7;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  font-family: "Poppins", sans-serif;
 }
 
+.header h1 {
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin-bottom: 0.3rem;
+}
 
+.header p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* A partir de telas médias */
+@media (min-width: 768px) {
+  .header {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 1.5rem 3rem;
+  }
+
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
+  .header p {
+    font-size: 1rem;
+  }
+}
+
+/* A partir de telas grandes */
+@media (min-width: 1200px) {
+  .header {
+    padding: 2rem 6rem;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+  }
+}

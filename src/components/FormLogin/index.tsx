@@ -31,8 +31,8 @@ export default function FormLogin() {
 }
 
 function FormTextLogin() {
-  const [email, setEmail] = useState("adm@gmail.com");
-  const [password, setPassword] = useState("123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 

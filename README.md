@@ -249,5 +249,3 @@ A documentação completa da API com todos os endpoints, métodos HTTP, parâmet
 Para mais informações sobre o projeto Sant' Sapore, entre em contato com nossa equipe de desenvolvimento.
 
 *Sistema desenvolvido como Projeto Integrador - Sant' Sapore 🎂*
-
-

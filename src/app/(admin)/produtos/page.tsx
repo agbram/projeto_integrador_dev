@@ -14,12 +14,35 @@ export default function ProdutosModal() {
   const [warningMessage, setWarningMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const modalityOptions = [
+  const categoryOptions = [
     { value: "Bolos", label: "Bolos" },
     { value: "Doces", label: "Doces" }
   ];
+  const handleSubmit = async (data: any) => {
+    setLoading(true);
+    try {
+      const response = await api.post("/products", data);
+      console.log("Cliente cadastrado:", response.data);
 
+      setSuccessModalShow(true);
+      setModalShow(false);
 
+    } catch (error: any) {
+      console.error("Erro ao cadastrar cliente:", error);
+      if (
+        error.response?.status === 409 ||
+        error.response?.data?.error?.includes("Produto") ||
+        error.response?.data?.error?.includes("já cadastrado")
+      ) {
+        setWarningMessage("Produto já cadastrado no sistema. Verifique os dados e tente novamente.");
+      } else {
+        setWarningMessage("Erro ao cadastrar produto. Tente novamente.");
+      }
+      setWarningModalShow(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -40,16 +63,10 @@ export default function ProdutosModal() {
             title="Cadastro de Produtoss"
             fields={[
               { name: "name", label: "Nome" },
-              {name: "FotoUrl", label:"FotoUrl"},
-              { name: "Descrisão", label: "Descrisão" },
-              { name: "Preço", label: "Preço" },
-              { name: "Receita", label: "Receita" },
-              {
-                name: "Type",
-                label: "Tipo do Produtos",
-                type: "select",
-                options: modalityOptions
-              },
+              {name: "costPrice", label:"Preço de custo"},
+              { name: "markupPercent", label: "Percentual de Markup" },
+              { name: "stockQuantity", label: "Quantidade em estoque" },      
+              { name: "category", label: "Tipo do Produtos", type: "select", options: categoryOptions},
             ]}
 
             submitLabel="Salvar"

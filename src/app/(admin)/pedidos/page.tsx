@@ -7,7 +7,7 @@ import Modal from 'react-bootstrap/Modal';
 import FAB from "@/components/FAB";
 import api from "@/services/api";
 
-export default function ProdutosModal() {
+export default function EstoqueModal() {
   const [modalShow, setModalShow] = useState(false);
   const [successModalShow, setSuccessModalShow] = useState(false);
   const [warningModalShow, setWarningModalShow] = useState(false);
@@ -44,7 +44,7 @@ export default function ProdutosModal() {
               {name: "FotoUrl", label:"FotoUrl"},
               { name: "Descrisão", label: "Descrisão" },
               { name: "Preço", label: "Preço" },
-              { name: "Receita", label: "Receita" },
+              { name: "Quantidade", label: "Quantidade", type: "Quantidade" },
               {
                 name: "Type",
                 label: "Tipo do Produtos",

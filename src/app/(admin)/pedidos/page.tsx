@@ -36,7 +36,6 @@ export default function EstoqueModal() {
         text="+"
       />
       
-      {/* Modal de Cadastro */}
       <Modal
         show={modalShow}
         onHide={() => setModalShow(false)}
@@ -82,7 +81,6 @@ export default function EstoqueModal() {
         </Modal.Footer>
       </Modal>
 
-      {/* Modal de Sucesso */}
       <Modal
         show={successModalShow}
         onHide={() => setSuccessModalShow(false)}
@@ -106,7 +104,6 @@ export default function EstoqueModal() {
         </Modal.Footer>
       </Modal>
 
-      {/* Modal de Warning para CNPJ duplicado */}
       <Modal
         show={warningModalShow}
         onHide={() => setWarningModalShow(false)}

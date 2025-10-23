@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Card from "@/components/Card";
+import Card from "@/components/Cards/Card";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import FAB from "@/components/FAB";
@@ -39,11 +39,11 @@ export default function ProdutosModal() {
       >
         <Modal.Body>
           <Card
-            title="Cadastro de Produtoss"
+            title="Cadastro de Produtos"
             fields={[
               { name: "name", label: "Nome" },
               {name: "FotoUrl", label:"FotoUrl"},
-              { name: "Descrisão", label: "Descrisão" },
+              { name: "Descrisão", label: "Descrição" },
               { name: "Preço", label: "Preço" },
               { name: "Quantidade", label: "Quantidade", type: "Quantidade" },
               {

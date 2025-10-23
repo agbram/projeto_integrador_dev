@@ -1,27 +1,47 @@
 "use client";
 
-import React, { useState } from "react";
-import Card from "@/components/Card";
+import React, { useEffect, useState } from "react";
+import Card from "@/components/Cards/Card";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import FAB from "@/components/FAB";
 import api from "@/services/api";
+import { UserPlusIcon, PencilLineIcon } from "@phosphor-icons/react";
+import CardCliente from "@/components/Cards/CardCliente";
 
 export default function ClientesModal() {
   const [modalShow, setModalShow] = useState(false);
+  const [modalEditShow, setModalEditShow] = useState(false);
   const [successModalShow, setSuccessModalShow] = useState(false);
   const [warningModalShow, setWarningModalShow] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [formStep, setFormStep] = useState<"check" | "register">("check");
   const [cnpjData, setCnpjData] = useState<any>(null);
+  const [clientes, setClientes] = useState<Customer[]>([]);
+  const [selectCliente, setSelectCliente] = useState<Customer>();
 
-    const modalityOptions = [
+  const modalityOptions = [
     { value: "Atacado", label: "Atacado" },
-    { value: "Varejo", label: "Varejo" }
+    { value: "Varejo", label: "Varejo" },
   ];
 
-  /** 🧩 Função para validar CNPJ localmente antes de consultar a API */
+  const fetchClientes = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/customers"); // rota GET dos clientes
+      setClientes(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar clientes:", error);
+      setWarningMessage("Erro ao carregar os clientes cadastrados.");
+      setWarningModalShow(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {fetchClientes();},[]);
+
   const isValidCNPJ = (cnpj: string): boolean => {
     cnpj = cnpj.replace(/[^\d]+/g, "");
 
@@ -69,7 +89,9 @@ export default function ClientesModal() {
     }
 
     if (!isValidCNPJ(cnpj)) {
-      setWarningMessage("CNPJ inválido. Verifique os números e tente novamente.");
+      setWarningMessage(
+        "CNPJ inválido. Verifique os números e tente novamente."
+      );
       setWarningModalShow(true);
       return;
     }
@@ -79,7 +101,9 @@ export default function ClientesModal() {
     try {
       const response = await api.get(`/customers/cnpj-check/${cnpj}`);
       // Se o GET retornar sucesso, o cliente já existe
-      setWarningMessage("CNPJ já cadastrado no sistema. Verifique os dados e tente novamente.");
+      setWarningMessage(
+        "CNPJ já cadastrado no sistema. Verifique os dados e tente novamente."
+      );
       setWarningModalShow(true);
     } catch (error: any) {
       if (error.response?.status === 404) {
@@ -116,7 +140,9 @@ export default function ClientesModal() {
         error.response?.data?.error?.includes("CNPJ") ||
         error.response?.data?.error?.includes("já cadastrado")
       ) {
-        setWarningMessage("CNPJ já cadastrado no sistema. Verifique os dados e tente novamente.");
+        setWarningMessage(
+          "CNPJ já cadastrado no sistema. Verifique os dados e tente novamente."
+        );
       } else {
         setWarningMessage("Erro ao cadastrar cliente. Tente novamente.");
       }
@@ -128,8 +154,62 @@ export default function ClientesModal() {
 
   return (
     <>
-      <FAB onClick={() => setModalShow(true)} text="+" />
+      <div>
+  {clientes.map((cliente) => (
+    <div key={cliente.id} style={{ position: "relative", marginBottom: "20px" }}>
+      <CardCliente
+        title={`Cliente: ${cliente.name}`}
+        customer={cliente}
+        loading={loading}
+        actions={[
+          {
+            label: "Editar",
+            onClick: () => {
+                setSelectCliente(cliente)
+                setModalEditShow(true)
+            }
+        }]}
+      />
+    </div>
+  ))}
+</div>
 
+<Modal
+show={modalEditShow}
+onHide={()=>{
+  setModalEditShow(false);
+}}
+size="lg"
+centered
+>
+  <Modal.Body>
+    <Card
+    title= {`Editar Cliente ${selectCliente?.name}`}
+    fields={[
+                { name: "name", value: selectCliente?.name, label: "Nome"},
+                { name: "contact", value: selectCliente?.contact, label: "Contato" },
+                { name: "email", label: "E-mail", type: "email" },
+                { name: "address", label: "Endereço" },
+                {
+                  name: "modality",
+                  label: "Modalidade do Cliente",
+                  type: "select",
+                  options: modalityOptions,
+                },
+              ]}
+              onSubmit={()=>{
+
+              }}
+              ></Card>
+  </Modal.Body>
+</Modal>
+
+      <FAB
+        onClick={() => setModalShow(true)}
+        text={
+          <UserPlusIcon weight="bold" size={24} style={{ marginLeft: 8 }} />
+        }
+      />
       {/* Modal principal */}
       <Modal
         show={modalShow}
@@ -155,16 +235,16 @@ export default function ClientesModal() {
             <Card
               title="Cadastro de cliente"
               fields={[
-              { name: "name", label: "Nome" },
-              { name: "contact", label: "Contato" },
-              { name: "email", label: "E-mail", type: "email" },
-              { name: "address", label: "Endereço" },
-              { 
-                name: "modality", 
-                label: "Modalidade do Cliente", 
-                type: "select", 
-                options: modalityOptions 
-              },
+                { name: "name", label: "Nome" },
+                { name: "contact", label: "Contato" },
+                { name: "email", label: "E-mail", type: "email" },
+                { name: "address", label: "Endereço" },
+                {
+                  name: "modality",
+                  label: "Modalidade do Cliente",
+                  type: "select",
+                  options: modalityOptions,
+                },
               ]}
               onSubmit={handleSubmit}
               submitLabel="Cadastrar"
@@ -185,7 +265,6 @@ export default function ClientesModal() {
           </Button>
         </Modal.Footer>
       </Modal>
-
       {/* Modal de Sucesso */}
       <Modal
         show={successModalShow}
@@ -205,8 +284,7 @@ export default function ClientesModal() {
           </Button>
         </Modal.Footer>
       </Modal>
-
-      {/* Modal de Aviso */}l
+      {/* Modal de Aviso */}
       <Modal
         show={warningModalShow}
         onHide={() => setWarningModalShow(false)}
@@ -226,8 +304,6 @@ export default function ClientesModal() {
           </Button>
         </Modal.Footer>
       </Modal>
-
-      
     </>
   );
 }

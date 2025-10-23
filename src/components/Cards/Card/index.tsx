@@ -5,8 +5,9 @@ import styles from "./styles.module.css"
 
 type Field = {
   name: string
-  label: string
+  label?: string
   type?: string
+  value?: string
   options?: { value: string; label: string }[] // Adicione esta linha
 }
 
@@ -50,7 +51,7 @@ export default function Card({
             {field.type === 'select' && field.options ? (
               <select
                 name={field.name}
-                value={formData[field.name] || ""}
+                value={formData[field.name]}
                 onChange={handleChange}
                 required
                 disabled={loading || disabled}
@@ -66,7 +67,7 @@ export default function Card({
               <input
                 type={field.type || "text"}
                 name={field.name}
-                value={formData[field.name] || ""}
+                value={formData[field.name] !== undefined ? formData[field.name] : field.value}
                 onChange={handleChange}
                 required
                 disabled={loading || disabled}

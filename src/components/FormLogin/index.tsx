@@ -68,7 +68,7 @@ function FormTextLogin() {
   return (
     <>
     <form onSubmit={handleSubmit}>
-      <FloatingLabel controlId="floatingInput" label="Email address" className="mb-3">
+      <FloatingLabel controlId="floatingInput" label="Email" className="mb-3">
         <Form.Control
           type="email"
           placeholder="name@example.com"
@@ -77,7 +77,7 @@ function FormTextLogin() {
           />
       </FloatingLabel>
 
-      <FloatingLabel controlId="floatingPassword" label="Password" className="mb-3">
+      <FloatingLabel controlId="floatingPassword" label="Senha" className="mb-3">
         <Form.Control
           type="password"
           placeholder="Password"

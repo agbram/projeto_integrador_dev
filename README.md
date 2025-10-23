@@ -5,15 +5,15 @@ Sistema completo para gerenciamento de confeitaria, permitindo o controle de cli
 ## 👨‍💻 Integrantes do Projeto
 
 - **Jean Fiel**
-- **Antônio Gustavo** 
+- **Gustavo Braga** 
 - **Bruno Rudalov**
 
 ## 📋 Descrição do Projeto
 
 Sistema desenvolvido para automatizar e otimizar o gerenciamento de confeitarias, oferecendo funcionalidades completas para:
 - 📝 Cadastro de clientes e produtos
-- 📊 Controle de estoque em tempo real
-- 🛒 Gerenciamento de pedidos via WhatsApp
+- 📊 Controle de estoque semanal
+- 🛒 Recebimento de pedidos via WhatsApp
 - 💰 Controle financeiro e de despesas
 - 👥 Sistema de usuários com permissões
 

@@ -5,7 +5,7 @@ import styles from "./styles.module.css"
 
 type Field = {
   name: string
-  label: string
+  label?: string
   type?: string
   preco?: number
   options?: { value: string; label: string }[] // Adicione esta linha

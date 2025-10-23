@@ -14,11 +14,19 @@ export default function EstoqueModal() {
   const [warningMessage, setWarningMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const modalityOptions = [
+  const typeOptions = [
     { value: "Bolos", label: "Bolos" },
     { value: "Doces", label: "Doces" }
   ];
-
+  const clientsOrdem = [
+      { value: "Bolos", label: "Bolos" },
+      { value: "Doces", label: "Doces" }
+    ];
+    const proutosOrden = [
+      { value: "Bolos", label: "Bolos" },
+      { value: "Doces", label: "Doces" }
+    ];
+    
 
 
   return (
@@ -38,19 +46,28 @@ export default function EstoqueModal() {
       >
         <Modal.Body>
           <Card
-            title="Cadastro de Produtoss"
+            title="Criar pedidos"
             fields={[
-              { name: "name", label: "Nome" },
-              {name: "FotoUrl", label:"FotoUrl"},
-              { name: "Descrisão", label: "Descrisão" },
-              { name: "Preço", label: "Preço" },
-              { name: "Quantidade", label: "Quantidade", type: "Quantidade" },
+              {
+                name: "Type",
+                label: "Clientes",
+                type: "select",
+                options: clientsOrdem
+              },
               {
                 name: "Type",
                 label: "Tipo do Produtos",
                 type: "select",
-                options: modalityOptions
+                options: typeOptions
               },
+              {
+                name: "Type",
+                label: "Produtos",
+                type: "select",
+                options: proutosOrden,
+              },
+            { name: "quantidade", label: "quantidade" },
+              
             ]}
 
             submitLabel="Salvar"

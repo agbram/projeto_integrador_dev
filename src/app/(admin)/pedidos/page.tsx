@@ -1,48 +1,33 @@
 "use client";
 
 import React, { useState } from "react";
-import Card from "@/components/Cards/Card";
+import Card from "@/components/Card";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import FAB from "@/components/FAB";
 import api from "@/services/api";
 
-export default function ProdutosModal() {
+export default function EstoqueModal() {
   const [modalShow, setModalShow] = useState(false);
   const [successModalShow, setSuccessModalShow] = useState(false);
   const [warningModalShow, setWarningModalShow] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const categoryOptions = [
+  const typeOptions = [
     { value: "Bolos", label: "Bolos" },
     { value: "Doces", label: "Doces" }
   ];
-  const handleSubmit = async (data: any) => {
-    setLoading(true);
-    try {
-      const response = await api.post("/products", data);
-      console.log("Cliente cadastrado:", response.data);
+  const clientsOrdem = [
+      { value: "Bolos", label: "Bolos" },
+      { value: "Doces", label: "Doces" }
+    ];
+    const proutosOrden = [
+      { value: "Bolos", label: "Bolos" },
+      { value: "Doces", label: "Doces" }
+    ];
+    
 
-      setSuccessModalShow(true);
-      setModalShow(false);
-
-    } catch (error: any) {
-      console.error("Erro ao cadastrar cliente:", error);
-      if (
-        error.response?.status === 409 ||
-        error.response?.data?.error?.includes("Produto") ||
-        error.response?.data?.error?.includes("já cadastrado")
-      ) {
-        setWarningMessage("Produto já cadastrado no sistema. Verifique os dados e tente novamente.");
-      } else {
-        setWarningMessage("Erro ao cadastrar produto. Tente novamente.");
-      }
-      setWarningModalShow(true);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <>
@@ -60,13 +45,28 @@ export default function ProdutosModal() {
       >
         <Modal.Body>
           <Card
-            title="Cadastro de Produtos"
+            title="Criar pedidos"
             fields={[
-              { name: "name", label: "Nome" },
-              {name: "costPrice", label:"Preço de custo"},
-              { name: "markupPercent", label: "Percentual de Markup" },
-              { name: "stockQuantity", label: "Quantidade em estoque" },      
-              { name: "category", label: "Tipo do Produtos", type: "select", options: categoryOptions},
+              {
+                name: "Type",
+                label: "Clientes",
+                type: "select",
+                options: clientsOrdem
+              },
+              {
+                name: "Type",
+                label: "Tipo do Produtos",
+                type: "select",
+                options: typeOptions
+              },
+              {
+                name: "Type",
+                label: "Produtos",
+                type: "select",
+                options: proutosOrden,
+              },
+            { name: "quantidade", label: "quantidade" },
+              
             ]}
 
             submitLabel="Salvar"
@@ -103,7 +103,6 @@ export default function ProdutosModal() {
           </Button>
         </Modal.Footer>
       </Modal>
-
 
       <Modal
         show={warningModalShow}

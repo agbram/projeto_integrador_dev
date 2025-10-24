@@ -1,69 +1,210 @@
-/* NAVBAR BASE - padrão mobile */
-.navbar {
-  background: linear-gradient(180deg, #ff9966, #ff5e62, #ffb347);
-  border-radius: 0;
-  padding: 0.8rem 1rem;
-  box-shadow: none;
+/* ============================
+   NAVBAR PRINCIPAL
+============================ */
+.headerWrapper {
+  display: flex;
+  flex-direction: column;
+  background: #402727;
   transition: all 0.3s ease;
+  box-shadow: none;
+  border-radius: 0;
 }
 
-/* LINKS */
-.navLink {
-  color: #fff8e7 !important;
-  font-weight: 500;
-  font-size: 0.95rem;
+
+.Nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+
+.Nav :global(.nav-link) {
+  color: #fff8e7;
+  background-color: transparent;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-weight: 550;
+  font-size: 0.95rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 0.8rem;
-  transition: background 0.3s ease, transform 0.2s ease;
 }
 
-.navLink:last-child {
+
+.Nav :global(.nav-link:last-child) {
   border-bottom: none;
 }
 
-.Navbar:first-child .navLink {
-
-} 
-
-.navLink:hover {
+/* HOVER */
+.Nav :global(.nav-link:hover) {
   background: rgba(255, 255, 255, 0.15);
   transform: translateY(-2px);
+  color: #ffffff;
 }
 
-.navLink.active {
-  background: rgba(255, 255, 255, 0.25);
-  font-weight: 600;
-  color: #fff;
+
+.activeLink,
+.Nav :global(.nav-link.active) {
+  background-color: #dec5a3;
+  color: #3d2d22;
+  border-bottom: none;
 }
 
-/* ÍCONES */
+
 .Icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   vertical-align: middle;
-  margin-right: 0.5rem;
+  margin-right: 0.4rem;
   opacity: 0.9;
   transition: all 0.2s ease-in-out;
 }
 
 .fufilledIcon {
+  color: #3d2d22; /* cor do ícone ativo */
   opacity: 1;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.12));
   transform: scale(1.1);
 }
 
-/* DESKTOP (>= 768px) */
+/* TEXTO AO LADO DO ÍCONE */
+.linkText {
+  display: inline-block;
+}
+
+/* ============================
+   SUBBAR (título, busca e botões)
+============================ */
+.subbar {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px 0 12px;
+}
+
+.pageTitle {
+  color: #fff8e7;
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+/* INPUT DE BUSCA */
+.actionsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.searchBox {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 6px 10px;
+  display: flex;        /* permite alinhar ícone e input */
+  align-items: center;  /* centraliza verticalmente */
+  gap: 6px;
+}
+
+.searchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  width: 220px;
+  
+}
+
+/* BOTÕES FILTRAR E ADD */
+.subBtn,
+.addBtn {
+  border-radius: 8px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff8e7;
+  border: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.addBtn{
+  display: inline-flex; /* ou flex */
+  align-items: center;  /* centraliza verticalmente */
+  gap: 6px;
+}
+
+.subBtn:hover,
+.addBtn:hover {
+  background: rgba(255, 255, 255, 0.35);
+  color: #fff;
+}
+
+
+/* BOTÃO DO DROPDOWN (Filtrar) */
+.filterBtn {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #fff8e7 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.filterBtn:hover,
+.filterBtn:focus,
+.filterBtn:active,
+.show > .filterBtn.dropdown-toggle {
+  background: rgba(255, 255, 255, 0.35) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+/* MENU DO DROPDOWN */
+.filterDropdown :global(.dropdown-menu) {
+  background-color: #cfae86;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 6px 0;
+}
+
+.filterDropdown :global(.dropdown-item) {
+  color: #fff8e7;
+  padding: 8px 16px;
+  transition: all 0.2s ease-in-out;
+}
+
+.filterDropdown :global(.dropdown-item:hover) {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+
+/* ============================
+   RESPONSIVIDADE
+============================ */
 @media (min-width: 768px) {
-  .navbar {
-    background: linear-gradient(90deg, #ff9966, #ff5e62, #ffb347);
+  .headerWrapper {
     border-radius: 12px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }
 
-  .navLink {
+  .Nav :global(.nav-link) {
     border: none;
     border-radius: 8px;
-    padding: 0.5rem 1rem;
+    padding: 0.6rem 1rem;
+  }
+
+  .searchInput {
+    width: 280px;
   }
 }

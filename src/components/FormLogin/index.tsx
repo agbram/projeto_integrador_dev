@@ -23,8 +23,6 @@ export default function FormLogin() {
         />
       </span>
 
-      <h2>Bem-vinda!</h2>
-
       <FormTextLogin />
     </div>
   );

@@ -1,4 +1,5 @@
 .container{
+    display: none;
     position: fixed;
     bottom: 64px;
     right: 32px;
@@ -10,4 +11,5 @@
     display: flex;
     align-content: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    
 }

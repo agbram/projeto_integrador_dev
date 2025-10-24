@@ -11,7 +11,7 @@ type Props = {
 export default function FAB(props: Props){
 
     return(
-        <Button variant="primary" onClick={props.onClick} className={styles.container}>
+        <Button variant="dark" onClick={props.onClick} className={styles.container}>
                 {props.text}
         </Button>
     )

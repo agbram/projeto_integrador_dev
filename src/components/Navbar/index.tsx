@@ -10,6 +10,7 @@ import {
   UsersIcon,
   ChartBarIcon,
   ShoppingCartIcon,
+  InvoiceIcon,
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -42,6 +43,7 @@ export default function Navbar() {
                 weight={isActive("/") ? "fill" : "regular"}
                 className={`${styles.Icon} ${isActive("/") ? styles.fufilledIcon : ""}`}
               />
+              
               Homepage
             </Nav.Link>
           </Nav.Item>
@@ -88,8 +90,17 @@ export default function Navbar() {
               />
               Relatórios
             </Nav.Link>
-          </Nav.Item>
 
+          </Nav.Item>
+          <Nav.Link as={Link} href="/despesas" eventKey="/despesas">
+                <InvoiceIcon
+                  size={20}
+                  weight={isActive("/despesas") ? "fill" : "regular"}
+                  className={`${styles.Icon} ${isActive("/despesas") ? styles.fufilledIcon : ""}`}
+                />
+                despesas
+              </Nav.Link>
+              
           <Nav.Item>
             <Nav.Link as={Link} href="/pedidos" eventKey="/pedidos">
               <ShoppingCartIcon
@@ -99,7 +110,7 @@ export default function Navbar() {
               />
               Pedidos
             </Nav.Link>
-          </Nav.Item>
+          </Nav.Item>   
         </Nav>
       </div>
     </div>

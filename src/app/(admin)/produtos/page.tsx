@@ -2,10 +2,11 @@
 
 import React, { useState } from "react";
 import Card from "@/components/Cards/Card";
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 import FAB from "@/components/FAB";
 import api from "@/services/api";
+import styles from "./styles.module.css";
 
 export default function ProdutosModal() {
   const [modalShow, setModalShow] = useState(false);
@@ -16,7 +17,7 @@ export default function ProdutosModal() {
 
   const categoryOptions = [
     { value: "Bolos", label: "Bolos" },
-    { value: "Doces", label: "Doces" }
+    { value: "Doces", label: "Doces" },
   ];
   const handleSubmit = async (data: any) => {
     setLoading(true);
@@ -26,7 +27,6 @@ export default function ProdutosModal() {
 
       setSuccessModalShow(true);
       setModalShow(false);
-
     } catch (error: any) {
       console.error("Erro ao cadastrar cliente:", error);
       if (
@@ -34,7 +34,9 @@ export default function ProdutosModal() {
         error.response?.data?.error?.includes("Produto") ||
         error.response?.data?.error?.includes("já cadastrado")
       ) {
-        setWarningMessage("Produto já cadastrado no sistema. Verifique os dados e tente novamente.");
+        setWarningMessage(
+          "Produto já cadastrado no sistema. Verifique os dados e tente novamente."
+        );
       } else {
         setWarningMessage("Erro ao cadastrar produto. Tente novamente.");
       }
@@ -46,36 +48,43 @@ export default function ProdutosModal() {
 
   return (
     <>
-      <FAB
-        onClick={() => setModalShow(true)}
-        text="+"
-      />
-      
+      <FAB onClick={() => setModalShow(true)} text="+" />
       <Modal
         show={modalShow}
         onHide={() => setModalShow(false)}
         size="lg"
         aria-labelledby="contained-modal-title-vcenter"
         centered
+        className={styles.modal}
       >
-        <Modal.Body>
+        <Modal.Body className={styles.modalBody}>
           <Card
             title="Cadastro de Produtos"
             fields={[
               { name: "name", label: "Nome" },
-              {name: "costPrice", label:"Preço de custo"},
+              { name: "costPrice", label: "Preço de custo" },
               { name: "markupPercent", label: "Percentual de Markup" },
-              { name: "stockQuantity", label: "Quantidade em estoque" },      
-              { name: "category", label: "Tipo do Produtos", type: "select", options: categoryOptions},
+              { name: "stockQuantity", label: "Quantidade em estoque" },
+              {
+                name: "category",
+                label: "Tipo do Produtos",
+                type: "select",
+                options: categoryOptions,
+              },
             ]}
-
             submitLabel="Salvar"
-            loading={loading} onSubmit={function (data: Record<string, string>): void {
+            loading={loading}
+            onSubmit={function (data: Record<string, string>): void {
               throw new Error("Function not implemented.");
-            } }          />
+            }}
+          />
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setModalShow(false)}>
+        <Modal.Footer className={styles.modalFooter}>
+          <Button
+            variant="secondary"
+            onClick={() => setModalShow(false)}
+            className={styles.button}
+          >
             Fechar
           </Button>
         </Modal.Footer>
@@ -87,23 +96,28 @@ export default function ProdutosModal() {
         size="sm"
         aria-labelledby="contained-modal-title-vcenter"
         centered
+        className={styles.successModal}
       >
-        <Modal.Body className="text-center">
-          <div className="mb-3">
-            <div style={{ fontSize: '48px', color: '#28a745' }}>✓</div>
+        <Modal.Body className={`text-center ${styles.successModalBody}`}>
+          <div className={`mb-3 ${styles.successIconContainer}`}>
+            <div className={styles.successIcon}>✓</div>
           </div>
-          <h5>Produtos cadastrado com sucesso!</h5>
+          <h5 className={styles.successTitle}>
+            Produtos cadastrado com sucesso!
+          </h5>
         </Modal.Body>
-        <Modal.Footer className="justify-content-center">
-          <Button 
-            variant="success" 
+        <Modal.Footer
+          className={`justify-content-center ${styles.successModalFooter}`}
+        >
+          <Button
+            variant="success"
             onClick={() => setSuccessModalShow(false)}
+            className={styles.successButton}
           >
             OK
           </Button>
         </Modal.Footer>
       </Modal>
-
 
       <Modal
         show={warningModalShow}
@@ -111,18 +125,22 @@ export default function ProdutosModal() {
         size="sm"
         aria-labelledby="contained-modal-title-vcenter"
         centered
+        className={styles.warningModal}
       >
-        <Modal.Body className="text-center">
-          <div className="mb-3">
-            <div style={{ fontSize: '48px', color: '#ffc107' }}>⚠️</div>
+        <Modal.Body className={`text-center ${styles.warningModalBody}`}>
+          <div className={`mb-3 ${styles.warningIconContainer}`}>
+            <div className={styles.warningIcon}>⚠️</div>
           </div>
-          <h5>Atenção</h5>
-          <p>{warningMessage}</p>
+          <h5 className={styles.warningTitle}>Atenção</h5>
+          <p className={styles.warningMessage}>{warningMessage}</p>
         </Modal.Body>
-        <Modal.Footer className="justify-content-center">
-          <Button 
-            variant="warning" 
+        <Modal.Footer
+          className={`justify-content-center ${styles.warningModalFooter}`}
+        >
+          <Button
+            variant="warning"
             onClick={() => setWarningModalShow(false)}
+            className={styles.warningButton}
           >
             Entendi
           </Button>

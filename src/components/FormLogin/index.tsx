@@ -17,13 +17,11 @@ export default function FormLogin() {
       <span className={styles.logotipo}>
         <Image
           src="/imgs/logo.png"
-          alt="logo do trem"
+          alt="logo sAnt's Sapore"
           fill
           style={{ objectFit: "contain" }}
         />
       </span>
-
-      <h2>Bem-vinda de volta!</h2>
 
       <FormTextLogin />
     </div>

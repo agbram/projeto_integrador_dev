@@ -1,6 +1,5 @@
 'use client'
 
-import FAB from "@/components/FAB"
 import styles from "./styles.module.css"
 
 type Customer = {
@@ -44,7 +43,6 @@ export default function CardCliente({ title, customer, loading = false, actions 
           {actions?.map((action, index)=>
               <button key={index} onClick={action.onClick}>
                 {action.label}
-
               </button>
             )}
         </div>

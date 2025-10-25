@@ -6,7 +6,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import FAB from "@/components/FAB";
 import api from "@/services/api";
-import { UserPlusIcon, PencilLineIcon } from "@phosphor-icons/react";
+import { UserPlusIcon } from "@phosphor-icons/react";
 import CardCliente from "@/components/Cards/CardCliente";
 
 export default function ClientesModal() {
@@ -17,9 +17,10 @@ export default function ClientesModal() {
   const [warningMessage, setWarningMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [formStep, setFormStep] = useState<"check" | "register">("check");
-  const [cnpjData, setCnpjData] = useState<any>(null);
+  const [docData, setDocData] = useState<any>(null);
   const [clientes, setClientes] = useState<Customer[]>([]);
   const [selectCliente, setSelectCliente] = useState<Customer>();
+  const [documentValue, setDocumentValue] = useState(""); // <- controla o valor do input
 
   const modalityOptions = [
     { value: "Atacado", label: "Atacado" },
@@ -29,7 +30,7 @@ export default function ClientesModal() {
   const fetchClientes = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/customers"); // rota GET dos clientes
+      const response = await api.get("/customers");
       setClientes(response.data);
     } catch (error) {
       console.error("Erro ao buscar clientes:", error);
@@ -40,15 +41,32 @@ export default function ClientesModal() {
     }
   };
 
-  useEffect(() => {fetchClientes();},[]);
+  useEffect(() => {
+    fetchClientes();
+  }, []);
 
+  // ✅ Validação de CPF
+  const isValidCPF = (cpf: string): boolean => {
+    cpf = cpf.replace(/[^\d]+/g, "");
+    if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+
+    let soma = 0;
+    for (let i = 0; i < 9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
+    let resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf.charAt(9))) return false;
+
+    soma = 0;
+    for (let i = 0; i < 10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    return resto === parseInt(cpf.charAt(10));
+  };
+
+  // ✅ Validação de CNPJ
   const isValidCNPJ = (cnpj: string): boolean => {
     cnpj = cnpj.replace(/[^\d]+/g, "");
-
-    if (cnpj.length !== 14) return false;
-
-    // Elimina CNPJs conhecidos como inválidos
-    if (/^(\d)\1+$/.test(cnpj)) return false;
+    if (cnpj.length !== 14 || /^(\d)\1+$/.test(cnpj)) return false;
 
     let tamanho = cnpj.length - 2;
     let numeros = cnpj.substring(0, tamanho);
@@ -64,7 +82,7 @@ export default function ClientesModal() {
     let resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
     if (resultado !== parseInt(digitos.charAt(0))) return false;
 
-    tamanho = tamanho + 1;
+    tamanho++;
     numeros = cnpj.substring(0, tamanho);
     soma = 0;
     pos = tamanho - 7;
@@ -77,40 +95,59 @@ export default function ClientesModal() {
     return resultado === parseInt(digitos.charAt(1));
   };
 
-  // Verificação inicial de CNPJ
-  const cadastroCnpj = async (data: any) => {
-    const cnpj = data.cnpj.replace(/\D/g, "");
+  // ✅ Máscara dinâmica CPF/CNPJ
+  const applyMask = (value: string): string => {
+    const numbers = value.replace(/\D/g, "");
+    if (numbers.length <= 11) {
+      return numbers
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    } else {
+      return numbers
+        .replace(/^(\d{2})(\d)/, "$1.$2")
+        .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+        .replace(/\.(\d{3})(\d)/, ".$1/$2")
+        .replace(/(\d{4})(\d)/, "$1-$2");
+    }
+  };
 
-    // ✅ 1. Verifica se o campo foi preenchido e se o formato é válido
-    if (!cnpj) {
-      setWarningMessage("Por favor, informe um CNPJ.");
+  // ✅ Verificação inicial (CPF/CNPJ)
+  const verificarDocumento = async (data: any) => {
+    const doc = data.documento.replace(/\D/g, "");
+    const tipo = doc.length <= 11 ? "cpf" : "cnpj";
+
+    if (!doc) {
+      setWarningMessage("Por favor, informe um CPF ou CNPJ.");
       setWarningModalShow(true);
       return;
     }
 
-    if (!isValidCNPJ(cnpj)) {
-      setWarningMessage(
-        "CNPJ inválido. Verifique os números e tente novamente."
-      );
+    if (tipo === "cpf" && !isValidCPF(doc)) {
+      setWarningMessage("CPF inválido. Verifique e tente novamente.");
       setWarningModalShow(true);
       return;
     }
 
-    // ✅ 2. Só faz a requisição se o CNPJ for válido
+    if (tipo === "cnpj" && !isValidCNPJ(doc)) {
+      setWarningMessage("CNPJ inválido. Verifique e tente novamente.");
+      setWarningModalShow(true);
+      return;
+    }
+
     setLoading(true);
     try {
-      const response = await api.get(`/customers/cnpj-check/${cnpj}`);
-      // Se o GET retornar sucesso, o cliente já existe
+      const response = await api.get(`/customers/doc-check/${doc}`);
       setWarningMessage(
-        "CNPJ já cadastrado no sistema. Verifique os dados e tente novamente."
+        `${tipo.toUpperCase()} já cadastrado no sistema. Verifique os dados e tente novamente.`
       );
       setWarningModalShow(true);
     } catch (error: any) {
       if (error.response?.status === 404) {
-        setCnpjData({ cnpj: data.cnpj });
+        setDocData({ documento: data.documento, tipo });
         setFormStep("register");
       } else {
-        setWarningMessage("Erro ao verificar CNPJ. Tente novamente.");
+        setWarningMessage("Erro ao verificar documento. Tente novamente.");
         setWarningModalShow(true);
       }
     } finally {
@@ -118,13 +155,13 @@ export default function ClientesModal() {
     }
   };
 
-  // Cadastro completo do cliente
+  // ✅ Cadastro do cliente
   const handleSubmit = async (data: any) => {
     setLoading(true);
     try {
       const formattedData = {
         ...data,
-        cnpj: cnpjData?.cnpj.replace(/\D/g, ""),
+        [docData.tipo]: docData.documento.replace(/\D/g, ""),
       };
 
       const response = await api.post("/customers", formattedData);
@@ -135,175 +172,148 @@ export default function ClientesModal() {
       setFormStep("check");
     } catch (error: any) {
       console.error("Erro ao cadastrar cliente:", error);
-      if (
-        error.response?.status === 409 ||
-        error.response?.data?.error?.includes("CNPJ") ||
-        error.response?.data?.error?.includes("já cadastrado")
-      ) {
-        setWarningMessage(
-          "CNPJ já cadastrado no sistema. Verifique os dados e tente novamente."
-        );
-      } else {
-        setWarningMessage("Erro ao cadastrar cliente. Tente novamente.");
-      }
+      setWarningMessage("Erro ao cadastrar cliente. Tente novamente.");
       setWarningModalShow(true);
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <>
-      <div>
-  {clientes.map((cliente) => (
-    <div key={cliente.id} style={{ position: "relative", marginBottom: "20px" }}>
-      <CardCliente
-        title={`Cliente: ${cliente.name}`}
-        customer={cliente}
-        loading={loading}
-        actions={[
-          {
-            label: "Editar",
-            onClick: () => {
-                setSelectCliente(cliente)
-                setModalEditShow(true)
-            }
-        }]}
-      />
+return (
+  <>
+    <div>
+      {clientes.map((cliente) => (
+        <div
+          key={cliente.id}
+          style={{ position: "relative", marginBottom: "20px" }}
+        >
+          <CardCliente
+            title={`Cliente: ${cliente.name}`}
+            customer={cliente}
+            loading={loading}
+            actions={[
+              {
+                label: "Editar",
+                onClick: () => {
+                  setSelectCliente(cliente);
+                  setModalEditShow(true);
+                },
+              },
+            ]}
+          />
+        </div>
+      ))}
     </div>
-  ))}
-</div>
 
-<Modal
-show={modalEditShow}
-onHide={()=>{
-  setModalEditShow(false);
-}}
-size="lg"
-centered
->
-  <Modal.Body>
-    <Card
-    title= {`Editar Cliente ${selectCliente?.name}`}
-    fields={[
-                { name: "name", value: selectCliente?.name, label: "Nome"},
-                { name: "contact", value: selectCliente?.contact, label: "Contato" },
-                { name: "email", label: "E-mail", type: "email" },
-                { name: "address", label: "Endereço" },
-                {
-                  name: "modality",
-                  label: "Modalidade do Cliente",
-                  type: "select",
-                  options: modalityOptions,
-                },
-              ]}
-              onSubmit={()=>{
+    {/* Modal principal */}
+    <Modal
+      show={modalShow}
+      onHide={() => {
+        setModalShow(false);
+        setFormStep("check");
+        setDocumentValue("");
+      }}
+      size="lg"
+      centered
+    >
+      <Modal.Body>
+        {formStep === "check" && (
+          <Card
+            title="Verificar CPF ou CNPJ"
+            fields={[
+              {
+                name: "documento",
+                label: "CPF ou CNPJ",
+                type: "text",
+                value: documentValue, // Valor controlado externamente
+              },
+            ]}
+            onChange={(name, value) => {
+              if (name === "documento") {
+                setDocumentValue(applyMask(value));
+              }
+            }}
+            onSubmit={() => verificarDocumento({ documento: documentValue })}
+            submitLabel="Próximo"
+            loading={loading}
+          />
+        )}
 
-              }}
-              ></Card>
-  </Modal.Body>
-</Modal>
-
-      <FAB
-        onClick={() => setModalShow(true)}
-        text={
-          <UserPlusIcon weight="bold" size={24} style={{ marginLeft: 8 }} />
-        }
-      />
-      {/* Modal principal */}
-      <Modal
-        show={modalShow}
-        onHide={() => {
-          setModalShow(false);
-          setFormStep("check");
-        }}
-        size="lg"
-        centered
-      >
-        <Modal.Body>
-          {formStep === "check" && (
-            <Card
-              title="Verificar CNPJ"
-              fields={[{ name: "cnpj", label: "CNPJ" }]}
-              onSubmit={cadastroCnpj}
-              submitLabel="Próximo"
-              loading={loading}
-            />
-          )}
-
-          {formStep === "register" && (
-            <Card
-              title="Cadastro de cliente"
-              fields={[
-                { name: "name", label: "Nome" },
-                { name: "contact", label: "Contato" },
-                { name: "email", label: "E-mail", type: "email" },
-                { name: "address", label: "Endereço" },
-                {
-                  name: "modality",
-                  label: "Modalidade do Cliente",
-                  type: "select",
-                  options: modalityOptions,
-                },
-              ]}
-              onSubmit={handleSubmit}
-              submitLabel="Cadastrar"
-              loading={loading}
-            />
-          )}
-        </Modal.Body>
-
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => {
+        {formStep === "register" && (
+          <Card
+            title="Cadastro de cliente"
+            fields={[
+              { name: "name", label: "Nome" },
+              { name: "contact", label: "Contato" },
+              { name: "email", label: "E-mail", type: "email" },
+              { name: "address", label: "Endereço" },
+              {
+                name: "modality",
+                label: "Modalidade do Cliente",
+                type: "select",
+                options: modalityOptions,
+              },
+            ]}
+            onSubmit={handleSubmit}
+            submitLabel="Cadastrar"
+            loading={loading}
+            showCancel
+            onCancel={() => {
               setModalShow(false);
               setFormStep("check");
             }}
-          >
-            Fechar
-          </Button>
-        </Modal.Footer>
-      </Modal>
-      {/* Modal de Sucesso */}
-      <Modal
-        show={successModalShow}
-        onHide={() => setSuccessModalShow(false)}
-        size="sm"
-        centered
-      >
-        <Modal.Body className="text-center">
-          <div className="mb-3" style={{ fontSize: "48px", color: "#28a745" }}>
-            ✓
-          </div>
-          <h5>Cliente cadastrado com sucesso!</h5>
-        </Modal.Body>
-        <Modal.Footer className="justify-content-center">
-          <Button variant="success" onClick={() => setSuccessModalShow(false)}>
-            OK
-          </Button>
-        </Modal.Footer>
-      </Modal>
-      {/* Modal de Aviso */}
-      <Modal
-        show={warningModalShow}
-        onHide={() => setWarningModalShow(false)}
-        size="sm"
-        centered
-      >
-        <Modal.Body className="text-center">
-          <div className="mb-3" style={{ fontSize: "48px", color: "#ffc107" }}>
-            ⚠️
-          </div>
-          <h5>Atenção</h5>
-          <p>{warningMessage}</p>
-        </Modal.Body>
-        <Modal.Footer className="justify-content-center">
-          <Button variant="warning" onClick={() => setWarningModalShow(false)}>
-            Entendi
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </>
-  );
+          />
+        )}
+      </Modal.Body>
+    </Modal>
+
+    {/* FAB */}
+    <FAB
+      onClick={() => setModalShow(true)}
+      text={<UserPlusIcon weight="bold" size={24} style={{ marginLeft: 8 }} />}
+    />
+
+    {/* Modal de sucesso */}
+    <Modal
+      show={successModalShow}
+      onHide={() => setSuccessModalShow(false)}
+      size="sm"
+      centered
+    >
+      <Modal.Body className="text-center">
+        <div className="mb-3" style={{ fontSize: "48px", color: "#28a745" }}>
+          ✓
+        </div>
+        <h5>Cliente cadastrado com sucesso!</h5>
+      </Modal.Body>
+      <Modal.Footer className="justify-content-center">
+        <Button variant="success" onClick={() => setSuccessModalShow(false)}>
+          OK
+        </Button>
+      </Modal.Footer>
+    </Modal>
+
+    {/* Modal de aviso */}
+    <Modal
+      show={warningModalShow}
+      onHide={() => setWarningModalShow(false)}
+      size="sm"
+      centered
+    >
+      <Modal.Body className="text-center">
+        <div className="mb-3" style={{ fontSize: "48px", color: "#ffc107" }}>
+          ⚠️
+        </div>
+        <h5>Atenção</h5>
+        <p>{warningMessage}</p>
+      </Modal.Body>
+      <Modal.Footer className="justify-content-center">
+        <Button variant="warning" onClick={() => setWarningModalShow(false)}>
+          Entendi
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  </>
+);
+
 }

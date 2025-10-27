@@ -117,7 +117,7 @@ export default function Card({
             className={styles.button}
             disabled={loading || disabled}
           >
-            {loading ? "Cadastrando..." : submitLabel}
+            {loading ? "Verificando..." : submitLabel}  
           </button>
         </div>
       </form>

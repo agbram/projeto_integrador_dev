@@ -10,6 +10,8 @@ export default function Header() {
         <div className={styles.logoArea}>
           <h1 className={styles.title}>Sant{"' Sapore"}</h1>
         </div>
+
+        {/* Navbar já contém a subbar (título, busca, ações) — o Navbar ficará ao lado do título em telas maiores */}
         <Navbar />
       </div>
     </header>

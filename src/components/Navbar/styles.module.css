@@ -1,6 +1,6 @@
-/* ============================
-   NAVBAR PRINCIPAL
-============================ */
+/* Navbar.module.css - centralização e responsividade */
+
+/* container do header do navbar (cor de fundo preservada) */
 .headerWrapper {
   display: flex;
   flex-direction: column;
@@ -8,43 +8,52 @@
   transition: all 0.3s ease;
   box-shadow: none;
   border-radius: 0;
+  padding: 12px 0;
 }
 
+/* inner que limita largura e centraliza como no exemplo beige */
+.headerInner {
+  width: 100%;
+  max-width: 1200px; /* centraliza e "junta" o conteúdo no centro */
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  justify-content: space-between; /* nav no centro, ações à direita */
+}
 
+/* NAV principal (menu de páginas) */
 .Nav {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
+  flex-wrap: wrap; /* permite quebrar em mobile se aberto */
+  margin: 0 auto;
 }
 
-
+/* estilização dos links (usa o global do bootstrap/nav-link) */
 .Nav :global(.nav-link) {
   color: #fff8e7;
   background-color: transparent;
   border-radius: 10px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 8px 14px;
+  gap: 8px;
+  padding: 8px 12px;
   font-weight: 550;
   font-size: 0.95rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.18s ease, background 0.18s ease;
 }
 
-
-.Nav :global(.nav-link:last-child) {
-  border-bottom: none;
-}
-
-/* HOVER */
 .Nav :global(.nav-link:hover) {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
   transform: translateY(-2px);
   color: #ffffff;
 }
-
 
 .activeLink,
 .Nav :global(.nav-link.active) {
@@ -53,7 +62,7 @@
   border-bottom: none;
 }
 
-
+/* ícone do menu */
 .Icon {
   flex-shrink: 0;
   width: 18px;
@@ -63,54 +72,55 @@
   justify-content: center;
   vertical-align: middle;
   margin-right: 0.4rem;
-  opacity: 0.9;
+  opacity: 0.95;
   transition: all 0.2s ease-in-out;
 }
 
 .fufilledIcon {
-  color: #3d2d22; /* cor do ícone ativo */
+  color: #3d2d22;
   opacity: 1;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.12));
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
-/* TEXTO AO LADO DO ÍCONE */
 .linkText {
   display: inline-block;
 }
 
-/* ============================
-   SUBBAR (título, busca e botões)
-============================ */
+/* SUBBAR (título, busca e botões) */
 .subbar {
-  margin-top: 14px;
+  margin-top: 10px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 8px 12px 0 12px;
+  justify-content: flex-end; /* ações ficam à direita do grupo central */
+  gap: 12px;
+  width: 100%;
 }
 
+/* título da página — na esquerda do bloco de ações */
 .pageTitle {
   color: #fff8e7;
   margin: 0;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 600;
+  margin-right: 12px;
 }
 
-/* INPUT DE BUSCA */
+/* actions */
 .actionsRow {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
+/* busca */
 .searchBox {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   padding: 6px 10px;
-  display: flex;        /* permite alinhar ícone e input */
-  align-items: center;  /* centraliza verticalmente */
-  gap: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .searchInput {
@@ -120,55 +130,47 @@
   outline: none;
   color: #fff;
   width: 220px;
-  
 }
 
-/* BOTÕES FILTRAR E ADD */
+/* botões */
 .subBtn,
 .addBtn {
   border-radius: 8px;
   padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.18);
   color: #fff8e7;
   border: none;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.18s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.addBtn{
-  display: inline-flex; /* ou flex */
-  align-items: center;  /* centraliza verticalmente */
-  gap: 6px;
+.addBtn {
+  background: #fff8e7; /* manter estilo de botão claro como antes? se não quiser, troque por rgba */
+  color: #3d2d22;
+  padding: 6px 10px;
 }
 
 .subBtn:hover,
 .addBtn:hover {
-  background: rgba(255, 255, 255, 0.35);
-  color: #fff;
+  filter: brightness(0.95);
+  transform: translateY(-2px);
 }
 
-
-/* BOTÃO DO DROPDOWN (Filtrar) */
+/* dropdown (filtrar) */
 .filterBtn {
-  background: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
   color: #fff8e7 !important;
   border: none !important;
   border-radius: 8px !important;
   padding: 6px 12px !important;
   display: flex;
   align-items: center;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.18s ease-in-out;
 }
 
-.filterBtn:hover,
-.filterBtn:focus,
-.filterBtn:active,
-.show > .filterBtn.dropdown-toggle {
-  background: rgba(255, 255, 255, 0.35) !important;
-  color: #fff !important;
-  box-shadow: none !important;
-}
-
-/* MENU DO DROPDOWN */
+/* menu do dropdown */
 .filterDropdown :global(.dropdown-menu) {
   background-color: #cfae86;
   border: none;
@@ -180,30 +182,87 @@
 .filterDropdown :global(.dropdown-item) {
   color: #fff8e7;
   padding: 8px 16px;
-  transition: all 0.2s ease-in-out;
 }
 
-.filterDropdown :global(.dropdown-item:hover) {
-  background-color: rgba(255, 255, 255, 0.15);
-  color: #fff;
-}
-
-
-/* ============================
-   RESPONSIVIDADE
-============================ */
+/* RESPONSIVIDADE */
+/* telas médias pra cima - mantém o agrupamento central com mais espaço */
 @media (min-width: 768px) {
   .headerWrapper {
     border-radius: 12px;
+    padding: 16px 0;
+  }
+
+  .headerInner {
+    padding: 0 28px;
   }
 
   .Nav :global(.nav-link) {
     border: none;
     border-radius: 8px;
     padding: 0.6rem 1rem;
+    font-size: 0.97rem;
   }
 
   .searchInput {
     width: 280px;
+  }
+}
+
+/* MOBILE: layout vertical mais compacto e mantendo tudo no topo */
+@media (max-width: 767px) {
+  .headerInner {
+    padding: 0 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  /* título e add em uma linha (o título é renderizado no Header.tsx, mas garantimos comportamento se estiver aqui também) */
+  .pageTitle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* título à esquerda, add à direita */
+    font-size: 1.25rem;
+    margin-bottom: 6px;
+  }
+
+  .subbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .actionsRow {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .searchBox {
+    width: 100%;
+  }
+
+  .searchInput {
+    width: 100%;
+  }
+
+  /* nav hidden por padrão via d-none/d-block (controlado pelo componente). Quando visível, que ocupe 100% e permita scroll horizontal */
+  .Nav {
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+    padding-bottom: 4px;
+  }
+
+  .Nav :global(.nav-link) {
+    padding: 8px 10px;
+    white-space: nowrap;
+  }
+
+  .addBtn {
+    align-self: flex-end;
   }
 }

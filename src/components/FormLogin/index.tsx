@@ -17,7 +17,7 @@ export default function FormLogin() {
       <span className={styles.logotipo}>
         <Image
           src="/imgs/logo.png"
-          alt="logo sAnt's Sapore"
+          alt="logo Sant' Sapore"
           fill
           style={{ objectFit: "contain" }}
         />

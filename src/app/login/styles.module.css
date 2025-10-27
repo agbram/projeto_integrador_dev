@@ -38,7 +38,7 @@
 }
 
 .painelLogin {
-  background-color: #fffefe;
+  background-color: #fffefe; 
   flex-grow: 1;
   align-items: center;
   height: 100vh;

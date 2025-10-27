@@ -1,7 +1,8 @@
 type Customer = {
   id?: number
   name: string
-  cnpj: string
+  document: string
+  type: string
   contact: string
   email: string
   address: string

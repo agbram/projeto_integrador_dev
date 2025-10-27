@@ -50,16 +50,6 @@ export default function Navbar() {
   return (
     <header className={styles.headerWrapper}>
       <div className="p-2">
-        <div className="d-flex justify-content-between align-items-center">
-          <Button
-            variant="outline-secondary"
-            className="d-md-none"
-            onClick={() => setOpen(!open)}
-          >
-            ☰
-          </Button>
-        </div>
-
         <div className={`${open ? "d-block" : "d-none"} d-md-block mt-2`}>
           <Nav
             variant="pills"

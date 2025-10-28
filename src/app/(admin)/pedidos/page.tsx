@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Card from "@/components/Card";
+import Card from "@/components/Cards/Card";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import FAB from "@/components/FAB";

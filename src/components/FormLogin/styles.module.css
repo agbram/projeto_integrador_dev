@@ -1,6 +1,6 @@
 .container {
   background-color: #fff;
-  color: #FF6063;
+  color: #402727;
   border-radius: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   width: 350px;
@@ -10,6 +10,10 @@
   flex-direction: column;
   align-items: stretch;
 }
+.h2{
+  align-self: center;
+}
+
 .logotipo {
   width: 100%;
   height: 140px;

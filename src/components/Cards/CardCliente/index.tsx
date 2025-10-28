@@ -1,12 +1,12 @@
 'use client'
 
-import FAB from "@/components/FAB"
 import styles from "./styles.module.css"
 
 type Customer = {
   id?: number
   name: string
-  cnpj: string
+  document: string
+  type: string
   contact: string
   email: string
   address: string
@@ -33,7 +33,8 @@ export default function CardCliente({ title, customer, loading = false, actions 
 
       <div className={styles.info}>
         <p><strong>ID:</strong> {customer.id}</p>
-        <p><strong>CNPJ:</strong> {customer.cnpj}</p>
+        <p><strong>Documento:</strong> {customer.document}</p>
+        <p><strong>Tipo de documento:</strong> {customer.type}</p>
         <p><strong>Nome:</strong> {customer.name}</p>
         <p><strong>Contato:</strong> {customer.contact}</p>
         <p><strong>Email:</strong> {customer.email}</p>
@@ -44,7 +45,6 @@ export default function CardCliente({ title, customer, loading = false, actions 
           {actions?.map((action, index)=>
               <button key={index} onClick={action.onClick}>
                 {action.label}
-
               </button>
             )}
         </div>

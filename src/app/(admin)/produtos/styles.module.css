@@ -1,0 +1,176 @@
+
+  /* Modal.module.css */
+
+/* Modal Principal */
+.modal {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.modalBody {
+  background-color: #D9C6A3; /* Bege claro, mesmo tom do botão ativo */
+  padding: 2rem;
+}
+
+.modalFooter {
+  background-color: #D9C6A3;
+  border-top: 1px solid #c2b292;
+  padding: 1rem 2rem;
+}
+
+.button {
+  background-color: #402727; /* Marrom escuro do header */
+  border: none;
+  color: #ffffff;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.button:hover {
+  background-color: #5a3730; /* Marrom levemente mais claro */
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal de Sucesso */
+.successModal {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.successModalBody {
+  background-color: #D9C6A3; /* Fundo bege */
+  padding: 2rem;
+}
+
+.successIconContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.successIcon {
+  font-size: 48px;
+  color: #27ae60;
+  font-weight: bold;
+}
+
+.successTitle {
+  color: #402727; /* Marrom escuro para títulos */
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.successModalFooter {
+  background-color: #D9C6A3;
+  border-top: 1px solid #c2b292;
+  padding: 1rem 2rem;
+}
+
+.successButton {
+  background-color: #402727;
+  border: none;
+  color: #ffffff;
+  padding: 0.5rem 2rem;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.successButton:hover {
+  background-color: #5a3730;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(64, 39, 39, 0.3);
+}
+
+/* Modal de Aviso */
+.warningModal {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.warningModalBody {
+  background-color: #D9C6A3;
+  padding: 2rem;
+}
+
+.warningIconContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.warningIcon {
+  font-size: 48px;
+  color: #f39c12;
+  font-weight: bold;
+}
+
+.warningTitle {
+  color: #402727;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.warningMessage {
+  color: #5a6c7d;
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+.warningModalFooter {
+  background-color: #D9C6A3;
+  border-top: 1px solid #c2b292;
+  padding: 1rem 2rem;
+}
+
+.warningButton {
+  background-color: #402727;
+  border: none;
+  color: #ffffff;
+  padding: 0.5rem 2rem;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.warningButton:hover {
+  background-color: #5a3730;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(64, 39, 39, 0.3);
+}
+
+/* Estilos para o Card dentro do Modal */
+.card {
+  background: #ffffff;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.cardTitle {
+  color: #402727;
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Override para o modal do Bootstrap */
+:global {
+  .modal-content {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal-header {
+    border-bottom: 1px solid #c2b292;
+    background-color: #402727;
+    color: white;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .modal-header .btn-close {
+    filter: invert(1);
+  }
+}

@@ -1,0 +1,9 @@
+.dropdown{
+    background-color: gray;
+    height: 32px;
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+}   

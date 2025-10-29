@@ -55,11 +55,12 @@ export default function Card({
     
     const submittedData = { ...formData }
     fields.forEach(field => {
-      if (field.value !== undefined) {
+      const fieldNaoFoiAlterado = submittedData[field.name] === undefined;
+      if (fieldNaoFoiAlterado && field.value !== undefined) {
         submittedData[field.name] = field.value
       }
     })
-    
+    console.log(submittedData)
     onSubmit(submittedData)
   }
 
@@ -69,7 +70,8 @@ export default function Card({
 
       <form className={styles.form} onSubmit={handleSubmit}>
         {fields.map(field => {
-          const value = field.value !== undefined ? field.value : (formData[field.name] || "")
+
+          const value = formData[field.name] !== undefined ? formData[field.name] : field.value || "";
           
           return (
             <label key={field.name}>
@@ -95,7 +97,6 @@ export default function Card({
                   name={field.name}
                   value={value}
                   onChange={handleChange}
-                  required
                   disabled={loading || disabled}
                 />
               )}

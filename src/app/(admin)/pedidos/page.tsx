@@ -1,132 +1,177 @@
 "use client";
 
-import React, { useState } from "react";
-import Card from "../../../components/Cards/Cards/Card";
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+import React, { useEffect, useState } from "react";
+import Card from "@/components/Cards/Card";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 import FAB from "@/components/FAB";
 import api from "@/services/api";
+import { UserPlusIcon } from "@phosphor-icons/react";
+import CardProduto from "@/components/Cards/CardProduto";
 
-export default function EstoqueModal() {
+
+export default function produtosModal() {
   const [modalShow, setModalShow] = useState(false);
+  const [modalEditShow, setModalEditShow] = useState(false);
   const [successModalShow, setSuccessModalShow] = useState(false);
   const [warningModalShow, setWarningModalShow] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [produtos, setprodutos] = useState<Customer[]>([]);
+  const [selectCliente, setSelectProduto] = useState<Customer>();
 
-  const typeOptions = [
-    { value: "Bolos", label: "Bolos" },
-    { value: "Doces", label: "Doces" }
+  const categoryOptions = [
+    { value: "Fixas", label: "Fixas" },
+    { value: "Variaveis", label: "Variaveis" },
   ];
-  const clientsOrdem = [
-      { value: "Bolos", label: "Bolos" },
-      { value: "Doces", label: "Doces" }
-    ];
-    const proutosOrden = [
-      { value: "Bolos", label: "Bolos" },
-      { value: "Doces", label: "Doces" }
-    ];
-    
 
+  const handleSubmit = async (data: any) => {
+    setLoading(true);
+    try {
+      const formattedData = {
+        ...data
+      };
 
-  return (
-    <>
-      <FAB
-        onClick={() => setModalShow(true)}
-        text="+"
-      />
-      
-      <Modal
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-        size="lg"
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-      >
-        <Modal.Body>
-          <Card
-            title="Criar pedidos"
-            fields={[
+      const response = await api.post("/products", formattedData);
+      console.log("Produto cadastrado:", response.data);
+
+      setSuccessModalShow(true);
+      setModalShow(false);
+    } catch (error: any) {
+      console.error("Erro ao cadastrar Produto:", error);
+      setWarningMessage("Erro ao cadastrar Produto. Tente novamente.");
+      setWarningModalShow(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchprodutos = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/products");
+      setprodutos(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar Produto:", error);
+      setWarningMessage("Erro ao carregar os Produto cadastrados.");
+      setWarningModalShow(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchprodutos();
+  }, []);
+
+return (
+  <>
+    <div>
+      {produtos.map((produto) => (
+        <div
+          key={produto.id}
+          style={{ position: "relative", marginBottom: "20px" }}
+        >
+          <CardProduto
+            title={`produto: ${produto.name}`}
+            products={produto}
+            loading={loading}
+            actions={[
               {
-                name: "Type",
-                label: "Clientes",
-                type: "select",
-                options: clientsOrdem
+                label: "Editar",
+                onClick: () => {
+                  setSelectProduto(produto);
+                  setModalEditShow(true);
+                },
               },
-              {
-                name: "Type",
-                label: "Tipo do Produtos",
-                type: "select",
-                options: typeOptions
-              },
-              {
-                name: "Type",
-                label: "Produtos",
-                type: "select",
-                options: proutosOrden,
-              },
-            { name: "quantidade", label: "quantidade" },
-              
             ]}
+          />
+        </div>
+      ))}
+    </div>
 
-            submitLabel="Salvar"
-            loading={loading} onSubmit={function (data: Record<string, string>): void {
-              throw new Error("Function not implemented.");
-            } }          />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setModalShow(false)}>
-            Fechar
-          </Button>
-        </Modal.Footer>
-      </Modal>
+    {/* Modal principal */}
+    <Modal
+      show={modalShow}
+      onHide={() => {
+        setModalShow(false);
+      }}
+      size="lg"
+      centered
+    >
+      <Modal.Body>
+          <Card
+          title="Cadastro de Produtos"
+          fields={[
+            { name: "name", label: "Nome" },
+            { name: "costPrice", label: "Preço de custo" },
+            { name: "markupPercent", label: "Percentual de Markup" },
+            { name: "stockQuantity", label: "Quantidade em estoque" },
+            {
+              name: "category",
+              label: "Tipo do Produtos",
+              type: "select",
+              options: categoryOptions,
+              },
+            ]}
+            onSubmit={handleSubmit}
+            submitLabel="Cadastrar"
+            loading={loading}
+            showCancel
+            onCancel={() => {
+              setModalShow(false);
+            }}
+          />
+      </Modal.Body>
+    </Modal>
 
-      <Modal
-        show={successModalShow}
-        onHide={() => setSuccessModalShow(false)}
-        size="sm"
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-      >
-        <Modal.Body className="text-center">
-          <div className="mb-3">
-            <div style={{ fontSize: '48px', color: '#28a745' }}>✓</div>
-          </div>
-          <h5>Produtos cadastrado com sucesso!</h5>
-        </Modal.Body>
-        <Modal.Footer className="justify-content-center">
-          <Button 
-            variant="success" 
-            onClick={() => setSuccessModalShow(false)}
-          >
-            OK
-          </Button>
-        </Modal.Footer>
-      </Modal>
+    {/* FAB */}
+    <FAB
+      onClick={() => setModalShow(true)}
+      text={<UserPlusIcon weight="bold" size={24} style={{ marginLeft: 8 }} />}
+    />
 
-      <Modal
-        show={warningModalShow}
-        onHide={() => setWarningModalShow(false)}
-        size="sm"
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-      >
-        <Modal.Body className="text-center">
-          <div className="mb-3">
-            <div style={{ fontSize: '48px', color: '#ffc107' }}>⚠️</div>
-          </div>
-          <h5>Atenção</h5>
-          <p>{warningMessage}</p>
-        </Modal.Body>
-        <Modal.Footer className="justify-content-center">
-          <Button 
-            variant="warning" 
-            onClick={() => setWarningModalShow(false)}
-          >
-            Entendi
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </>
-  );
+    {/* Modal de sucesso */}
+    <Modal
+      show={successModalShow}
+      onHide={() => setSuccessModalShow(false)}
+      size="sm"
+      centered
+    >
+      <Modal.Body className="text-center">
+        <div className="mb-3" style={{ fontSize: "48px", color: "#28a745" }}>
+          ✓
+        </div>
+        <h5>Produto cadastrado com sucesso!</h5>
+      </Modal.Body>
+      <Modal.Footer className="justify-content-center">
+        <Button variant="success" onClick={() => setSuccessModalShow(false)}>
+          OK
+        </Button>
+      </Modal.Footer>
+    </Modal>
+
+    {/* Modal de aviso */}
+    <Modal
+      show={warningModalShow}
+      onHide={() => setWarningModalShow(false)}
+      size="sm"
+      centered
+    >
+      <Modal.Body className="text-center">
+        <div className="mb-3" style={{ fontSize: "48px", color: "#ffc107" }}>
+          ⚠️
+        </div>
+        <h5>Atenção</h5>
+        <p>{warningMessage}</p>
+      </Modal.Body>
+      <Modal.Footer className="justify-content-center">
+        <Button variant="warning" onClick={() => setWarningModalShow(false)}>
+          Entendi
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  </>
+);
+
 }

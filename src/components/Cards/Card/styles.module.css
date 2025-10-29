@@ -108,7 +108,7 @@
 
 /* Botão padrão */
 .button {
-  background: #402727;
+  background: #44A34A;
   color: #ffffff;
   font-weight: 600;
   border: none;
@@ -122,7 +122,13 @@
 
 /* Efeito de hover do botão */
 .button:hover {
-  background-color: #5a3730;
+  background-color:  #75CD6C;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(64, 39, 39, 0.25);
+}
+
+.buttonsRow{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
 }

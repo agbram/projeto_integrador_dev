@@ -8,8 +8,15 @@
     height: 64px;
     align-items: center;
     justify-items: center;
-    display: flex;
+    display: none;
     align-content: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     
 }
+
+@media (max-width: 800px) {
+    .container {
+     display: flex;
+    }
+  }
+  

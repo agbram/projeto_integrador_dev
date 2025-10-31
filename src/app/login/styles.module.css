@@ -17,10 +17,9 @@
   transition: all 0.3s ease-in-out;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
   color: #F2EBE9;
   text-align: left;
-  padding: 2rem;
   overflow: hidden;
 }
 

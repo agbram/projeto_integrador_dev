@@ -8,26 +8,19 @@ export default function WelcomeLogin() {
       <div className={styles.welcomeContent}>
         <div className={styles.welcomeIcon}>
           <CakeIcon
-            size={150}
+            size={180}
             color="#FFEAEF"
             weight="duotone"
-          ><animate
-          attributeName="fill"
-          values="#FFEAEF"
-          dur="6s"
-          repeatCount="indefinite"
-        /></CakeIcon>
-
-          <TrendUpIcon
-          size={150}
-          color="#FFEAEF"
-          weight="duotone" 
           />
-
+          <TrendUpIcon
+            size={180} 
+            color="#FFEAEF"
+            weight="duotone" 
+          />
           <ChartBarIcon 
-          size={150}
-          color= "#FFEAEF"
-          weight="duotone"
+            size={180}
+            color="#FFEAEF"
+            weight="duotone"
           />
         </div>
 
@@ -35,8 +28,8 @@ export default function WelcomeLogin() {
           Olá <span className={styles.highlight}>Confeiteira!</span>
         </h1>
         <p className={styles.welcomeText}>
-        Gerencie pedidos, organize receitas e acompanhe sua produção de forma simples e elegante — 
-        tudo o que sua confeitaria precisa em um só lugar.{" "}
+          Gerencie pedidos, organize receitas e acompanhe sua produção de forma simples e elegante — 
+          tudo o que sua confeitaria precisa em um só lugar.{" "}
         </p>
       </div>
       <p className={styles.welcomeFooter}>

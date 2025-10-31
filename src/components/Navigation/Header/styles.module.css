@@ -1,0 +1,32 @@
+/* container do header */
+.headerWrapper {
+  width: 100%;
+  background: linear-gradient(180deg, #c7a98a 0%, #b58f6f 100%);
+  padding: 14px 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+
+.headerInner {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1200px;    /* limite para onde o conteúdo pode esticar */
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column; /* TopBar / NavBar / ActionBar empilhados */
+  gap: 12px;
+  align-items: center;    /* alinha horizontalmente ao centro */
+  box-sizing: border-box;
+}
+
+/* Cada área ocupa 100% do espaço disponível, mas seu conteúdo interno fica limitado ao max-width do headerInner.
+   Use essas classes para os blocos que você já tem no JSX: topBarArea, NavBarArea, actionBarArea. */
+.topBarArea,
+.NavBarArea,
+.actionBarArea {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* por padrão, centraliza o conteúdo interno */
+}

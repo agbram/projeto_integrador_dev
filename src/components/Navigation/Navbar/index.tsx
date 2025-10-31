@@ -1,8 +1,8 @@
+// Navbar.tsx
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Nav from "react-bootstrap/Nav";
-import { Button, Dropdown } from "react-bootstrap";
 import {
   PackageIcon,
   HouseIcon,
@@ -11,59 +11,52 @@ import {
   ChartBarIcon,
   ShoppingCartIcon,
   InvoiceIcon,
-  FunnelSimpleIcon,
-  MagnifyingGlassIcon,
-  PlusIcon,
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./styles.module.css";
+import HamburgerButton from "@/components/HamburgerButton";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const rawPathname = usePathname();
   const pathname = rawPathname ?? "/";
   const isActive = (path: string) => pathname === path;
-  const getPageTitle = () => {
-    switch (pathname) {
-      case "/":
-        return "Homepage";
-      case "/produtos":
-        return "Produtos";
-      case "/estoque":
-        return "Estoque";
-      case "/clientes":
-        return "Clientes";
-      case "/relatorios":
-        return "Relatórios";
-      case "/despesas":
-        return "Despesas";
-      case "/pedidos":
-        return "Pedidos";
-      default:
-        return pathname.charAt(1).toUpperCase() + pathname.slice(2);
+
+  // Fecha menu com esc e trava scroll do body quando aberto
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
     }
-  };
+    document.addEventListener("keydown", onKey);
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [open]);
 
   return (
     <header className={styles.headerWrapper}>
-      {/* inner container que centraliza todo o conteúdo do header */}
       <div className={styles.headerInner}>
-        <div className="p-2" style={{ width: "100%" }}>
-          <div className="d-flex justify-content-between align-items-center">
-            {/* hamburger para mobile */}
-            <Button
-              variant="outline-secondary"
-              className="d-md-none"
-              onClick={() => setOpen(!open)}
-            >
-              ☰
-            </Button>
-            {/* título/branding no topo (em telas pequenas o Header.tsx também renderiza título; aqui permanecerá neutro) */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            width: "100%",
+          }}
+        >
+          <div className={styles.mobileMenu}>
+            <HamburgerButton open={open} onClick={() => setOpen((s) => !s)} />
           </div>
 
-          {/* Nav principal: no mobile o próprio estado 'open' controla se mostra ou não */}
-          <div className={`${open ? "d-block" : "d-none"} d-md-block mt-2`}>
+          {/* NAV (desktop) */}
+          <div className="d-none d-md-block mt-2">
             <Nav
               variant="pills"
               activeKey={pathname}
@@ -209,33 +202,147 @@ export default function Navbar() {
             </Nav>
           </div>
         </div>
+      </div>
 
-        {/* subbar com título/busca/ações — alinhada à direita do grupo central */}
-        <div className={styles.subbar}>
-          <h2 className={styles.pageTitle}>{getPageTitle()}</h2>
-          <div className={styles.actionsRow}>
-            <div className={styles.searchBox}>
-              <input className={styles.searchInput} placeholder="Procurar" />
-              <MagnifyingGlassIcon size={16} className={styles.searchIcon} />
-            </div>
-            <Dropdown className={styles.filterDropdown}>
-              <Dropdown.Toggle id="dropdown-basic" className={styles.filterBtn}>
-                <FunnelSimpleIcon size={16} className="me-2" />
-                Filtrar
-              </Dropdown.Toggle>
-
-              <Dropdown.Menu>
-                <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-                <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-                <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-
-            <Button variant="light" className={styles.addBtn}>
-              <PlusIcon size={16} className="me-2" /> Add
-            </Button>
+      {/* SIDE MENU OVERLAY (aparece quando open === true) */}
+      <div
+        className={`${styles.sideOverlay} ${open ? styles.sideOpen : ""}`}
+        role="dialog"
+        aria-hidden={!open}
+        onClick={() => setOpen(false)}
+      >
+        <nav
+          className={styles.sideMenu}
+          onClick={(e) => {
+            // evita que clique dentro do menu feche o overlay
+            e.stopPropagation();
+          }}
+        >
+          <div className={styles.sideHeader}>
+            <strong>Menu</strong>
+            <button
+              aria-label="Fechar menu"
+              className={styles.sideClose}
+              onClick={() => setOpen(false)}
+            >
+              ×
+            </button>
           </div>
-        </div>
+
+          <div className={styles.sideNav}>
+            <Link
+              href="/"
+              className={`${styles.sideNavLink} ${
+                isActive("/") ? styles.activeLink : ""
+              }`}
+              onClick={() => setOpen(false)}
+            >
+              <span className={styles.sideNavIcon} aria-hidden>
+                <HouseIcon
+                  size={18}
+                  weight={isActive("/") ? "fill" : "regular"}
+                />
+              </span>
+              <span className={styles.sideNavText}>Homepage</span>
+            </Link>
+
+            <Link
+              href="/produtos"
+              className={`${styles.sideNavLink} ${
+                isActive("/produtos") ? styles.activeLink : ""
+              }`}
+              onClick={() => setOpen(false)}
+            >
+              <span className={styles.sideNavIcon} aria-hidden>
+                <PackageIcon
+                  size={18}
+                  weight={isActive("/produtos") ? "fill" : "regular"}
+                />
+              </span>
+              <span className={styles.sideNavText}>Produtos</span>
+            </Link>
+
+            <Link
+              href="/estoque"
+              className={`${styles.sideNavLink} ${
+                isActive("/estoque") ? styles.activeLink : ""
+              }`}
+              onClick={() => setOpen(false)}
+            >
+              <span className={styles.sideNavIcon} aria-hidden>
+                <ClipboardTextIcon
+                  size={18}
+                  weight={isActive("/estoque") ? "fill" : "regular"}
+                />
+              </span>
+              <span className={styles.sideNavText}>Estoque</span>
+            </Link>
+
+            <Link
+              href="/clientes"
+              className={`${styles.sideNavLink} ${
+                isActive("/clientes") ? styles.activeLink : ""
+              }`}
+              onClick={() => setOpen(false)}
+            >
+              <span className={styles.sideNavIcon} aria-hidden>
+                <UsersIcon
+                  size={18}
+                  weight={isActive("/clientes") ? "fill" : "regular"}
+                />
+              </span>
+              <span className={styles.sideNavText}>Clientes</span>
+            </Link>
+
+            <Link
+              href="/relatorios"
+              className={`${styles.sideNavLink} ${
+                isActive("/relatorios") ? styles.activeLink : ""
+              }`}
+              onClick={() => setOpen(false)}
+            >
+              <span className={styles.sideNavIcon} aria-hidden>
+                <ChartBarIcon
+                  size={18}
+                  weight={isActive("/relatorios") ? "fill" : "regular"}
+                />
+              </span>
+              <span className={styles.sideNavText}>Relatórios</span>
+            </Link>
+
+            <Link
+              href="/despesas"
+              className={`${styles.sideNavLink} ${
+                isActive("/despesas") ? styles.activeLink : ""
+              }`}
+              onClick={() => setOpen(false)}
+            >
+              <span className={styles.sideNavIcon} aria-hidden>
+                <InvoiceIcon
+                  size={18}
+                  weight={isActive("/despesas") ? "fill" : "regular"}
+                />
+              </span>
+              <span className={styles.sideNavText}>Despesas</span>
+            </Link>
+
+            <Link
+              href="/pedidos"
+              className={`${styles.sideNavLink} ${
+                isActive("/pedidos") ? styles.activeLink : ""
+              }`}
+              onClick={() => setOpen(false)}
+            >
+              <span className={styles.sideNavIcon} aria-hidden>
+                <ShoppingCartIcon
+                  size={18}
+                  weight={isActive("/pedidos") ? "fill" : "regular"}
+                />
+              </span>
+              <span className={styles.sideNavText}>Pedidos</span>
+            </Link>
+          </div>
+        </nav>
       </div>
     </header>
   );

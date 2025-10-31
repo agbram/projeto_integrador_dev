@@ -1,0 +1,81 @@
+/* TopBar atualizado: brand ocupa o espaço disponível; profile empurra para a direita */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* não usamos space-between aqui porque vamos empurrar o profile com margin-left:auto */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* o bloco da marca (logo + texto) pode crescer até ocupar o espaço disponível,
+   mas tem um min-width para não encolher demais no mobile */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 auto;      /* pode crescer e encolher */
+  min-width: 160px;    /* evita que encolha muito e deixe a foto grudada */
+  min-height: 40px;
+  overflow: hidden;    /* protege contra overflow por filhos largos */
+}
+
+/* garante que o círculo não encolha */
+.logoCircle {
+  flex: 0 0 auto;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e9d7c6;
+  color: #4a2f26;
+  font-weight: 700;
+}
+
+/* nome da marca: usa ellipsis quando faltar espaço */
+.brandText {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.10rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0; /* importante para permitir o truncamento em flex children */
+}
+
+/* botão do profile fica sempre no extremo direito */
+.profileBtn {
+  background: transparent;
+  border: 0;
+  padding: 4px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-left: auto; /* empurra até a borda direita */
+  flex: 0 0 auto;
+}
+
+/* imagem do profile */
+.profileImg {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+/* --- Responsividade: reduz min-width da brand no mobile para caber melhor --- */
+@media (max-width: 767px) {
+  .brand {
+    min-width: 120px; /* menos para caber, mas ainda evita que fique colado */
+    gap: 10px;
+  }
+
+  .brandText {
+    font-size: 1rem;
+  }
+
+  .logoCircle { width: 36px; height: 36px; }
+  .profileImg { width: 34px; height: 34px; }
+}

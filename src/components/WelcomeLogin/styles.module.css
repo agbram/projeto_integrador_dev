@@ -3,7 +3,7 @@
   flex-direction: column;
   justify-content: center;
   flex-grow: 1;
-  max-width: 500px;
+  max-width: 520px; /* Aumentei levemente a largura máxima */
   position: relative;
   color: #F2EBE9;
   z-index: 1;
@@ -17,34 +17,36 @@
 }
 
 .welcomeIcon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  color: #F2EBE9;
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px; /* Espaço entre os ícones */
+  margin-bottom: 2rem; 
 }
 
-
-
 .welcomeTitle {
-  font-size: 2.4rem;
+  font-size: 2.8rem; /* Aumentei de 2.4 para 2.8rem */
   font-weight: 700;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem; 
   line-height: 1.2;
   color: #F2EBE9;
 }
 
 .highlight {
-  color: #C8829A
+  color: #FFA0C2;
 }
 
 .welcomeText {
-  font-size: 1rem;
+  font-size: 1.10rem; /* Aumentei de 1 para 1.15rem */
   opacity: 0.9;
-  line-height: 1.5;
-  color: #F2EBE9 
+  line-height: 1.6; /* Aumentei o line-height para melhor legibilidade */
+  color: #F2EBE9;
+  margin-bottom: 2rem;
 }
 
 .welcomeFooter {
-  font-size: 0.8rem;
-  opacity: 0.7;
-  color:#C8829A;
+  font-size: 0.9rem; /* Aumentei de 0.8 para 0.9rem */
+  opacity: 0.8; /* Aumentei levemente a opacidade */
+  color: #C8829A;
+  margin-top: auto;
+  padding-top: 2rem;
 }

@@ -1,0 +1,46 @@
+.hamburgerButton {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    
+    /* alinhamento no canto esquerdo */
+    position: relative;
+    left: 0;
+    margin-right: auto; /* força ficar à esquerda se container for flex */
+  }
+
+  .hamburgerContainer{
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+  
+  .bar {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background-color: #fff;
+    margin: 3px 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  
+  /* Estado quando “open” */
+  .open .bar:nth-child(1) {
+    transform: translateY(5px) rotate(45deg);
+  }
+  .open .bar:nth-child(2) {
+    opacity: 0;
+  }
+  .open .bar:nth-child(3) {
+    transform: translateY(-5px) rotate(-45deg);
+  }
+  

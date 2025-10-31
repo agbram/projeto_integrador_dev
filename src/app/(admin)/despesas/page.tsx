@@ -15,8 +15,8 @@ export default function DespesasModal() {
   const [loading, setLoading] = useState(false);
 
   const categoryOptions = [
-    { value: "Bolos", label: "Bolos" },
-    { value: "Doces", label: "Doces" }
+    { value: "Despesas Variavel", label: "Despesas Variavel" },
+    { value: "Despesas Fixas", label: "Despesas Fixas" }
   ];
   const handleSubmit = async (data: any) => {
     setLoading(true);

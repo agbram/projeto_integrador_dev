@@ -1,4 +1,4 @@
-import Produto from "@/models/Testes";
+import Produto from "@/models/Product";
 import ProductCard from "../ProductCard/Card";
 import styles from "./styles.module.css";
 

@@ -21,7 +21,9 @@ type FormProps = {
   loading?: boolean
   disabled?: boolean
   showCancel?: boolean
+  showDelete?: boolean
   onCancel?: () => void
+  onDelete?: () => void
   onChange?: (name: string, value: string) => void
 }
 
@@ -33,7 +35,9 @@ export default function Card({
   loading = false,
   disabled = false,
   showCancel = false,
+  showDelete = false,
   onCancel,
+  onDelete,
   onChange,
 }: FormProps) {
   const [formData, setFormData] = useState<Record<string, string>>({})
@@ -106,12 +110,21 @@ export default function Card({
         })}
 
         <div className={styles.buttonsRow}>
+          {showDelete && onDelete && (
+            <ButtonCancelar
+              label= "Desativar usuário"
+              onClick={onDelete}
+              variant="outline"
+            />
+          )}
           {showCancel && onCancel && (
             <ButtonCancelar
               label="Cancelar"
               onClick={onCancel}
+              variant="cancelLight"
             />
           )}
+
           
           <button 
             type="submit" 

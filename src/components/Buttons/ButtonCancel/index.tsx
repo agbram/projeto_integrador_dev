@@ -4,7 +4,7 @@ type CancelProps = {
   label?: string
   onClick: () => void
   disabled?: boolean
-  variant?: "default" | "outline" | "danger"
+  variant?: VariantType
 }
 
 export default function ButtonCancelar({
@@ -13,12 +13,16 @@ export default function ButtonCancelar({
   disabled = false,
   variant = "default"
 }: CancelProps) {
-  const variantClass =
-    variant === "outline"
-      ? styles.cancelOutline
-      : variant === "danger"
-      ? styles.cancelDanger
-      : styles.cancelDefault
+
+  const variantClasses: Record<VariantType, string> = {
+    default: styles.cancelDefault,
+    outline: styles.cancelOutline,
+    danger: styles.cancelDanger,
+    cancelLight: styles.cancelLight,
+    delete: styles.cancelDelete
+  }
+
+  const variantClass = variantClasses[variant]
 
   return (
     <button

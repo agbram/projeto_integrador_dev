@@ -1,18 +1,76 @@
-.cancelButton{
-  background: #DD0303;
-  color: #ffffff;
+/* 🎯 BASE (Comum a todos os botões) */
+.cancelButton {
   font-weight: 600;
   border: none;
   border-radius: 6px;
-  padding: 9px 18px;
+  padding: 2px 16px;
   cursor: pointer;
   transition: all 0.22s ease;
   margin-top: 12px;
   font-size: 0.9rem;
 }
 
+/* Hover universal */
 .cancelButton:hover {
-  background-color:  lightcoral;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(64, 39, 39, 0.25);
+}
+
+/* 🟥 HIERARQUIA (Do mais suave ao mais intenso) */
+
+/* 1️⃣ Leve - Para ações secundárias */
+.cancelLight {
+  background-color: transparent;
+  border: 2px solid #dd0303;
+  color: #dd0303;
+}
+
+.cancelLight:hover {
+  background-color: #dd0303;
+  color: white;
+}
+
+.cancelOutline {
+  background-color: transparent;
+  color: #dd0303;
+  text-decoration: none; /* Remove sublinhado padrão */
+}
+
+.cancelOutline:hover {
+  transform: none; /* Remove a transformação do hover universal */
+  box-shadow: none; /* Remove a sombra do hover universal */
+  text-decoration: underline; /* Apenas sublinha o texto */
+}
+
+/* 3️⃣ Default - Cancelamento padrão */
+.cancelDefault {
+  background-color: #dd0303;
+  color: white;
+}
+
+.cancelDefault:hover {
+  background-color: #b80202;
+}
+
+/* 4️⃣ Danger - Ação perigosa */
+.cancelDanger {
+  background-color: #ff4444;
+  color: white;
+}
+
+.cancelDanger:hover {
+  background-color: #d42f2f;
+}
+
+/* 5️⃣ Delete - Máxima urgência */
+.cancelDelete {
+  background-color: #000;
+  color: #fff;
+  border: 2px solid #000;
+}
+
+.cancelDelete:hover {
+  background-color: #fff;
+  color: #000;
+  border-color: #000;
 }

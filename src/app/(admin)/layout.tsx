@@ -32,9 +32,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
         
-        <Header />
-        <PagesWallpaper />
         <AuthProvider>
+        <Header/>
+        <PagesWallpaper />
         {children}
         </AuthProvider>
         

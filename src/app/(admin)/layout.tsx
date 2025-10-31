@@ -32,9 +32,11 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
         
         <AuthProvider>
+        <PrivateRouter>    
         <Header/>
-        <PagesWallpaper />
+        <PagesWallpaper/>
         {children}
+        </PrivateRouter>
         </AuthProvider>
         
       </body>

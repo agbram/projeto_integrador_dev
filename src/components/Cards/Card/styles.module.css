@@ -1,6 +1,6 @@
 /* Container (mantém 340px) */
 .container {
-  background: #fff;
+  background-color: #fff;
   color: #1e1e1e;
   width: 100%;
   max-width: 340px;
@@ -68,7 +68,7 @@
   margin: 6px 0;
   border: 1px solid #c2b292; /* tom bege suave */
   border-radius: 6px;
-  background-color: #f2e4cb; /* bege claro */
+  background-color: #ffffff; /* bege claro */
   color: #402727; /* texto marrom escuro */
   font-size: 0.95rem;
   box-sizing: border-box;
@@ -127,8 +127,11 @@
   box-shadow: 0 4px 8px rgba(64, 39, 39, 0.25);
 }
 
-.buttonsRow{
+.buttonsRow {
   display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
+  gap: 12px; /* espaço entre os botões */
+}
+
+.buttonsRow button {
+  flex: 1; /* cada botão ocupa o mesmo espaço */
 }

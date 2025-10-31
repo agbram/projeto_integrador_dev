@@ -31,9 +31,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
         
+        <AuthProvider>
         <Header/>
         <PagesWallpaper />
-        <AuthProvider>
         {children}
         </AuthProvider>
         

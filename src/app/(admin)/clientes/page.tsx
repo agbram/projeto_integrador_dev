@@ -10,6 +10,7 @@ import { UserPlusIcon } from "@phosphor-icons/react";
 import CardCliente from "@/components/Cards/CardCliente";
 import Customer, { CustomerType } from "@/models/Customer";
 import styles from "./styles.module.css";
+import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 
 // ✅ Funções de validação movidas para fora do componente
 const isValidCPF = (cpf: string): boolean => {
@@ -82,6 +83,7 @@ export default function ClientesModal() {
   const [successModalShow, setSuccessModalShow] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [warningModalShow, setWarningModalShow] = useState(false);
+  const [warningDeleteModalShow, setWarningDeleteModalShow] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [formStep, setFormStep] = useState<"check" | "register">("check");
@@ -96,8 +98,8 @@ export default function ClientesModal() {
   ];
 
   const fetchClientes = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       const response = await api.get("/customers");
       setClientes(response.data);
     } catch (error) {
@@ -155,7 +157,7 @@ export default function ClientesModal() {
     }
   };
 
-  const handleSubmit = async (data: any) => {
+  const handleCadastroSubmit = async (data: any) => {
     setLoading(true);
     try {      
       const fullData = {
@@ -225,6 +227,42 @@ export default function ClientesModal() {
     setSelectCliente(undefined);
   };
 
+  const handleCloseWarningModal = () => {
+    setModalEditShow(true);
+    setWarningDeleteModalShow(false);
+  };
+
+  const handleWarningDelete = () => {
+    setModalEditShow(false);
+    setWarningDeleteModalShow(true);
+    setWarningMessage("Deseja realmente desativar esse cliente?");
+  };
+
+  const handleDesativaUser = async () => {
+    setLoading(true);
+    try {      
+      const response = await api.delete(`/customers/${selectCliente?.id}`);
+      console.log("Cliente desativado com sucesso:", response.data);
+
+      setClientes(prev => prev.map(cliente => 
+        cliente.id === selectCliente?.id ? response.data : cliente
+      ));
+      setWarningDeleteModalShow(false);
+      setSuccessMessage("Cliente desativado com sucesso!");
+      setSuccessModalShow(true);
+      setModalEditShow(false);
+      fetchClientes();
+    } catch (error: any) {
+      console.error("Erro ao desativar cliente:", error);
+      setWarningMessage(
+        error.response?.data?.message || "Erro ao desativar cliente. Tente novamente."
+      );
+      setWarningModalShow(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <div className={styles.containerPrincipal}>
@@ -234,7 +272,7 @@ export default function ClientesModal() {
             className={styles.divContainerCliente}
           >
             <CardCliente
-              title={`Cliente: ${cliente.name}`}
+              title={`${cliente.name}`}
               customer={cliente}
               loading={loading}
               actions={[
@@ -255,10 +293,11 @@ export default function ClientesModal() {
       <Modal
         show={modalEditShow}
         onHide={handleCloseEditModal}
-        size="lg"
         centered
       >
-        <Modal.Body>
+        <Modal.Body
+        className={styles.modalBodyEdit}
+        >
           <Card
             key={selectCliente?.id}
             title="Editar Cliente" 
@@ -275,6 +314,8 @@ export default function ClientesModal() {
                 options: modalityOptions,
               },
             ]}
+            showDelete
+            onDelete={handleWarningDelete}
             showCancel
             onCancel={handleCloseEditModal}
             onSubmit={handleSalvarAlteracoes}
@@ -282,6 +323,29 @@ export default function ClientesModal() {
             loading={loading}
           />
         </Modal.Body>
+      </Modal>
+
+
+      {/*Modal de alerta de delete*/}
+      <Modal
+        show={warningDeleteModalShow}
+        onHide={() => setWarningDeleteModalShow(false)}
+        size="sm"
+        centered
+      >
+        <Modal.Body className="text-center">
+          <div className="mb-3" style={{ fontSize: "48px", color: "#ffc107"}}>
+            ⚠️
+          </div>
+          <h5><strong>Atenção</strong></h5>
+          <p>{warningMessage}</p>
+        </Modal.Body>
+        <Modal.Footer className={styles.modalWarningFooter}>
+          <ButtonCancelar variant="outline" onClick={handleCloseWarningModal} label="Cancelar"/>
+          <Button variant="danger" onClick={handleDesativaUser}>
+            Desativar
+          </Button>
+        </Modal.Footer>
       </Modal>
 
       {/* Modal de Cadastro */}
@@ -331,7 +395,7 @@ export default function ClientesModal() {
                   options: modalityOptions  
                 },
               ]}
-              onSubmit={handleSubmit}
+              onSubmit={handleCadastroSubmit}
               submitLabel="Cadastrar"
               loading={loading}
               showCancel

@@ -29,14 +29,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e9d7c6;
-  color: #4a2f26;
+  background: var(--color-primary-light);
+  color: var(--color-bg);
   font-weight: 700;
 }
 
 /* nome da marca: usa ellipsis quando faltar espaço */
 .brandText {
-  color: #fff;
+  color: var(--color-bg);
   font-weight: 700;
   font-size: 1.10rem;
   white-space: nowrap;
@@ -62,7 +62,7 @@
   height: 36px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(255,255,255,0.3);
+  border: 2px solid rgba(var(--color-primary-dark-rgb), 0.3); /* usando primary-dark */
 }
 
 /* --- Responsividade: reduz min-width da brand no mobile para caber melhor --- */

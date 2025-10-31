@@ -11,6 +11,7 @@ import CardCliente from "@/components/Cards/CardCliente";
 import Customer, { CustomerType } from "@/models/Customer";
 import styles from "./styles.module.css";
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
+import { usePageActions } from "@/hooks/usePageActions";
 
 // ✅ Funções de validação movidas para fora do componente
 const isValidCPF = (cpf: string): boolean => {
@@ -91,6 +92,34 @@ export default function ClientesModal() {
   const [clientes, setClientes] = useState<Customer[]>([]);
   const [selectCliente, setSelectCliente] = useState<Customer>();
   const [documentValue, setDocumentValue] = useState("");
+  const pageAction = usePageActions();
+  const [showDisabled, setShowDisabled] = useState(false);
+  const { setHandleFilter } = usePageActions();
+
+   useEffect(() => {
+    // registra o handler que será chamado pelo header
+    setHandleFilter(() => (show: boolean) => {
+      setShowDisabled(show);
+    });
+
+    // cleanup opcional: restaura no-op quando desmontar
+    return () => {
+      setHandleFilter(() => () => {});
+    };
+  }, [setHandleFilter]);
+
+   useEffect(() => {
+    // registra o handler apenas quando o componente montar (ou quando pageAction mudar)
+    pageAction.setHandleAdd(() => {
+      setModalShow(true);
+      
+    });
+    // opcional: cleanup para restaurar handler padrão (não obrigatório)
+    return () => {
+      pageAction.setHandleAdd(() => () => {}); // no-op ao desmontar
+    };
+  }, []);
+
 
   const modalityOptions = [
     { value: "Atacado", label: "Atacado" },
@@ -140,6 +169,7 @@ export default function ClientesModal() {
     setLoading(true);
     try {
       const response = await api.get(`/customers/check-document/${doc}`);
+      alert(response.status)
       setWarningMessage(
         `${type === CustomerType.PF_CPF ? "CPF" : "CNPJ"} já cadastrado no sistema. Verifique os dados e tente novamente.`
       );
@@ -172,6 +202,7 @@ export default function ClientesModal() {
       setClientes((prev) => [...prev, response.data]);
       setSuccessMessage("Cliente cadastrado com sucesso!");
       setSuccessModalShow(true);
+      setDocumentValue("");
       setModalShow(false);
       setFormStep("check");
     } catch (error: any) {

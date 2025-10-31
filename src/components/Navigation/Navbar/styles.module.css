@@ -1,11 +1,7 @@
-/* styles.module.css */
+/* ============================
+   Header Styles
+============================ */
 .headerWrapper {
-  --accent: #c96a48;
-  --accent-contrast: #ffffff;
-  --accent-shadow: 0 6px 18px rgba(201, 106, 72, 0.18);
-  --text-inactive: #6b584a;
-  --hover-bg: rgba(61, 45, 34, 0.06);
-  --side-active-bg: #dec5a3;
   background: transparent;
 }
 
@@ -14,7 +10,7 @@
   background: transparent;
   border: 0;
   padding: 6px;
-  display: inline-flex;
+  display: none;
   flex-direction: column;
   gap: 4px;
   justify-content: center;
@@ -23,16 +19,8 @@
   margin-right: 8px;
 }
 
-.styles_topBarArea__SaSrP,
-.styles_NavBarArea__7wBy9,
-.styles_actionBarArea__s0eFb {
-  justify-content: flex-start !important;
-  align-items: flex-start !important;
-}
-
-
-.mobileMenu{
-  display: flex;
+.mobileMenu {
+  display: none;
   align-self: start;
   flex: 1 1 auto;
   min-width: 0;
@@ -41,7 +29,7 @@
 .bar {
   width: 20px;
   height: 2px;
-  background: #fff8e7;
+  background: var(--color-bg-soft);
   border-radius: 2px;
   transition: transform 180ms ease, opacity 180ms ease;
 }
@@ -57,23 +45,26 @@
   background: rgba(0, 0, 0, 0);
   transition: background 180ms ease;
 }
+
 .sideOpen {
   display: flex;
   background: rgba(0, 0, 0, 0.36);
 }
+
 .sideMenu {
   width: 280px;
   max-width: 85%;
   height: 100%;
-  background: #f7efe8;
+  background: var(--color-bg-soft);
   padding: 18px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-strong);
   transform: translateX(-12px);
   animation: slideIn 200ms ease forwards;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
+
 .sideHeader {
   display: flex;
   justify-content: space-between;
@@ -81,6 +72,7 @@
   gap: 8px;
   margin-bottom: 6px;
 }
+
 .sideClose {
   background: transparent;
   border: 0;
@@ -88,6 +80,7 @@
   line-height: 1;
   cursor: pointer;
 }
+
 .sideNav {
   display: flex;
   flex-direction: column;
@@ -96,6 +89,7 @@
   overflow: auto;
   padding-bottom: 12px;
 }
+
 .sideNavLink {
   display: flex;
   align-items: center;
@@ -103,38 +97,46 @@
   text-decoration: none;
   padding: 10px 12px;
   border-radius: 8px;
-  color: #3d2d22;
+  color: var(--text-inactive);
   background: transparent;
   font-weight: 600;
 }
+
 .sideNavIcon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
+
 .sideNavText {
   font-size: 0.96rem;
 }
+
 .sideNavLink:hover {
   background: var(--hover-bg);
-  color: #3d2d22;
+  color: var(--color-text);
 }
+
 .sideNavLink:active,
 .sideNavLink[aria-current="page"],
 .sideNavLink.active {
   background: var(--side-active-bg);
-  color: #3d2d22;
+  color: var(--color-text);
 }
+
+.sideNavLink:focus {
+  outline: 3px solid rgba(247, 166, 184, 0.18);
+  outline-offset: 2px;
+}
+
 @keyframes slideIn {
   from { transform: translateX(-18px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
-.sideNavLink:focus {
-  outline: 3px solid rgba(125, 95, 74, 0.18);
-  outline-offset: 2px;
-}
 
-/* Nav (desktop) */
+/* ============================
+   Navbar Pills - Novo Estilo com espaçamento
+============================ */
 .Nav :global(.nav-link) {
   display: inline-flex;
   align-items: center;
@@ -143,31 +145,45 @@
   border-radius: 999px;
   text-decoration: none;
   font-weight: 600;
-  color: var(--text-inactive);
+  color: var(--color-bg); /* texto branco */
   background: transparent;
   transition: background 160ms ease, color 160ms ease, transform 120ms ease, box-shadow 160ms ease;
   line-height: 1;
   white-space: nowrap;
+
+  /* distância entre as pills */
+  margin-right: 8px; 
 }
+
+/* remove margin da última pill */
+.Nav :global(.nav-link:last-child) {
+  margin-right: 0;
+}
+
+/* Hover: apenas para a pill sob o mouse */
 .Nav :global(.nav-link):hover {
-  background: var(--hover-bg);
-  color: #3d2d22;
+  background: var(--color-primary-light); /* marrom mais claro para destacar */
+  color: var(--color-bg); /* texto continua branco */
   transform: translateY(-1px);
 }
+
+/* Focus */
 .Nav :global(.nav-link):focus {
-  outline: 3px solid rgba(125, 95, 74, 0.14);
+  outline: 3px solid rgba(125, 95, 74, 0.18); /* leve destaque */
   outline-offset: 3px;
 }
 
-/* estado ativo */
+/* Estado ativo / selecionado */
 .activeLink,
 .Nav :global(.nav-link).active {
-  background: var(--accent);
-  color: var(--accent-contrast);
-  box-shadow: var(--accent-shadow);
+  background: var(--color-primary-dark) !important; /* cor de destaque */
+  color: var(--color-bg) !important;
+  box-shadow: var(--shadow-medium);
 }
 
-/* icon/text helpers */
+/* ============================
+   Icon / Text Helpers
+============================ */
 .Icon {
   display: inline-flex;
   align-items: center;
@@ -176,13 +192,18 @@
   height: 20px;
   flex-shrink: 0;
 }
+
 .fufilledIcon {
   color: var(--accent-contrast);
 }
+
 .linkText {
   font-size: 0.95rem;
 }
 
 @media (max-width: 767px) {
-  
+
+  .mobileMenu {
+    display: flex;
+  }
 }

@@ -1,21 +1,24 @@
 /* container do header */
 .headerWrapper {
   width: 100%;
-  background: linear-gradient(180deg, #c7a98a 0%, #b58f6f 100%);
+  background: linear-gradient(
+    180deg,
+    var(--color-primary-light) 0%,
+    var(--color-primary) 100%
+  );
   padding: 14px 0;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  box-shadow: var(--shadow-soft);
 }
-
 
 .headerInner {
   margin: 0 auto;
   width: 100%;
-  max-width: 1200px;    /* limite para onde o conteúdo pode esticar */
+  max-width: 1200px; /* limite para onde o conteúdo pode esticar */
   padding: 0 16px;
   display: flex;
   flex-direction: column; /* TopBar / NavBar / ActionBar empilhados */
   gap: 12px;
-  align-items: center;    /* alinha horizontalmente ao centro */
+  align-items: center; /* alinha horizontalmente ao centro */
   box-sizing: border-box;
 }
 
@@ -29,4 +32,10 @@
   display: flex;
   align-items: center;
   justify-content: center; /* por padrão, centraliza o conteúdo interno */
+}
+
+@media (max-width: 768px) {
+  .NavBarArea {
+    justify-content: flex-start; /* alinha o conteúdo interno à esquerda em telas pequenas */
+  }
 }

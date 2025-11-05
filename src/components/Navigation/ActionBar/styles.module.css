@@ -1,78 +1,66 @@
-/* Container principal */
 .actionBar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 20px;
-   
   padding: 12px 20px;
   flex-wrap: wrap;
+  width: 100%;
+  max-width: 1200px;
+  margin: 10px auto;
+
 }
 
-/* Título da página */
 .pageTitle {
+  display: inline-flex;   /* ocupa só o espaço do conteúdo */
+  align-items: center;
+  white-space: nowrap;    /* evita quebra de linha dentro do título */
+  flex: 0 0 auto;         /* não cresce nem encolhe no flex container */
+  width: auto;
+  min-width: 0;           /* garante que não force um mínimo */
+  margin: 0;
+  padding: 0;
+  overflow: visible;      /* mostra o conteúdo sem cortar */
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--color-bg); /* antes era #fff */
-  margin: 0;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  flex: 1 1 auto; /* pode crescer e encolher */
-  min-width: 160px; /* evita que encolha muito */
-  min-height: 40px;
-  overflow: hidden;
-  flex-shrink: 0; /* impede o título de encolher demais */
+  color: var(--color-bg);
 }
 
-/* Linha de ações à direita */
-.actionsRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-grow: 1; /* permite crescer e ocupar espaço */
-  justify-content: flex-end; /* cola os botões à direita */
-  min-width: 360px; /* impede que a área fique muito pequena */
-}
 
-/* ============================
-   Barra de busca
-============================ */
 .searchBox {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.12); /* podemos trocar por --color-bg-soft se quiser ainda mais consistente */
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   padding: 6px 10px;
   max-width: 420px;
-  flex: 1;
+  flex: 0 0 auto;
+  align-self: flex-end;
 }
 
 .searchInput {
   flex: 1;
   background: transparent;
   border: none;
-  color: var(--color-bg); /* antes era #fff */
+  color: var(--color-bg);
   outline: none;
   font-size: 0.95rem;
 }
 
 .searchInput::placeholder {
-  color: rgba(255, 255, 255, 0.7); /* opcional: pode usar var(--color-text-light) */
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .iconBtn {
   border: none;
   background: transparent;
   cursor: pointer;
-  color: var(--color-bg); /* antes era #fff */
+  color: var(--color-bg);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* ============================
-   Botão de filtro
-============================ */
 .filterDropdown {
   display: flex;
 }
@@ -80,53 +68,64 @@
 .filterBtn {
   display: flex !important;
   align-items: center;
-  background: rgba(255, 255, 255, 0.12) !important; /* opcional: var(--color-bg-soft) */
+  background: rgba(255, 255, 255, 0.12) !important;
   border: none !important;
-  color: var(--color-bg) !important; /* antes era #fff */
+  color: var(--color-bg) !important;
   font-weight: 500;
   border-radius: 8px !important;
   padding: 6px 10px !important;
 }
 
 .filterBtn:hover {
-  background: rgba(255, 255, 255, 0.2) !important; /* opcional: usar var(--hover-bg) */
+  background: rgba(255, 255, 255, 0.2) !important;
 }
 
-/* ============================
-   Botão de adicionar
-============================ */
 .addBtn {
   display: flex !important;
   align-items: center;
-  background: var(--color-bg) !important; /* antes era #fff */
+  background: var(--color-bg) !important;
   border: none !important;
   border-radius: 8px !important;
-  color: var(--color-primary) !important; /* antes era #5a3a2b */
+  color: var(--color-primary) !important;
   font-weight: 700 !important;
   padding: 6px 12px !important;
 }
 
 .addBtn:hover {
-  background: var(--color-bg-soft) !important; /* antes era #f0f0f0 */
+  background: var(--color-bg-soft) !important;
 }
 
-/* ============================
-   Responsividade
-============================ */
+.actionsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-grow: 0;
+  justify-content: flex-end;
+  min-width: 360px;
+}
+
+/* Responsividade */
 @media (max-width: 800px) {
   .actionBar {
     flex-direction: column;
     align-items: stretch;
   }
 
+  .spacer {
+    display: none;
+  }
+
   .actionsRow {
     justify-content: center;
     flex-wrap: wrap;
+    min-width: 0;
   }
 
   .searchBox {
     max-width: 100%;
+    width: 100%;
   }
+
   .addBtn {
     display: none !important;
   }

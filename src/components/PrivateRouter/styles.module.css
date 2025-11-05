@@ -2,10 +2,12 @@
 
 .load{
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 10px;
     height: 100vh;
+    color: (--color-primary-dark);
+    font-family: "Poppins", sans-serif;
     font-size: 1.2rem;
-    color: black;
-    font-family: "Poppins", sans-serif; 
 }

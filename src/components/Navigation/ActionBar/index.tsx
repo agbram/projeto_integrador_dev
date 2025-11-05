@@ -57,6 +57,7 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
     }
   }
 
+
   function getPageIconMobile(pathname: string): JSX.Element {
       switch (pathname) {
         case "/produtos": return <PackageIcon size={24} style={{ marginLeft: 8 }} weight="bold"/>;
@@ -78,7 +79,6 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
   return (
     <div className={styles.actionBar}>
       <h2 className={styles.pageTitle}>{getPageTitle()}</h2>
-
       <div className={styles.actionsRow}>
         <form className={styles.searchBox} onSubmit={submitSearch}>
           <input

@@ -3,6 +3,7 @@
 import { ReactNode } from "react"
 import styles from "./styles.module.css"
 import { strict } from "assert"
+import Button from 'react-bootstrap/Button';
 
 type Action = {
   label: string
@@ -32,11 +33,7 @@ export default function CardProduto({ title, products, loading = true, actions }
         <p><strong>Categoria:</strong> {products.category}</p>
         
         <div>
-          {actions?.map((action, index)=>
-              <button key={index} onClick={action.onClick}>
-                {action.label}
-              </button>
-            )}
+          <Button variant="dark" >Editar</Button>
         </div>
       </div>
     </div>

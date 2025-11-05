@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import PrivateRouter from "@/components/PrivateRouter";
 import PagesWallpaper from "@/components/PagesWallpaper";
 import Header from "@/components/Navigation/Header";
 import { PageActionProvider } from "@/contexts/PageActions";
-
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,18 +30,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
-        
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <AuthProvider>
           <PrivateRouter>
             <PageActionProvider>
-              <Header/>
-              <PagesWallpaper/>
+              <Header />
+              <PagesWallpaper />
               {children}
-            </PageActionProvider>    
+            </PageActionProvider>
           </PrivateRouter>
         </AuthProvider>
-        
       </body>
     </html>
   );

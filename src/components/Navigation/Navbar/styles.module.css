@@ -46,6 +46,7 @@
   transition: background 180ms ease;
 }
 
+
 .sideOpen {
   display: flex;
   background: rgba(0, 0, 0, 0.36);
@@ -145,14 +146,11 @@
   border-radius: 999px;
   text-decoration: none;
   font-weight: 600;
-  color: var(--color-bg); /* texto branco */
+  color: var(--color-bg);
   background: transparent;
   transition: background 160ms ease, color 160ms ease, transform 120ms ease, box-shadow 160ms ease;
   line-height: 1;
   white-space: nowrap;
-
-  /* distância entre as pills */
-  margin-right: 8px; 
 }
 
 /* remove margin da última pill */
@@ -163,7 +161,7 @@
 /* Hover: apenas para a pill sob o mouse */
 .Nav :global(.nav-link):hover {
   background: var(--color-primary-light); /* marrom mais claro para destacar */
-  color: var(--color-bg); /* texto continua branco */
+  color: var(--color-bg);
   transform: translateY(-1px);
 }
 

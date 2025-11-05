@@ -112,7 +112,7 @@ export default function Card({
         <div className={styles.buttonsRow}>
           {showDelete && onDelete && (
             <ButtonCancelar
-              label= "Desativar usuário"
+              label= "Desativar cliente"
               onClick={onDelete}
               variant="outline"
             />

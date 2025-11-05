@@ -1,30 +1,66 @@
-@import "tailwindcss";
 
+/* Tema do aplicativo */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background-color: white;
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-main{
-  padding: 16px;
+    /* cores principais */
+    --color-primary: #402727; /* marrom escuro base */
+    --color-primary-light: #5b3a37; /* para hover, gradientes */
+    --color-primary-dark: #2c1a1a; /* fundo ou ativo escuro */
+    
+    --color-accent: #f7a6b8; /* detalhes / ícones / bordas */
+    --color-accent-light: #ffd0dc; /* hover / gradiente leve */
+    --color-accent-dark: #d47b92; /* ativo / hover intenso */
+  
+    --color-bg: #ffffff; /* fundo principal */
+    --color-bg-soft: #faf8f8; /* fundo secundário, mobile */
+  
+    --color-text: #3a2b2b; /* texto principal */
+    --color-text-light: #6b5a5a; /* texto secundário, labels */
+    
+    --color-border: #e4dcdc; /* linhas divisórias */
+    
+    /* semantic extras derivados da primeira paleta */
+    --color-header-grad-start: var(--color-primary-dark);
+    --color-header-grad-end: var(--color-bg-soft);
+    --color-on-header: var(--color-bg); /* texto/icons sobre header */
+  
+    --color-topbar-bg: var(--color-bg);
+    --color-topbar-text: var(--color-text);
+    --color-topbar-border: rgba(58,43,43,0.06);
+  
+    --color-navbar-bg: var(--color-bg);
+    --color-navbar-text: var(--color-text);
+    --color-navbar-border: rgba(58,43,43,0.06);
+    --color-navbar-icon: var(--color-text-light);
+    --color-navbar-active-bg: rgba(247,166,184,0.08);
+    --color-navbar-active-text: var(--color-primary);
+    --color-navbar-accent: var(--color-accent);
+  
+    --color-actionbar-bg: var(--color-bg);
+    --color-actionbar-text: var(--color-text);
+    --color-actionbar-border: rgba(58,43,43,0.04);
+  
+    /* botões */
+    --color-btn-bg: var(--color-primary-light);
+    --color-btn-text: var(--color-bg);
+    --color-btn-border: transparent;
+    --color-btn-hover-bg: var(--color-primary-dark);
+    --color-btn-hover-text: var(--color-bg);
+    --color-btn-hover-border: transparent;
+  
+    /* mobile variants — mais claros e legíveis */
+    --color-mobile-bg: var(--color-bg-soft);
+    --color-mobile-text: var(--color-text);
+    --color-mobile-border: rgba(58,43,43,0.06);
+    --color-mobile-header-grad-start: #f8efe6;
+    --color-mobile-header-grad-end: #fff8ee;
+    --color-mobile-active-bg: rgba(64,39,39,0.06);
+    --color-mobile-active-text: var(--color-primary);
+    --color-mobile-btn-bg: var(--color-primary-light);
+    --color-mobile-btn-text: var(--color-bg);
+    --color-mobile-btn-border: transparent;
+  
+    /* shadows */
+    --shadow-soft: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-medium: 0 4px 12px rgba(0,0,0,0.12);
+    --shadow-strong: 0 8px 20px rgba(0,0,0,0.15);
 }

@@ -16,6 +16,7 @@ import {
 } from "@phosphor-icons/react";
 import { usePathname } from "next/navigation";
 import styles from "./styles.module.css";
+import { usePageActions } from "@/hooks/usePageActions";
 
 type Props = {
   onSearch?: (q: string) => void;
@@ -28,6 +29,9 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
   const [q, setQ] = useState("");
   const rawPath = usePathname();
   const pathname = rawPath ?? "/";
+
+  const pageAction = usePageActions();
+  const { handleFilter } = usePageActions();
 
   function getPageTitle() {
     if (title) return title;
@@ -100,7 +104,7 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
           </Dropdown.Toggle>
 
           <Dropdown.Menu>
-            <Dropdown.Item onClick={() => onFilter?.()}>Opção 1</Dropdown.Item>
+            <Dropdown.Item onClick={() => handleFilter(true)}>Mostrar clientes desativados</Dropdown.Item>
             <Dropdown.Item onClick={() => onFilter?.()}>Opção 2</Dropdown.Item>
             <Dropdown.Item onClick={() => onFilter?.()}>Opção 3</Dropdown.Item>
           </Dropdown.Menu>
@@ -109,7 +113,7 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
         <Button
           variant="light"
           className={styles.addBtn}
-          onClick={() => onAdd?.()}
+          onClick={pageAction.handleAdd}
         >
           <PlusIcon size={16} className="me-2" /> Add
         </Button>

@@ -2,12 +2,8 @@
 .actionBar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: clamp(
-    32px,
-    5vw,
-    120px
-  ); /* espaçamento dinâmico, nunca menor que 32px e nunca maior que 120px */
+  gap: 20px;
+   
   padding: 12px 20px;
   flex-wrap: wrap;
 }
@@ -16,16 +12,16 @@
 .pageTitle {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-bg); /* antes era #fff */
   margin: 0;
   white-space: nowrap;
   display: flex;
   align-items: center;
-  gap: max(10px, 2vw);
   flex: 1 1 auto; /* pode crescer e encolher */
-  min-width: 160px; /* evita que encolha muito e deixe a foto grudada */
+  min-width: 160px; /* evita que encolha muito */
   min-height: 40px;
   overflow: hidden;
+  flex-shrink: 0; /* impede o título de encolher demais */
 }
 
 /* Linha de ações à direita */
@@ -35,17 +31,7 @@
   gap: 10px;
   flex-grow: 1; /* permite crescer e ocupar espaço */
   justify-content: flex-end; /* cola os botões à direita */
-  min-width: 360px; /* impede que a área dos botões/grupo de busca fique muito pequena */
-}
-
-/* Título da página */
-.pageTitle {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #fff;
-  margin: 0;
-  white-space: nowrap;
-  flex-shrink: 0; /* impede o título de encolher demais */
+  min-width: 360px; /* impede que a área fique muito pequena */
 }
 
 /* ============================
@@ -54,7 +40,7 @@
 .searchBox {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.12); /* podemos trocar por --color-bg-soft se quiser ainda mais consistente */
   border-radius: 8px;
   padding: 6px 10px;
   max-width: 420px;
@@ -65,20 +51,20 @@
   flex: 1;
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--color-bg); /* antes era #fff */
   outline: none;
   font-size: 0.95rem;
 }
 
 .searchInput::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.7); /* opcional: pode usar var(--color-text-light) */
 }
 
 .iconBtn {
   border: none;
   background: transparent;
   cursor: pointer;
-  color: #fff;
+  color: var(--color-bg); /* antes era #fff */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -94,16 +80,16 @@
 .filterBtn {
   display: flex !important;
   align-items: center;
-  background: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.12) !important; /* opcional: var(--color-bg-soft) */
   border: none !important;
-  color: #fff !important;
+  color: var(--color-bg) !important; /* antes era #fff */
   font-weight: 500;
   border-radius: 8px !important;
   padding: 6px 10px !important;
 }
 
 .filterBtn:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.2) !important; /* opcional: usar var(--hover-bg) */
 }
 
 /* ============================
@@ -112,16 +98,16 @@
 .addBtn {
   display: flex !important;
   align-items: center;
-  background: #fff !important;
+  background: var(--color-bg) !important; /* antes era #fff */
   border: none !important;
   border-radius: 8px !important;
-  color: #5a3a2b !important;
+  color: var(--color-primary) !important; /* antes era #5a3a2b */
   font-weight: 700 !important;
   padding: 6px 12px !important;
 }
 
 .addBtn:hover {
-  background: #f0f0f0 !important;
+  background: var(--color-bg-soft) !important; /* antes era #f0f0f0 */
 }
 
 /* ============================

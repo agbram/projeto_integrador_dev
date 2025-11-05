@@ -6,6 +6,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import PrivateRouter from "@/components/PrivateRouter";
 import PagesWallpaper from "@/components/PagesWallpaper";
 import Header from "@/components/Navigation/Header";
+import { PageActionProvider } from "@/contexts/PageActions";
 
 
 const geistSans = Geist({
@@ -33,11 +34,13 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
         
         <AuthProvider>
-        <PrivateRouter>    
-        <Header/>
-        <PagesWallpaper/>
-        {children}
-        </PrivateRouter>
+          <PrivateRouter>
+            <PageActionProvider>
+              <Header/>
+              <PagesWallpaper/>
+              {children}
+            </PageActionProvider>    
+          </PrivateRouter>
         </AuthProvider>
         
       </body>

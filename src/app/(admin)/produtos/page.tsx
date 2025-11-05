@@ -115,6 +115,7 @@ return (
             { name: "costPrice", label: "Preço de custo" },
             { name: "markupPercent", label: "Percentual de Markup" },
             { name: "stockQuantity", label: "Quantidade em estoque" },
+            { name: "fotoUrl", label: "Imagen" },
             {
               name: "category",
               label: "Tipo do Produtos",

@@ -7,6 +7,7 @@ type Product = {
     costPrice: number
     markupPercent: string
     stockQuantity: number
+    fotoUrl: string
     isActive: string
 
 }

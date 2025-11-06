@@ -4,6 +4,7 @@ import styles from "./styles.module.css";
 import { Image } from 'react-bootstrap';
 
 
+
 type Props ={
     nome: string;
     fotoUrl: string;
@@ -13,6 +14,7 @@ type Props ={
 
 
 export default function ProductCard(props: Props){
+    
     return(
             <li className={styles.root}>
             <span className={styles.nome}>{props.nome}</span>

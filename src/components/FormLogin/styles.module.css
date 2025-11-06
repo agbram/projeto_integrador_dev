@@ -38,3 +38,35 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0);
   }
 }
+
+.toastBody{
+  color: white;
+  display: flex;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.progressBar{
+  margin-top: 10px;
+  width: 100%;
+  background-color: white;
+  transition: 0.1s linear;
+  height: 4px;
+}
+
+.toastContainer{
+  position: fixed !important;
+  top: 70px !important;
+  right: 35px !important;
+  z-index: 9999;
+  width: 320px;
+  flex-grow: 1;
+  height: 100vh;
+  padding: 2rem;
+  color: #15141b;
+}
+
+.toastComponent{
+  border-radius: 16px 16px 0px 0px
+}

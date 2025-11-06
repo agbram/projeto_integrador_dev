@@ -295,9 +295,11 @@ export default function ClientesModal() {
     }
   };
 
+  // const pageActions = usePageActions();
+  // pageActions.setActionBar(<ActionBar title="Clientes" />);
+
   return (
     <>
-    <ActionBar />
       <div className={styles.containerPrincipal}>
         {clientes.map((cliente) => (
           <div

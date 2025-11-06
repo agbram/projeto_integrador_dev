@@ -7,6 +7,8 @@ import Navbar from "@/components/Navigation/Navbar";
 import ActionBar from "../ActionBar";
 
 export default function Header() {
+  // const pageActions = usePageActions();
+
   return (
     <header className={styles.headerWrapper}>
       <div className={styles.headerInner}>
@@ -19,7 +21,7 @@ export default function Header() {
         </div>
 
         <div className={styles.actionBarArea}>
-          
+          {/* {pageActions.actionBar} */}
         </div>
       </div>
     </header>

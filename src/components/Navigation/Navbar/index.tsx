@@ -71,7 +71,7 @@ export default function Navbar() {
                 >
                   <span className={styles.Icon} aria-hidden>
                     <HouseIcon
-                      size={18}
+                      size={20}
                       weight={isActive("/") ? "fill" : "regular"}
                       className={`${isActive("/") ? styles.fufilledIcon : ""}`}
                     />
@@ -89,7 +89,7 @@ export default function Navbar() {
                 >
                   <span className={styles.Icon} aria-hidden>
                     <PackageIcon
-                      size={18}
+                      size={20}
                       weight={isActive("/produtos") ? "fill" : "regular"}
                       className={`${
                         isActive("/produtos") ? styles.fufilledIcon : ""
@@ -109,7 +109,7 @@ export default function Navbar() {
                 >
                   <span className={styles.Icon} aria-hidden>
                     <ClipboardTextIcon
-                      size={18}
+                      size={20}
                       weight={isActive("/estoque") ? "fill" : "regular"}
                       className={`${
                         isActive("/estoque") ? styles.fufilledIcon : ""
@@ -129,7 +129,7 @@ export default function Navbar() {
                 >
                   <span className={styles.Icon} aria-hidden>
                     <UsersIcon
-                      size={18}
+                      size={20}
                       weight={isActive("/clientes") ? "fill" : "regular"}
                       className={`${
                         isActive("/clientes") ? styles.fufilledIcon : ""
@@ -149,7 +149,7 @@ export default function Navbar() {
                 >
                   <span className={styles.Icon} aria-hidden>
                     <ChartBarIcon
-                      size={18}
+                      size={20}
                       weight={isActive("/relatorios") ? "fill" : "regular"}
                       className={`${
                         isActive("/relatorios") ? styles.fufilledIcon : ""
@@ -169,7 +169,7 @@ export default function Navbar() {
                 >
                   <span className={styles.Icon} aria-hidden>
                     <InvoiceIcon
-                      size={18}
+                      size={20}
                       weight={isActive("/despesas") ? "fill" : "regular"}
                       className={`${
                         isActive("/despesas") ? styles.fufilledIcon : ""
@@ -189,7 +189,7 @@ export default function Navbar() {
                 >
                   <span className={styles.Icon} aria-hidden>
                     <ShoppingCartIcon
-                      size={18}
+                      size={20}
                       weight={isActive("/pedidos") ? "fill" : "regular"}
                       className={`${
                         isActive("/pedidos") ? styles.fufilledIcon : ""

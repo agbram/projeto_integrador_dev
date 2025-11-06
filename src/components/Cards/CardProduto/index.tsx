@@ -2,6 +2,10 @@
 
 import { ReactNode } from "react";
 import styles from "./styles.module.css";
+import { ReactNode } from "react"
+import styles from "./styles.module.css"
+import { strict } from "assert"
+import Button from 'react-bootstrap/Button';
 
 type Action = {
   label: string;
@@ -68,6 +72,9 @@ export default function CardProduto({ title, products, loading = true, actions }
               {action.label}
             </button>
           ))}
+        
+        <div>
+          <Button variant="dark" >Editar</Button>
         </div>
       </div>
     </div>

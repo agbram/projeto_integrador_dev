@@ -3,9 +3,10 @@
   border: 1px solid #ddd;
   border-radius: 20px;
   padding: 16px;
-  margin: 10px 0;
+  margin: 10px auto;
   transition: all 0.3s ease;
-  width: 700px;
+  width: 100%;
+  max-width: 1200px;
   display: flex;
   flex-direction: column;
 }
@@ -79,4 +80,13 @@
   display: flex;
   justify-content: end;
   margin: 10px 10px 10px 10px
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: calc(100% - 32px); /* deixa um espaço nas laterais */
+    max-width: none;
+    margin: 10px 16px;
+    border-radius: 12px;
+  }
 }

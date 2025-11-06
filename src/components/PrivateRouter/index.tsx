@@ -2,8 +2,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import "ldrs/react/Helix.css";
-import RotatingText from "../Animations/rotatingText";
+import { DotWave, } from "ldrs/react";
+import styles from "./styles.module.css";
+import "ldrs/react/DotWave.css";
+
 
 type Props = {
   children: React.ReactNode;
@@ -28,20 +30,10 @@ export default function PrivateRoute({ children }: Props) {
 
   if (loading) {
     return (
-
-        <RotatingText
-          texts={["React", "Bits", "Is", "Cool!"]}
-          mainClassName="px-2 sm:px-2 md:px-3 bg-cyan-300 text-black overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg"
-          staggerFrom={"last"}
-          initial={{ y: "100%" }}
-          animate={{ y: 0 }}
-          exit={{ y: "-120%" }}
-          staggerDuration={0.025}
-          splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1"
-          transition={{ type: "spring", damping: 30, stiffness: 400 }}
-          rotationInterval={2000}
-        />
-
+      <div className={styles.load}>
+        <DotWave size="100" speed="1" color="black" />
+        Quase lá...
+      </div>
     );
   }
 
@@ -49,7 +41,5 @@ export default function PrivateRoute({ children }: Props) {
     return null;
   }
 
-  // <Helix size="150" speed="2.5" color="black" />
-  // Quase lá...
   return <>{children}</>;
 }

@@ -12,6 +12,7 @@ import Customer, { CustomerType } from "@/models/Customer";
 import styles from "./styles.module.css";
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 import { usePageActions } from "@/hooks/usePageActions";
+import ActionBar from "@/components/Navigation/ActionBar";
 
 // ✅ Funções de validação movidas para fora do componente
 const isValidCPF = (cpf: string): boolean => {
@@ -296,6 +297,7 @@ export default function ClientesModal() {
 
   return (
     <>
+    <ActionBar />
       <div className={styles.containerPrincipal}>
         {clientes.map((cliente) => (
           <div

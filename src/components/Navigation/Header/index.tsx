@@ -19,7 +19,7 @@ export default function Header() {
         </div>
 
         <div className={styles.actionBarArea}>
-          <ActionBar />
+          
         </div>
       </div>
     </header>

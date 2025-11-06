@@ -8,6 +8,7 @@ import FAB from "@/components/FAB";
 import api from "@/services/api";
 import { UserPlusIcon } from "@phosphor-icons/react";
 import CardProduto from "@/components/Cards/CardProduto";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 
 export default function produtosModal() {
@@ -34,6 +35,7 @@ export default function produtosModal() {
         costPrice: Number(data.costPrice),
         markupPercent: Number(data.markupPercent),
         stockQuantity: Number(data.stockQuantity),
+        fotoData: data.fotoUrl,
         category: data.category,
         isActive: true,
       };

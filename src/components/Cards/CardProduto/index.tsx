@@ -1,7 +1,6 @@
 'use client';
 
-import { ReactNode } from "react";
-import styles from "./styles.module.css";
+
 import { ReactNode } from "react"
 import styles from "./styles.module.css"
 import { strict } from "assert"
@@ -26,6 +25,7 @@ export default function CardProduto({ title, products, loading = true, actions }
   const imageSrc = `${urlBase}${products.fotoUrl}`; //getImageSrc(products.fotoUrl);
 
   return (
+
     <div className={styles.container}>
       <h3 className={styles.title}>{title || "Produto"}</h3>
 
@@ -77,6 +77,7 @@ export default function CardProduto({ title, products, loading = true, actions }
           <Button variant="dark" >Editar</Button>
         </div>
       </div>
+    </div>
     </div>
   );
 }

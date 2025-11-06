@@ -111,7 +111,7 @@ function FormTextLogin() {
       </form>
 
       {/* Toast com barra de progresso */}
-      <ToastContainer position="bottom-end" className={`${styles.toastContainer} p-3`}>
+      <ToastContainer className={`${styles.toastContainer} p-3`}>
         <Toast
           bg={toast.variant}
           show={toast.show}

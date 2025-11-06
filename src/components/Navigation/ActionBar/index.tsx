@@ -104,7 +104,7 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
           </Dropdown.Toggle>
 
           <Dropdown.Menu>
-            <Dropdown.Item onClick={() => handleFilter(true)}>Mostrar clientes desativados</Dropdown.Item>
+            <Dropdown.Item onClick={() => onFilter?.()}>Opção 1</Dropdown.Item>
             <Dropdown.Item onClick={() => onFilter?.()}>Opção 2</Dropdown.Item>
             <Dropdown.Item onClick={() => onFilter?.()}>Opção 3</Dropdown.Item>
           </Dropdown.Menu>
@@ -115,7 +115,7 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
           className={styles.addBtn}
           onClick={pageAction.handleAdd}
         >
-          <PlusIcon size={16} className="me-2" /> Add
+          <PlusIcon size={16} className="me-2" /> Adicionar
         </Button>
 
         <FAB onClick={() => {}} text={IconComp} />

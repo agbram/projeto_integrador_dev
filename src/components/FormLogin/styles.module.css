@@ -38,3 +38,29 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0);
   }
 }
+
+.toastBody{
+  color: white;
+  display: flex;
+  justify-content: center;
+}
+
+.progressBar{
+  margin-top: 10px;
+  width: 100%;
+  background-color: white;
+  transition: 0.1s linear;
+  height: 4px;
+}
+
+.toastContainer{
+  position: fixed !important;
+  bottom: 70px !important;
+  right: 90px !important;
+  z-index: 9999;
+  width: 330px;
+}
+
+.toastComponent{
+  border-radius: 16px 16px 0px 0px
+}

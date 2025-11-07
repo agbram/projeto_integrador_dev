@@ -1,4 +1,4 @@
-// Navbar.tsx
+
 "use client";
 import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -97,26 +97,6 @@ export default function Navbar() {
                     />
                   </span>
                   <span className={styles.linkText}>Produtos</span>
-                </Nav.Link>
-              </Nav.Item>
-
-              <Nav.Item>
-                <Nav.Link
-                  as={Link}
-                  href="/estoque"
-                  eventKey="/estoque"
-                  className={isActive("/estoque") ? styles.activeLink : ""}
-                >
-                  <span className={styles.Icon} aria-hidden>
-                    <ClipboardTextIcon
-                      size={20}
-                      weight={isActive("/estoque") ? "fill" : "regular"}
-                      className={`${
-                        isActive("/estoque") ? styles.fufilledIcon : ""
-                      }`}
-                    />
-                  </span>
-                  <span className={styles.linkText}>Estoque</span>
                 </Nav.Link>
               </Nav.Item>
 
@@ -260,22 +240,6 @@ export default function Navbar() {
                 />
               </span>
               <span className={styles.sideNavText}>Produtos</span>
-            </Link>
-
-            <Link
-              href="/estoque"
-              className={`${styles.sideNavLink} ${
-                isActive("/estoque") ? styles.activeLink : ""
-              }`}
-              onClick={() => setOpen(false)}
-            >
-              <span className={styles.sideNavIcon} aria-hidden>
-                <ClipboardTextIcon
-                  size={18}
-                  weight={isActive("/estoque") ? "fill" : "regular"}
-                />
-              </span>
-              <span className={styles.sideNavText}>Estoque</span>
             </Link>
 
             <Link

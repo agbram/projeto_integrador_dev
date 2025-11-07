@@ -1,27 +1,23 @@
-
-/* Tema do aplicativo */
 :root {
-    /* cores principais */
-    --color-primary: #402727; /* marrom escuro base */
-    --color-primary-light: #5b3a37; /* para hover, gradientes */
-    --color-primary-dark: #2c1a1a; /* fundo ou ativo escuro */
+    --color-primary: #402727;
+    --color-primary-light: #5b3a37;
+    --color-primary-dark: #2c1a1a;
     
-    --color-accent: #f7a6b8; /* detalhes / ícones / bordas */
-    --color-accent-light: #ffd0dc; /* hover / gradiente leve */
-    --color-accent-dark: #d47b92; /* ativo / hover intenso */
+    --color-accent: #f7a6b8;
+    --color-accent-light: #ffd0dc;
+    --color-accent-dark: #d47b92;
   
-    --color-bg: #ffffff; /* fundo principal */
-    --color-bg-soft: #faf8f8; /* fundo secundário, mobile */
+    --color-bg: #ffffff;
+    --color-bg-soft: #faf8f8;
   
-    --color-text: #3a2b2b; /* texto principal */
-    --color-text-light: #6b5a5a; /* texto secundário, labels */
+    --color-text: #3a2b2b;
+    --color-text-light: #6b5a5a;
     
-    --color-border: #e4dcdc; /* linhas divisórias */
+    --color-border: #e4dcdc;
     
-    /* semantic extras derivados da primeira paleta */
     --color-header-grad-start: var(--color-primary-dark);
     --color-header-grad-end: var(--color-bg-soft);
-    --color-on-header: var(--color-bg); /* texto/icons sobre header */
+    --color-on-header: var(--color-bg);
   
     --color-topbar-bg: var(--color-bg);
     --color-topbar-text: var(--color-text);
@@ -39,7 +35,6 @@
     --color-actionbar-text: var(--color-text);
     --color-actionbar-border: rgba(58,43,43,0.04);
   
-    /* botões */
     --color-btn-bg: var(--color-primary-light);
     --color-btn-text: var(--color-bg);
     --color-btn-border: transparent;
@@ -47,7 +42,6 @@
     --color-btn-hover-text: var(--color-bg);
     --color-btn-hover-border: transparent;
   
-    /* mobile variants — mais claros e legíveis */
     --color-mobile-bg: var(--color-bg-soft);
     --color-mobile-text: var(--color-text);
     --color-mobile-border: rgba(58,43,43,0.06);
@@ -59,8 +53,46 @@
     --color-mobile-btn-text: var(--color-bg);
     --color-mobile-btn-border: transparent;
   
-    /* shadows */
     --shadow-soft: 0 2px 8px rgba(0,0,0,0.08);
     --shadow-medium: 0 4px 12px rgba(0,0,0,0.12);
     --shadow-strong: 0 8px 20px rgba(0,0,0,0.15);
+
+    --color-beige: #D9C6A3;
+    --color-beige-border: #c2b292;
+    --color-success: #27ae60;
+    --color-warning: #f39c12;
+    --color-muted: #5a6c7d;
+    --color-shadow-brown: rgba(64,39,39,0.3);
+
+    --color-danger: #dd0303;
+    --color-danger-dark: #b80202;
+    --color-danger-strong: #ff4444;
+    --color-danger-strong-dark: #d42f2f;
+    --color-black: #000000;
+    --shadow-cancel-hover: 0 4px 8px rgba(64,39,39,0.25);
+
+    --color-dropdown-bg: gray;
+
+
+    --color-button-bg: #15141B;
+    --color-button-hover-bg: #403F48;
+    --color-button-text: #ffffff;
+
+    --color-container-bg: #ffffff;
+    --color-container-text: #1e1e1e;
+    --color-title-text: #2b2b2b;
+    --color-field-border: #c2b292;
+    --color-field-bg: #ffffff;
+    --color-field-text: #402727;
+    --color-field-focus-border: #8b5e3c;
+    --color-field-focus-bg: #fff7e6;
+    --color-field-focus-shadow: rgba(139, 94, 60, 0.35);
+    --color-field-placeholder: #8c7b67;
+    --color-field-hover-border: #a68258;
+    --color-field-hover-bg: #f5e9d3;
+    --color-button-bg-success: #44A34A;
+    --color-button-hover-bg-success: #75CD6C;
+    
+
+  
 }

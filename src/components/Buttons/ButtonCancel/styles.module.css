@@ -1,4 +1,4 @@
-/* 🎯 BASE (Comum a todos os botões) */
+/* CSS dos botões (substitui cores fixas por variáveis da paleta) */
 .cancelButton {
   font-weight: 600;
   border: none;
@@ -10,67 +10,64 @@
   font-size: 0.9rem;
 }
 
-/* Hover universal */
 .cancelButton:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(64, 39, 39, 0.25);
+  box-shadow: var(--shadow-cancel-hover);
 }
 
-/* 🟥 HIERARQUIA (Do mais suave ao mais intenso) */
-
-/* 1️⃣ Leve - Para ações secundárias */
+/* Leve - Para ações secundárias */
 .cancelLight {
   background-color: transparent;
-  border: 2px solid #dd0303;
-  color: #dd0303;
+  border: 2px solid var(--color-danger);
+  color: var(--color-danger);
 }
 
 .cancelLight:hover {
-  background-color: #dd0303;
-  color: white;
+  background-color: var(--color-danger);
+  color: var(--color-bg);
 }
 
 .cancelOutline {
   background-color: transparent;
-  color: #dd0303;
-  text-decoration: none; /* Remove sublinhado padrão */
+  color: var(--color-danger);
+  text-decoration: none;
 }
 
 .cancelOutline:hover {
-  transform: none; /* Remove a transformação do hover universal */
-  box-shadow: none; /* Remove a sombra do hover universal */
-  text-decoration: underline; /* Apenas sublinha o texto */
+  transform: none;
+  box-shadow: none;
+  text-decoration: underline;
 }
 
-/* 3️⃣ Default - Cancelamento padrão */
+/* Default - Cancelamento padrão */
 .cancelDefault {
-  background-color: #dd0303;
-  color: white;
+  background-color: var(--color-danger);
+  color: var(--color-bg);
 }
 
 .cancelDefault:hover {
-  background-color: #b80202;
+  background-color: var(--color-danger-dark);
 }
 
-/* 4️⃣ Danger - Ação perigosa */
+/* Danger - Ação perigosa */
 .cancelDanger {
-  background-color: #ff4444;
-  color: white;
+  background-color: var(--color-danger-strong);
+  color: var(--color-bg);
 }
 
 .cancelDanger:hover {
-  background-color: #d42f2f;
+  background-color: var(--color-danger-strong-dark);
 }
 
-/* 5️⃣ Delete - Máxima urgência */
+/* Delete - Máxima urgência */
 .cancelDelete {
-  background-color: #000;
-  color: #fff;
-  border: 2px solid #000;
+  background-color: var(--color-black);
+  color: var(--color-bg);
+  border: 2px solid var(--color-black);
 }
 
 .cancelDelete:hover {
-  background-color: #fff;
-  color: #000;
-  border-color: #000;
+  background-color: var(--color-bg);
+  color: var(--color-black);
+  border-color: var(--color-black);
 }

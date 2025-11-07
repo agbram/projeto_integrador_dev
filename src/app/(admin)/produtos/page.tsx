@@ -118,10 +118,10 @@ export default function ProdutosModal() {
               { name: "costPrice", label: "Preço de custo" },
               { name: "markupPercent", label: "Percentual de Markup" },
               { name: "stockQuantity", label: "Quantidade em estoque" },
-              { name: "fotoUrl", label: "Imagen" },
+              { name: "fotoUrl", label: "Imagem" },
               {
                 name: "category",
-                label: "Tipo do Produtos",
+                label: "Categoria",
                 type: "select",
                 options: categoryOptions,
               },

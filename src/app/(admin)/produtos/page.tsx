@@ -10,16 +10,104 @@ import { UserPlusIcon } from "@phosphor-icons/react";
 import CardProduto from "@/components/Cards/CardProduto";
 import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
+import { usePageActions } from "@/hooks/usePageActions"
+import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 
 export default function ProdutosModal() {
   const [modalShow, setModalShow] = useState(false);
   const [modalEditShow, setModalEditShow] = useState(false);
   const [successModalShow, setSuccessModalShow] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const [warningModalShow, setWarningModalShow] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [produtos, setprodutos] = useState<Product[]>([]);
+  const [produtos, setProdutos] = useState<Product[]>([]);
   const [selectProduto, setSelectProduto] = useState<Product>();
+  const [warningDeleteModalShow, setWarningDeleteModalShow] = useState(false);
+  const pageAction = usePageActions();
+
+  const handleCloseEditModal = () => {
+    setModalEditShow(false);
+    setSelectProduto(undefined);
+  };
+
+  const handleWarningDelete = () => {
+    setModalEditShow(false);
+    setWarningDeleteModalShow(true);
+    setWarningMessage("Deseja realmente desativar esse produto?");
+  };
+
+  const handleDesativaProduct = async () => {
+    setLoading(true);
+    try {      
+      const response = await api.delete(`/product/${selectProduto?.id}`);
+      console.log("Cliente desativado com sucesso:", response.data);
+
+      setProdutos(prev => prev.map(produto => 
+        produto.id === selectProduto?.id ? response.data : produto
+      ));
+      setWarningDeleteModalShow(false);
+      setSuccessMessage("Cliente desativado com sucesso!");
+      setSuccessModalShow(true);
+      setModalEditShow(false);
+      fetchprodutos();
+    } catch (error: any) {
+      console.error("Erro ao desativar produto:", error);
+      setWarningMessage(
+        error.response?.data?.message || "Erro ao desativar cliente. Tente novamente."
+      );
+      setWarningModalShow(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseWarningModal = () => {
+    setModalEditShow(true);
+    setWarningDeleteModalShow(false);
+  };
+
+  const handleSalvarAlteracoes = async (data: any) => {
+    setLoading(true);
+    try {      
+      const fullData = {
+        ...data
+      };
+      
+      console.log("Editando produto:", fullData);
+      const response = await api.put(`/products/${selectProduto?.id}`, fullData);
+      console.log("Produto alterado com sucesso:", response.data);
+
+      // ✅ Atualizar a lista de clientes
+      setProdutos(prev => prev.map(produto => 
+        produto.id === selectProduto?.id ? response.data : produto
+      ));
+      
+      setSuccessMessage("Produto atualizado com sucesso!");
+      setSuccessModalShow(true);
+      setModalEditShow(false);
+    } catch (error: any) {
+      console.error("Erro ao editar cliente:", error);
+      setWarningMessage(
+        error.response?.data?.message || "Erro ao editar cliente. Tente novamente."
+      );
+      setWarningModalShow(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+     useEffect(() => {
+      // registra o handler apenas quando o componente montar (ou quando pageAction mudar)
+      pageAction.setHandleAdd(() => {
+        setModalShow(true);
+        
+      });
+      // opcional: cleanup para restaurar handler padrão (não obrigatório)
+      return () => {
+        pageAction.setHandleAdd(() => () => {}); // no-op ao desmontar
+      };
+    }, []);
 
   const categoryOptions = [
     { value: "BOLOS", label: "BOLOS" },
@@ -28,6 +116,11 @@ export default function ProdutosModal() {
 
   const handleSubmit = async (data: any) => {
     setLoading(true);
+
+    // converter o file do input para base 64
+    const fotoData = ""; 
+
+
     try {
       const formattedData = {
         name: data.name,
@@ -35,7 +128,7 @@ export default function ProdutosModal() {
         costPrice: Number(data.costPrice),
         markupPercent: Number(data.markupPercent),
         stockQuantity: Number(data.stockQuantity),
-        fotoData: data.fotoUrl,
+        fotoData: fotoData,
         category: data.category,
         isActive: true,
       };
@@ -59,7 +152,7 @@ export default function ProdutosModal() {
     try {
       setLoading(true);
       const response = await api.get("/products");
-      setprodutos(response.data);
+      setProdutos(response.data);
     } catch (error) {
       console.error("Erro ao buscar Produto:", error);
       setWarningMessage("Erro ao carregar os Produto cadastrados.");
@@ -75,14 +168,14 @@ export default function ProdutosModal() {
 
   return (
     <>
-      <div>
+      <div className={styles.containerPrincipal}>
         {produtos.map((produto) => (
           <div
             key={produto.id}
-            style={{ position: "relative", marginBottom: "20px" }}
+            className={styles.divContainerCliente}
           >
             <CardProduto
-              title={`produto: ${produto.name}`}
+              title={produto.name}
               products={produto}
               loading={loading}
               actions={[
@@ -118,7 +211,7 @@ export default function ProdutosModal() {
               { name: "costPrice", label: "Preço de custo" },
               { name: "markupPercent", label: "Percentual de Markup" },
               { name: "stockQuantity", label: "Quantidade em estoque" },
-              { name: "fotoUrl", label: "Imagen" },
+              { name: "fotoData", label: "Imagem", type: "file" },
               {
                 name: "category",
                 label: "Tipo do Produtos",
@@ -133,9 +226,41 @@ export default function ProdutosModal() {
             onCancel={() => {
               setModalShow(false);
             }}
-            submitClassName={
-              styles.modalProdutosButton
-            } /* se o Card aceita essa prop */
+          />
+        </Modal.Body>
+      </Modal>
+
+      <Modal
+        show={modalEditShow}
+        onHide={handleCloseEditModal}
+        centered
+      >
+        <Modal.Body
+        className={styles.modalBodyEdit}
+        >
+          <Card
+            key={selectProduto?.id}
+            title="Editar Cliente" 
+            fields={[
+              { name: "name",value: selectProduto?.name.toString(), label: "Nome" },
+              { name: "description",value: selectProduto?.description.toString(), label: "Descrição" },
+              { name: "costPrice", value: selectProduto?.costPrice.toString(), label: "Preço de custo" },
+              { name: "markupPercent",value: selectProduto?.markupPercent.toString(), label: "Percentual de Markup" },
+              { name: "fotoUrl", label: "Imagem" },
+              {
+                name: "category",
+                label: "Tipo do Produtos",
+                type: "select",
+                options: categoryOptions,
+              },
+            ]}
+            showDelete
+            onDelete={handleWarningDelete}
+            showCancel
+            onCancel={handleCloseEditModal}
+            onSubmit={handleSalvarAlteracoes}
+            submitLabel="Salvar"
+            loading={loading}
           />
         </Modal.Body>
       </Modal>
@@ -173,6 +298,27 @@ export default function ProdutosModal() {
             className={styles.successProdutosButton}
           >
             OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={warningDeleteModalShow}
+        onHide={() => setWarningDeleteModalShow(false)}
+        size="sm"
+        centered
+      >
+        <Modal.Body className="text-center">
+          <div className="mb-3" style={{ fontSize: "48px", color: "#ffc107"}}>
+            ⚠️
+          </div>
+          <h5><strong>Atenção</strong></h5>
+          <p>{warningMessage}</p>
+        </Modal.Body>
+        <Modal.Footer className={styles.modalWarningFooter}>
+          <ButtonCancelar variant="outline" onClick={handleCloseWarningModal} label="Cancelar"/>
+          <Button variant="danger" onClick={handleDesativaProduct}>
+            Desativar
           </Button>
         </Modal.Footer>
       </Modal>

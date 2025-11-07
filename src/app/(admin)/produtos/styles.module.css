@@ -8,6 +8,32 @@
   padding: 2rem;
 }
 
+.divContainerCliente{
+  display: flex;
+  flex-direction: row;
+  margin-top: 20px;
+}
+
+.modalWarningFooter{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    justify-items: center;
+}
+
+
+.containerPrincipal{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 10px auto;
+}
+
 .modalProdutosFooter {
   background-color: #D9C6A3;
   border-top: 1px solid #c2b292;

@@ -1,15 +1,16 @@
-'use client';
+"use client";
 
-
-import { ReactNode } from "react"
-import styles from "./styles.module.css"
-import { strict } from "assert"
-import Button from 'react-bootstrap/Button';
+import { useState } from "react";
+import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
+import { XIcon } from "@phosphor-icons/react";
+import styles from "./styles.module.css";
 
 type Action = {
   label: string;
   onClick(): void;
 };
+
 
 type CardProductProps = {
   title?: string;
@@ -18,66 +19,83 @@ type CardProductProps = {
   actions?: Action[];
 };
 
-export default function CardProduto({ title, products, loading = true, actions }: CardProductProps) {
-
-
-  const urlBase = 'http://localhost:4000';
-  const imageSrc = `${urlBase}${products.fotoUrl}`; //getImageSrc(products.fotoUrl);
+export default function CardProduto({
+  title,
+  products,
+  loading = false,
+  actions,
+}: CardProductProps) {
+  const urlBase = "http://localhost:4000";
+  const imageSrc = products.fotoUrl ? `${urlBase}${products.fotoUrl}` : "";
+  const [showDetails, setShowDetails] = useState(false);
 
   return (
+    <Card style={{ width: "18rem" }} className={styles.card}>
+      {/* Imagem do produto */}
+      <Card.Img
+        variant="top"
+        src={imageSrc || "/placeholder.png"}
+        alt={products.name}
+        style={{
+          height: "180px",
+          objectFit: "cover",
+          cursor: "pointer",
+        }}
+        onClick={() => setShowDetails(true)}
+      />
 
-    <div className={styles.container}>
-      <h3 className={styles.title}>{title || "Produto"}</h3>
+      <Card.Body>
+        {/* Cabeçalho com título e XIcon */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "8px",
+          }}
+        >
+          <Card.Title>{title || products.name || "Produto"}</Card.Title>
 
-      <div className={styles.info}>
-        <p><strong>ID:</strong> {products.id}</p>
-        <p><strong>Nome:</strong> {products.name}</p>
-        <p><strong>Descrição:</strong> {products.description}</p>
-        <p><strong>Preço de custo:</strong> {products.costPrice}</p>
-        <p><strong>Markup:</strong> {products.markupPercent}%</p>
-        <p><strong>Categoria:</strong> {products.category}</p>
-
-        {/* ✅ Exibe a imagem corretamente */}
-        <div style={{ marginTop: "10px" }}>
-          <strong>Imagem:</strong>
-          {imageSrc ? (
-            <div>
-              <img
-                src={imageSrc}
-                alt={products.name}
-                style={{
-                  width: "150px",
-                  height: "150px",
-                  objectFit: "cover",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                  marginTop: "5px",
-                }}
-              />
-            </div>
-          ) : (
-            <p>Não disponível</p>
+          {showDetails && (
+            <XIcon
+              weight="bold"
+              size={22}
+              onClick={() => setShowDetails(false)}
+              style={{
+                cursor: "pointer",
+                color: "#444",
+              }}
+            />
           )}
         </div>
 
-        {/* Ações */}
-        <div style={{ marginTop: "10px" }}>
+        {/* Conteúdo do card */}
+        <Card.Text>
+          {showDetails ? (
+            <>
+              <strong>Descrição:</strong> {products.description || "—"} <br />
+              <strong>Preço de custo:</strong> R$ {products.costPrice?.toFixed(2)} <br />
+              <strong>Markup:</strong> {products.markupPercent}% <br />
+              <strong>Categoria:</strong> {products.category || "—"}
+            </>
+          ) : (
+            "Clique na imagem para ver os detalhes."
+          )}
+        </Card.Text>
+
+        {/* Botões de ação */}
+        <div className={styles.teste}>
           {actions?.map((action, index) => (
             <button
               key={index}
               onClick={action.onClick}
               className={styles.button}
-              style={{ marginRight: "8px" }}
             >
               {action.label}
             </button>
           ))}
-        
-        <div>
-          <Button variant="dark" >Editar</Button>
         </div>
-      </div>
-    </div>
-    </div>
+      </Card.Body>
+    </Card>
   );
 }

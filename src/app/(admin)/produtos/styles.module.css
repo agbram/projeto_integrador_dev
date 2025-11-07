@@ -1,10 +1,13 @@
-/* Modal Principal — Produtos */
-.modalProdutos {
+.modalProdutos,
+.successProdutosModal,
+.warningProdutosModal {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.modalProdutosBody {
-  background-color: #D9C6A3; /* Bege claro, mesmo tom do botão ativo */
+.modalProdutosBody,
+.successProdutosBody,
+.warningProdutosBody {
+  background-color: var(--color-bg);
   padding: 2rem;
 }
 
@@ -40,158 +43,99 @@
   padding: 1rem 2rem;
 }
 
-.modalProdutosButton {
-  background-color: #402727; /* Marrom escuro do header */
-  border: none;
-  color: #ffffff;
+.modalProdutosButton,
+.successProdutosButton,
+.warningProdutosButton {
+  background-color: var(--color-btn-bg);
+  border: var(--color-btn-border);
+  color: var(--color-btn-text);
   padding: 0.5rem 1.5rem;
   font-weight: 600;
   border-radius: 6px;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
-.modalProdutosButton:hover {
-  background-color: #5a3730; /* Marrom levemente mais claro */
-  color: #ffffff;
+.modalProdutosButton:hover,
+.successProdutosButton:hover,
+.warningProdutosButton:hover {
+  background-color: var(--color-btn-hover-bg);
+  color: var(--color-btn-hover-text);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-medium);
 }
 
-/* Modal de Sucesso — Produtos */
-.successProdutosModal {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.successProdutosBody {
-  background-color: #D9C6A3; /* Fundo bege */
-  padding: 2rem;
-}
-
-.successProdutosIconContainer {
+.successProdutosIconContainer,
+.warningProdutosIconContainer {
   display: flex;
   justify-content: center;
 }
 
 .successProdutosIcon {
   font-size: 48px;
-  color: #27ae60;
+  color: var(--color-success);
   font-weight: bold;
 }
 
-.successProdutosTitle {
-  color: #402727; /* Marrom escuro para títulos */
+.successProdutosTitle,
+.warningProdutosTitle {
+  color: var(--color-primary);
   font-weight: 600;
   margin-bottom: 0;
 }
 
-.successProdutosFooter {
-  background-color: #D9C6A3;
-  border-top: 1px solid #c2b292;
-  padding: 1rem 2rem;
-}
-
-.successProdutosButton {
-  background-color: #402727;
-  border: none;
-  color: #ffffff;
-  padding: 0.5rem 2rem;
-  font-weight: 600;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-}
-
-.successProdutosButton:hover {
-  background-color: #5a3730;
-  color: #ffffff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(64, 39, 39, 0.3);
-}
-
-/* Modal de Aviso — Produtos */
-.warningProdutosModal {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.warningProdutosBody {
-  background-color: #D9C6A3;
-  padding: 2rem;
-}
-
-.warningProdutosIconContainer {
-  display: flex;
-  justify-content: center;
-}
-
-.warningProdutosIcon {
-  font-size: 48px;
-  color: #f39c12;
-  font-weight: bold;
-}
-
-.warningProdutosTitle {
-  color: #402727;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
 .warningProdutosMessage {
-  color: #5a6c7d;
+  color: var(--color-muted);
   margin-bottom: 0;
   line-height: 1.5;
 }
 
-.warningProdutosFooter {
-  background-color: #D9C6A3;
-  border-top: 1px solid #c2b292;
-  padding: 1rem 2rem;
-}
-
-.warningProdutosButton {
-  background-color: #402727;
-  border: none;
-  color: #ffffff;
-  padding: 0.5rem 2rem;
-  font-weight: 600;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-}
-
-.warningProdutosButton:hover {
-  background-color: #5a3730;
-  color: #ffffff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(64, 39, 39, 0.3);
-}
-
-/* Estilos para o Card dentro do Modal de Produtos */
 .modalProdutosCard {
-  background: #ffffff;
+  background: var(--color-bg);
   border: none;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
 }
 
 .modalProdutosCardTitle {
-  color: #402727;
+  color: var(--color-primary);
   font-weight: 700;
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
-/* Override do Bootstrap apenas para este modal específico */
 :global(.modalProdutos) .modal-content {
   border: none;
   border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-strong);
 }
 
 :global(.modalProdutos) .modal-header {
-  border-bottom: 1px solid #c2b292;
-  background-color: #402727;
-  color: white;
+  border-bottom: 1px solid var(--color-border);
+  background: linear-gradient(90deg, var(--color-header-grad-start), var(--color-header-grad-end));
+  color: var(--color-on-header);
   border-radius: 10px 10px 0 0;
+  padding: 1rem 1.25rem;
 }
 
 :global(.modalProdutos) .modal-header .btn-close {
   filter: invert(1);
+}
+
+.modalProdutos .icon-center,
+.successProdutosIconContainer,
+.warningProdutosIconContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalProdutosFooter .actions,
+.successProdutosFooter .actions,
+.warningProdutosFooter .actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  align-items: center;
 }

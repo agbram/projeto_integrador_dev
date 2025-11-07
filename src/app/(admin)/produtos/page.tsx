@@ -214,7 +214,7 @@ export default function ProdutosModal() {
               { name: "fotoData", label: "Imagem", type: "file" },
               {
                 name: "category",
-                label: "Tipo do Produtos",
+                label: "Categoria",
                 type: "select",
                 options: categoryOptions,
               },

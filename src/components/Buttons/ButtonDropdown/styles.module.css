@@ -1,9 +1,10 @@
-.dropdown{
-    background-color: gray;
+.dropdown {
+    background-color: var(--color-dropdown-bg);
     height: 32px;
     width: auto;
     display: flex;
     align-items: center;
     justify-content: center;
     border: none;
-}   
+  }
+  

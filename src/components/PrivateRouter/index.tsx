@@ -32,7 +32,7 @@ export default function PrivateRoute({ children }: Props) {
     return (
       <div className={styles.load}>
         <DotWave size="100" speed="1" color="black" />
-        Quase lá...
+        Carregando...
       </div>
     );
   }

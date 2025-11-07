@@ -22,6 +22,7 @@ export default function Header() {
 
         <div className={styles.actionBarArea}>
           {/* {pageActions.actionBar} */}
+          <ActionBar />
         </div>
       </div>
     </header>

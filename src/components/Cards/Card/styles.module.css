@@ -1,7 +1,7 @@
 /* Container (mantém 340px) */
 .container {
-  background-color: #fff;
-  color: #1e1e1e;
+  background-color: var(--color-container-bg);
+  color: var(--color-container-text);
   width: 100%;
   max-width: 340px;
   margin: 16px auto;
@@ -21,7 +21,7 @@
   font-size: 1.28rem;
   font-weight: 700;
   margin-bottom: 50px;
-  color: #2b2b2b;
+  color: var(--color-title-text);
   letter-spacing: 0.33px;
   justify-content: center;
   align-items: center;
@@ -33,11 +33,11 @@
   max-width: 320px;
   box-sizing: border-box;
   border-width: 5px;
-  border-color: #1e1e1e;
+  border-color: var(--color-container-text);
   padding: 0 6px;
   font-size: 0.95rem;
   line-height: 1.45;
-  color: #333;
+  color: var(--color-container-text);
   margin-bottom: 7px;
 }
 
@@ -55,7 +55,7 @@
   width: 100%;
   margin-bottom: 7px;
   font-weight: bolder;
-  color: #2b2b2b;
+  color: var(--color-title-text);
   font-size: 0.9rem;
 }
 
@@ -66,10 +66,10 @@
   width: 100%;
   padding: 8px 10px;
   margin: 6px 0;
-  border: 1px solid #c2b292; /* tom bege suave */
+  border: 1px solid var(--color-field-border);
   border-radius: 6px;
-  background-color: #ffffff; /* bege claro */
-  color: #402727; /* texto marrom escuro */
+  background-color: var(--color-field-bg);
+  color: var(--color-field-text);
   font-size: 0.95rem;
   box-sizing: border-box;
   transition: all 0.25s ease;
@@ -85,16 +85,16 @@
 .form input:focus,
 .form select:focus,
 .form textarea:focus {
-  border-color: #8b5e3c; /* marrom médio */
-  background-color: #fff7e6; /* destaque suave */
-  box-shadow: 0 0 6px rgba(139, 94, 60, 0.35);
+  border-color: var(--color-field-focus-border);
+  background-color: var(--color-field-focus-bg);
+  box-shadow: 0 0 6px var(--color-field-focus-shadow);
   outline: none;
 }
 
 /* Placeholder mais sutil */
 .form input::placeholder,
 .form textarea::placeholder {
-  color: #8c7b67;
+  color: var(--color-field-placeholder);
   opacity: 0.9;
 }
 
@@ -102,14 +102,14 @@
 .form input:hover,
 .form select:hover,
 .form textarea:hover {
-  border-color: #a68258;
-  background-color: #f5e9d3;
+  border-color: var(--color-field-hover-border);
+  background-color: var(--color-field-hover-bg);
 }
 
 /* Botão padrão */
 .button {
-  background: #44A34A;
-  color: #ffffff;
+  background: var(--color-button-bg-success);
+  color: var(--color-button-text);
   font-weight: 600;
   border: none;
   border-radius: 6px;
@@ -122,16 +122,16 @@
 
 /* Efeito de hover do botão */
 .button:hover {
-  background-color:  #75CD6C;
+  background-color: var(--color-button-hover-bg-success);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(64, 39, 39, 0.25);
 }
 
 .buttonsRow {
   display: flex;
-  gap: 12px; /* espaço entre os botões */
+  gap: 12px;
 }
 
 .buttonsRow button {
-  flex: 1; /* cada botão ocupa o mesmo espaço */
+  flex: 1;
 }

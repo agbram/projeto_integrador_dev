@@ -1,6 +1,6 @@
 .container {
-  background-color: #f8f9fa;
-  border: 1px solid #ddd;
+  background-color: var(--color-container-bg);
+  border: 1px solid var(--color-container-border);
   border-radius: 20px;
   padding: 16px;
   margin: 10px auto;
@@ -11,16 +11,15 @@
   flex-direction: column;
 }
 
-
 .container:hover {
-  background-color: #fff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  background-color: var(--color-container-hover-bg);
+  box-shadow: 0 2px 6px var(--color-container-shadow);
 }
 
 .title {
   font-size: 1.2rem;
   margin-bottom: 10px;
-  color: #333;
+  color: var(--color-title-text);
   display: flex;
   text-align: left;
   flex-grow: 1;
@@ -30,29 +29,28 @@
 
 .icon {
   font-weight: bold;
-  size: 1000px;
   margin-left: 8px;
-  color: black
+  color: var(--color-icon-text);
 }
 
 .info {
   font-family: Arial, Helvetica, sans-serif;
-  color: black;
+  color: var(--color-info-text);
   max-height: 0;
   overflow: hidden;
   opacity: 0;
   transition: all 0.4s ease;
-  padding: 0px 0px 0px 32px
+  padding: 0px 0px 0px 32px;
 }
 
 .show {
-  max-height: 500px; /* ajuste conforme o conteúdo */
+  max-height: 500px;
   opacity: 1;
 }
 
 .button {
-  background: black;
-  color: #ffffff;
+  background: var(--color-button-bg);
+  color: var(--color-button-text);
   font-weight: 600;
   border: none;
   border-radius: 6px;
@@ -65,12 +63,12 @@
 }
 
 .button:hover {
-  background-color: gray;
+  background-color: var(--color-button-hover-bg);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(64, 39, 39, 0.25);
 }
 
-.header{
+.header {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -79,12 +77,12 @@
 .teste {
   display: flex;
   justify-content: end;
-  margin: 10px 10px 10px 10px
+  margin: 10px 10px 10px 10px;
 }
 
 @media (max-width: 768px) {
   .container {
-    width: calc(100% - 32px); /* deixa um espaço nas laterais */
+    width: calc(100% - 32px);
     max-width: none;
     margin: 10px 16px;
     border-radius: 12px;

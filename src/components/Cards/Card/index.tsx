@@ -4,6 +4,8 @@ import { useState } from "react"
 import styles from "./styles.module.css"
 import ButtonCancelar from "@/components/Buttons/ButtonCancel"
 
+export type FormData = Record<string, string | File>;
+
 type Field = {
   name: string
   label?: string
@@ -16,7 +18,7 @@ type Field = {
 type FormProps = {
   title?: string
   fields: Field[]
-  onSubmit: (data: Record<string, string>) => void
+  onSubmit: (data: FormData) => void
   submitLabel?: string
   loading?: boolean
   disabled?: boolean
@@ -40,13 +42,19 @@ export default function Card({
   onDelete,
   onChange,
 }: FormProps) {
-  const [formData, setFormData] = useState<Record<string, string>>({})
+  const [formData, setFormData] = useState<FormData>({})
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     
     // Atualiza o estado interno
-    setFormData(prev => ({ ...prev, [name]: value }))
+    if (e.target instanceof HTMLInputElement && e.target.files) {
+      const files = e.target.files;
+      const file = files[0];
+      setFormData(prev => ({ ...prev, [name]: file }))
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }))
+    }
 
     // Chama o onChange externo se existir
     if (onChange) {
@@ -61,7 +69,7 @@ export default function Card({
     fields.forEach(field => {
       const fieldNaoFoiAlterado = submittedData[field.name] === undefined;
       if (fieldNaoFoiAlterado && field.value !== undefined) {
-        submittedData[field.name] = field.value
+        submittedData[field.name] = field.value 
       }
     })
     console.log(submittedData)
@@ -83,7 +91,7 @@ export default function Card({
               {field.type === 'select' && field.options ? (
                 <select
                   name={field.name}
-                  value={value}
+                  value={value.toString()}
                   onChange={handleChange}
                   required
                   disabled={loading || disabled}
@@ -99,7 +107,7 @@ export default function Card({
                 <input
                   type={field.type || "text"}
                   name={field.name}
-                  value={value}
+                  value={field.type === 'file' ? undefined : value.toString()}
                   onChange={handleChange}
                   disabled={loading || disabled}
                 />
@@ -112,7 +120,7 @@ export default function Card({
         <div className={styles.buttonsRow}>
           {showDelete && onDelete && (
             <ButtonCancelar
-              label= "Desativar cliente"
+              label= "Desativar"
               onClick={onDelete}
               variant="outline"
             />

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Card from "@/components/Cards/Card";
+import Card, { FormData } from "@/components/Cards/Card";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import FAB from "@/components/FAB";
@@ -71,7 +71,7 @@ export default function DespesasModal() {
             ]}
 
             submitLabel="Salvar"
-            loading={loading} onSubmit={function (data: Record<string, string>): void {
+            loading={loading} onSubmit={function (data: FormData): void {
               throw new Error("Function not implemented.");
             } }          />
         </Modal.Body>

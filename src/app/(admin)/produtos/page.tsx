@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Card from "@/components/Cards/Card";
+import Card, { FormData } from "@/components/Cards/Card";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import FAB from "@/components/FAB";
@@ -12,6 +12,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
 import { usePageActions } from "@/hooks/usePageActions"
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
+import fileToBase64 from "@/utils/fileToBase64";
 
 export default function ProdutosModal() {
   const [modalShow, setModalShow] = useState(false);
@@ -40,14 +41,14 @@ export default function ProdutosModal() {
   const handleDesativaProduct = async () => {
     setLoading(true);
     try {      
-      const response = await api.delete(`/product/${selectProduto?.id}`);
-      console.log("Cliente desativado com sucesso:", response.data);
+      const response = await api.delete(`/products/${selectProduto?.id}`);
+      console.log("Produto desativado com sucesso:", response.data);
 
       setProdutos(prev => prev.map(produto => 
         produto.id === selectProduto?.id ? response.data : produto
       ));
       setWarningDeleteModalShow(false);
-      setSuccessMessage("Cliente desativado com sucesso!");
+      setSuccessMessage("Produto desativado com sucesso!");
       setSuccessModalShow(true);
       setModalEditShow(false);
       fetchprodutos();
@@ -70,12 +71,19 @@ export default function ProdutosModal() {
   const handleSalvarAlteracoes = async (data: any) => {
     setLoading(true);
     try {      
-      const fullData = {
-        ...data
+      const formattedData = {
+        name: data.name,
+        description: data.description,
+        costPrice: Number(data.costPrice),
+        markupPercent: Number(data.markupPercent),
+        stockQuantity: Number(data.stockQuantity),
+        fotoData: (data.fotoData != null) ? await fileToBase64(data.fotoData as File) : undefined,
+        category: data.category,
+        isActive: true,
       };
       
-      console.log("Editando produto:", fullData);
-      const response = await api.put(`/products/${selectProduto?.id}`, fullData);
+      console.log("Editando produto:", formattedData);
+      const response = await api.put(`/products/${selectProduto?.id}`, formattedData);
       console.log("Produto alterado com sucesso:", response.data);
 
       // ✅ Atualizar a lista de clientes
@@ -89,7 +97,7 @@ export default function ProdutosModal() {
     } catch (error: any) {
       console.error("Erro ao editar cliente:", error);
       setWarningMessage(
-        error.response?.data?.message || "Erro ao editar cliente. Tente novamente."
+        error.response?.data?.message || "Erro ao editar produto. Tente novamente."
       );
       setWarningModalShow(true);
     } finally {
@@ -114,12 +122,8 @@ export default function ProdutosModal() {
     { value: "DOCINHOS", label: "DOCINHOS" },
   ];
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: FormData) => {
     setLoading(true);
-
-    // converter o file do input para base 64
-    const fotoData = ""; 
-
 
     try {
       const formattedData = {
@@ -128,7 +132,7 @@ export default function ProdutosModal() {
         costPrice: Number(data.costPrice),
         markupPercent: Number(data.markupPercent),
         stockQuantity: Number(data.stockQuantity),
-        fotoData: fotoData,
+        fotoData: (data.fotoData != null) ? await fileToBase64(data.fotoData as File) : undefined,
         category: data.category,
         isActive: true,
       };
@@ -246,7 +250,7 @@ export default function ProdutosModal() {
               { name: "description",value: selectProduto?.description.toString(), label: "Descrição" },
               { name: "costPrice", value: selectProduto?.costPrice.toString(), label: "Preço de custo" },
               { name: "markupPercent",value: selectProduto?.markupPercent.toString(), label: "Percentual de Markup" },
-              { name: "fotoUrl", label: "Imagem" },
+              { name: "fotoData", label: "Alterar imagem atual", type: "file" },
               {
                 name: "category",
                 label: "Tipo do Produtos",

@@ -46,7 +46,7 @@ export default function PrivateRoute({ children }: Props) {
     const timer = setTimeout(() => {
       if (!isAuthenticated) router.push("/login");
       setLoading(false);
-    }, 3000);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, [isAuthenticated, router]);

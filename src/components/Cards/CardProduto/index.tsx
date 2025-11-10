@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
 import { XIcon } from "@phosphor-icons/react";
 import styles from "./styles.module.css";
 
@@ -10,7 +8,6 @@ type Action = {
   label: string;
   onClick(): void;
 };
-
 
 type CardProductProps = {
   title?: string;
@@ -30,72 +27,65 @@ export default function CardProduto({
   const [showDetails, setShowDetails] = useState(false);
 
   return (
-    <Card style={{ width: "18rem" }} className={styles.card}>
+    <div className={styles.container}>
       {/* Imagem do produto */}
-      <Card.Img
-        variant="top"
+      <img
         src={imageSrc || "/placeholder.png"}
         alt={products.name}
-        style={{
-          height: "180px",
-          objectFit: "cover",
-          cursor: "pointer",
-        }}
+        className={styles.cardImage}
         onClick={() => setShowDetails(true)}
       />
 
-      <Card.Body>
-        {/* Cabeçalho com título e XIcon */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "8px",
-          }}
-        >
-          <Card.Title>{title || products.name || "Produto"}</Card.Title>
+      {/* Cabeçalho */}
+      <div className={styles.header}>
+        <h5 className={styles.title}>{title || products.name || "Produto"}</h5>
 
-          {showDetails && (
-            <XIcon
-              weight="bold"
-              size={22}
-              onClick={() => setShowDetails(false)}
-              style={{
-                cursor: "pointer",
-                color: "#444",
-              }}
-            />
-          )}
-        </div>
+        {showDetails && (
+          <XIcon
+            weight="bold"
+            size={22}
+            onClick={() => setShowDetails(false)}
+            className={styles.icon}
+          />
+        )}
+      </div>
 
-        {/* Conteúdo do card */}
-        <Card.Text>
-          {showDetails ? (
-            <>
-              <strong>Descrição:</strong> {products.description || "—"} <br />
-              <strong>Preço de custo:</strong> R$ {products.costPrice?.toFixed(2)} <br />
-              <strong>Markup:</strong> {products.markupPercent}% <br />
-              <strong>Categoria:</strong> {products.category || "—"}
-            </>
-          ) : (
-            "Clique na imagem para ver os detalhes."
-          )}
-        </Card.Text>
+      {/* Texto quando detalhes não estão visíveis */}
+      {!showDetails && (
+        <p className={styles.clickHint}>
+          Clique na imagem para obter mais detalhes
+        </p>
+      )}
 
-        {/* Botões de ação */}
-        <div className={styles.teste}>
-          {actions?.map((action, index) => (
-            <button
-              key={index}
-              onClick={action.onClick}
-              className={styles.button}
-            >
-              {action.label}
-            </button>
-          ))}
-        </div>
-      </Card.Body>
-    </Card>
+      {/* Detalhes do produto */}
+      <div className={`${styles.info} ${showDetails ? styles.show : ""}`}>
+        <p>
+          <strong>Descrição:</strong> {products.description || "—"}
+        </p>
+        <p>
+          <strong>Preço de custo:</strong> R$ {products.costPrice?.toFixed(2) || "0.00"}
+        </p>
+        <p>
+          <strong>Markup:</strong> {products.markupPercent || 0}%
+        </p>
+        <p>
+          <strong>Categoria:</strong> {products.category || "—"}
+        </p>
+      </div>
+
+      {/* Botões de ação */}
+      <div className={styles.teste}>
+        {actions?.map((action, index) => (
+          <button
+            key={index}
+            onClick={action.onClick}
+            className={styles.button}
+            disabled={loading}
+          >
+            {action.label}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }

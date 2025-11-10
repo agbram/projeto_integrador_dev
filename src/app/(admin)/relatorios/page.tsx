@@ -1,10 +1,13 @@
-"use client";
+'Use Client';
+import { useState, useEffect } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import styles from "./styles.module.css"
+import { HourglassMediumIcon } from "@phosphor-icons/react/dist/ssr";
 
-import styles from "./styles.module.css";
-
-export default function Page() {
+export default function Home() {
   return (
-    <div className={styles.container}>
-    </div>
+    <>
+      <h1 className={styles.dev}>EM DESEVOLVIMENTO...<HourglassMediumIcon size={60} /></h1>
+    </>
   );
 }

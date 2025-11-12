@@ -1,57 +1,52 @@
-'use client'
+'use client';
 
-import { ReactNode } from "react"
-import styles from "./styles.module.css"
-import { strict } from "assert"
+import { ReactNode } from "react";
+import styles from "./styles.module.css";
+import Order from "@/models/order";
 
-type product = {
-  address: ReactNode
-  id?: number
-  name: string
-  description: string
-  category: string
-  markupPercent: string
-  costPrice: string
-  stockQuantity: Number
-  isActive: string
-}
 type Action = {
-  label: string
-  onClick(): void
-}
-type CardProductProps = {
-  title?: string
-  products: product
-  loading?: boolean
-  actions?: Action[]
-}
+  label: string;
+  onClick(): void;
+};
 
+type CardOrderProps = {
+  title?: string;
+  order: Order;
+  loading?: boolean;
+  actions?: Action[];
+};
 
-
-export default function CardProduto({ title, products, loading = false, actions }: CardProductProps) {
+export default function CardOrder({ title, order, loading = false, actions }: CardOrderProps) {
   return (
-    
     <div className={styles.container}>
-      <h3 className={styles.title}>{title || "Product"}</h3>
+      <h3 className={styles.title}>{title ?? `Pedido #${order.id ?? ""}`}</h3>
 
       <div className={styles.info}>
-        <p><strong>ID:</strong> {products.id}</p>
-        <p><strong>Descrição:</strong> {products.description}</p>
-        <p><strong>Nome:</strong> {products.name}</p>
-        <p><strong>markupPercent:</strong> {products.markupPercent}</p>
-        <p><strong>preço:</strong> {products.costPrice}</p>
-        <p><strong>Quantidade no stock:</strong> {products.address}</p>
-        <p><strong>Categoria:</strong> {products.category}</p>
-        
-        <div>
-          {actions?.map((action, index)=>
-              <button key={index} onClick={action.onClick}>
-                {action.label}
-              </button>
-            )}
-        </div>
+        <p><strong>ID do Pedido:</strong> {order.id}</p>
+        <p><strong>ID Cliente:</strong> {order.customerId}</p>
+        {order.customerName && <p><strong>Customer:</strong> {order.customerName}</p>}
+        <p><strong>Descrição:</strong> {order.description}</p>
+        <p><strong>Status:</strong> {order.status}</p>
+        <p><strong>Total:</strong> {typeof order.total === 'number' ? `R$ ${order.total.toFixed(2)}` : order.total}</p>
+        <p><strong>Data do pedido:</strong> {order.orderDate}</p>
+        <p><strong>Data de entrega:</strong> {order.deliveryDate ?? "—"}</p>
+        {order.deliveryAddress && <p><strong>Delivery Address:</strong> {order.deliveryAddress}</p>}
       </div>
+
+      {actions && actions.length > 0 && (
+        <div className={styles.actions}>
+          {actions.map((action, idx) => (
+            <button
+              key={idx}
+              onClick={action.onClick}
+              className={styles.actionButton}
+              disabled={loading}
+            >
+              {action.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
-    
-  )
+  );
 }

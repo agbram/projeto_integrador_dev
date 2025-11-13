@@ -14,10 +14,9 @@ type Props = {
 };
 
 export default function PrivateRoute({ children }: Props) {
-  const { isAuthenticated } = useAuth();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
   const [phrase, setPhrase] = useState("");
+  const { isAuthenticated, isLoading } = useAuth();
 
   const getRandomPhrase = () => {
     const phrases = [
@@ -33,16 +32,12 @@ export default function PrivateRoute({ children }: Props) {
   };
 
   useEffect(() => {
-    setPhrase(getRandomPhrase());
-    const timer = setTimeout(() => {
-      if (!isAuthenticated) router.push("/login");
-      setLoading(false);
-    }, 1500000);
+    if(!isLoading && !isAuthenticated){
+      router.push("/login");
+    }
+  }, [isLoading, isAuthenticated, router]);
 
-    return () => clearTimeout(timer);
-  }, [isAuthenticated, router]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div
         className={styles.wrapper}
@@ -125,6 +120,7 @@ export default function PrivateRoute({ children }: Props) {
     );
   }
 
-  if (!isAuthenticated) return null;
-  return <>{children}</>;
+  if (isAuthenticated) return <>{children}</>;
+
+  return null;
 }

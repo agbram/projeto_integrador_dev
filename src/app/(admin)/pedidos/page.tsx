@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from "react";
 import Card, { FormData } from "@/components/Cards/Card";
@@ -28,7 +28,9 @@ export default function PedidosModal() {
 
   const [pedidos, setPedidos] = useState<Order[]>([]);
   const [selectPedido, setSelectPedido] = useState<Order>();
-  const [customers, setCustomers] = useState<{ id: number; name: string }[]>([]);
+  const [customers, setCustomers] = useState<{ id: number; name: string }[]>(
+    []
+  );
   const [selectedCustomer, setSelectedCustomer] = useState<{
     id: number;
     name: string;
@@ -36,8 +38,17 @@ export default function PedidosModal() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  const [products, setProducts] = useState<{ id: number; name: string; price: number }[]>([]);
-  const [orderItems, setOrderItems] = useState<{ productId: number; quantity: number }[]>([]);
+  const [products, setProducts] = useState<
+    {
+      id: number;
+      name: string;
+      salePrice: number;
+    }[]
+  >([]);
+
+  const [orderItems, setOrderItems] = useState<
+    { productId: number; quantity: number }[]
+  >([]);
 
   const pageAction = usePageActions();
 
@@ -128,37 +139,131 @@ export default function PedidosModal() {
     return item ? item.quantity : 0;
   };
 
-  // 💾 Cadastrar pedido
+  // ✅ CORREÇÃO: Função para formatar data corretamente
+  const formatDeliveryDate = (dateString: string): string | null => {
+    if (!dateString) return null;
+    
+    try {
+      // Remove qualquer caractere não numérico exceto /
+      const cleaned = dateString.replace(/[^\d/]/g, '');
+      const parts = cleaned.split('/');
+      
+      if (parts.length === 3) {
+        const [day, month, year] = parts;
+        
+        // Garante que o ano tenha 4 dígitos
+        const fullYear = year.length === 2 ? `20${year}` : year;
+        
+        // Cria a data no formato YYYY-MM-DD
+        const date = new Date(`${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`);
+        
+        if (!isNaN(date.getTime())) {
+          return date.toISOString();
+        }
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Erro ao formatar data:', error);
+      return null;
+    }
+  };
+
+  // 💾 Cadastrar pedido - VERSÃO CORRIGIDA
   const handleSubmit = async (data: FormData) => {
     setLoading(true);
 
     try {
+      // ✅ Validações antes de enviar
+      if (!selectedCustomer) {
+        setWarningMessage("Selecione um cliente antes de cadastrar o pedido.");
+        setWarningModalShow(true);
+        setLoading(false);
+        return;
+      }
+
+      if (orderItems.length === 0) {
+        setWarningMessage("Adicione pelo menos um produto ao pedido.");
+        setWarningModalShow(true);
+        setLoading(false);
+        return;
+      }
+
+      // Buscar preços dos produtos
+      const selectedProducts = products.filter((p) =>
+        orderItems.some((i) => i.productId === p.id)
+      );
+
+      const items = orderItems.map((item) => {
+        const product = selectedProducts.find((p) => p.id === item.productId);
+        const unitPrice = product?.salePrice ?? 0;
+        const subtotal = unitPrice * item.quantity;
+        return { 
+          productId: item.productId, 
+          quantity: item.quantity, 
+          unitPrice, 
+          subtotal 
+        };
+      });
+
+      const totalCalculated = items.reduce((acc, i) => acc + i.subtotal, 0);
+
+      // ✅ CORREÇÃO: Formatação correta da data
+      const formattedDeliveryDate = data.deliveryDate 
+        ? formatDeliveryDate(String(data.deliveryDate))
+        : null;
+
       const formattedData = {
-        customerId: selectedCustomer?.id,
-        deliveryDate: data.deliveryDate
-          ? new Date(String(data.deliveryDate))
-          : null,
+        customerId: selectedCustomer.id, // ✅ Garantir que não é null
+        deliveryDate: formattedDeliveryDate,
         status: "PENDING",
         notes: data.notes || "",
-        total: data.total ? parseFloat(String(data.total)) : 0,
+        total: totalCalculated, // ✅ Usar sempre o total calculado
         userId: 1,
-        items: orderItems, // produtos e quantidades
+        items,
       };
 
-      const response = await api.post("/orders", formattedData);
-      console.log("Pedido cadastrado:", response.data);
-      fetchPedidos();
+      console.log("📦 Enviando pedido:", formattedData);
 
+      const response = await api.post("/orders", formattedData);
+      console.log("✅ Pedido cadastrado:", response.data);
+
+      fetchPedidos();
       setSuccessMessage("Pedido cadastrado com sucesso!");
       setSuccessModalShow(true);
       handleCloseModal();
-    } catch (error) {
-      console.error("Erro ao cadastrar Pedido:", error);
-      setWarningMessage("Erro ao cadastrar Pedido. Tente novamente.");
+      
+    } catch (error: any) {
+      console.error("❌ Erro ao cadastrar Pedido:", error);
+      
+      // ✅ CORREÇÃO: Mensagem de erro mais específica
+      if (error.response) {
+        const errorData = error.response.data;
+        console.error("📋 Detalhes do erro:", errorData);
+        
+        if (error.response.status === 400) {
+          setWarningMessage(errorData.message || "Dados inválidos. Verifique as informações do pedido.");
+        } else {
+          setWarningMessage(`Erro ${error.response.status}: ${errorData.message || 'Erro ao cadastrar pedido'}`);
+        }
+      } else if (error.request) {
+        setWarningMessage("Erro de conexão. Verifique se o servidor está rodando.");
+      } else {
+        setWarningMessage("Erro inesperado. Tente novamente.");
+      }
+      
       setWarningModalShow(true);
     } finally {
       setLoading(false);
     }
+  };
+
+  // ✅ CORREÇÃO: Calcular total para exibir no additionalInfo
+  const calculateTotal = () => {
+    return orderItems.reduce((total, item) => {
+      const product = products.find(p => p.id === item.productId);
+      return total + (product ? product.salePrice * item.quantity : 0);
+    }, 0);
   };
 
   return (
@@ -167,7 +272,7 @@ export default function PedidosModal() {
         {pedidos.map((p) => (
           <div key={p.id} className={styles.divContainerCliente}>
             <CardOrder
-              title={`${p.customerName}`}
+              title={p.customer?.name ?? "Cliente desconhecido"}
               order={p}
               loading={loading}
               actions={[
@@ -200,7 +305,9 @@ export default function PedidosModal() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onFocus={() => setIsSearchFocused(true)}
-                  onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+                  onBlur={() =>
+                    setTimeout(() => setIsSearchFocused(false), 200)
+                  }
                 />
               </div>
 
@@ -237,6 +344,9 @@ export default function PedidosModal() {
                 {products.map((p) => (
                   <div key={p.id} className={styles.productItem}>
                     <span className={styles.productName}>{p.name}</span>
+                    <span className={styles.productPrice}>
+                      R$ {p.salePrice.toFixed(2)}
+                    </span>
                     <div className={styles.quantityControls}>
                       <button
                         className={styles.btnQuantity}
@@ -257,6 +367,13 @@ export default function PedidosModal() {
                   </div>
                 ))}
               </div>
+
+              {/* ✅ CORREÇÃO: Exibir total parcial */}
+              {orderItems.length > 0 && (
+                <div className={styles.partialTotal}>
+                  <strong>Total parcial: R$ {calculateTotal().toFixed(2)}</strong>
+                </div>
+              )}
 
               <div className={styles.productsActions}>
                 <Button
@@ -285,15 +402,42 @@ export default function PedidosModal() {
             <Card
               title={`Cadastro de Pedido — ${selectedCustomer.name}`}
               fields={[
-                { name: "deliveryDate", label: "Data de Entrega (opcional)" },
-                { name: "notes", label: "Observações" },
-                { name: "total", label: "Total do Pedido (R$)" },
+                { 
+                  name: "deliveryDate", 
+                  label: "Data de Entrega (opcional)",
+                  type: "date",
+                  value: ""
+                },
+                { 
+                  name: "notes", 
+                  label: "Observações",
+                  type: "text",
+                  value: ""
+                },
               ]}
               onSubmit={handleSubmit}
               submitLabel="Cadastrar Pedido"
               loading={loading}
               showCancel
               onCancel={() => setFormStep("selectProducts")}
+              additionalInfo={
+                <div className={styles.orderSummary}>
+                  <h5>📦 Resumo do Pedido</h5>
+                  {orderItems.map(item => {
+                    const product = products.find(p => p.id === item.productId);
+                    return product ? (
+                      <div key={item.productId} className={styles.orderItem}>
+                        <span>{product.name}</span>
+                        <span>Qtd: {item.quantity}</span>
+                        <span>R$ {(product.salePrice * item.quantity).toFixed(2)}</span>
+                      </div>
+                    ) : null;
+                  })}
+                  <div className={styles.orderTotal}>
+                    <strong>Total: R$ {calculateTotal().toFixed(2)}</strong>
+                  </div>
+                </div>
+              }
             />
           )}
         </Modal.Body>

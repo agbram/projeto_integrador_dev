@@ -7,7 +7,7 @@ import { HourglassMediumIcon } from "@phosphor-icons/react/dist/ssr";
 export default function Home() {
   return (
     <>
-      <h1 className={styles.dev}>EM DESEVOLVIMENTO...<HourglassMediumIcon size={60} /></h1>
+      <h1 className={styles.dev}>EM DESENVOLVIMENTO...<HourglassMediumIcon size={60} /></h1>
     </>
   );
 }

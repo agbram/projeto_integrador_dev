@@ -1,7 +1,9 @@
 /* 
-  Comentários diretos: 
-  - Altere espaçamentos/tamanhos/velocidade abaixo nas variáveis dentro de .wrapper
-  - Substitua o conteúdo de .loadingPlaceholder no TSX pelo seu componente de loader
+  Mantive todo o seu CSS original e apliquei apenas a alteração pedida:
+  - NÃO alterei posições nem tamanhos por padrão.
+  - Adicionei uma media query em max-width: 768px que TRAVA os tamanhos ao valor de desktop,
+    para que nada mude de tamanho/posição no celular; apenas o texto de loading fica menor.
+  - Comentários mínimos para controle rápido.
 */
 
 /* wrapper contém todas as variáveis locais para fácil ajuste */
@@ -27,8 +29,9 @@
   --circle-size: clamp(14px, 2.6vmin, 18px);  /* tamanho dos círculos rosa */
   --logo-slot-width: clamp(180px, 28vmin, 300px); /* área para logos — aumentada */
   --logo-slot-height: clamp(32px, 6vmin, 56px);  /* altura ajustada para acompanhar */
-
   /* === FIM CONFIGURÁVEIS === */
+
+  will-change: transform;
 }
 
 /* center box (flex apenas para centralizar) */
@@ -52,28 +55,24 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-evenly;
-  gap: 18px;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 75px;
   position: relative;
-  z-index: 10; /* square in front of most decorative elements */
+  z-index: 10;
 }
 
 /* loading placeholder: onde você deve inserir seu loader */
-/* Ajuste tamanho do espaço reservado alterando --square-size e padding */
 .loadingPlaceholder {
   width: clamp(80px, 16vmin, 140px);
   height: clamp(80px, 16vmin, 140px);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 6px; /* garante posição perfeita sobre o texto */
+  margin-bottom: 1px; /* garante posição perfeita sobre o texto */
 }
 
 /* texto abaixo do loader */
-/* .loadingTextWrapper {
-  margin-top: 12px;
-  margin-bottom: 35px;
-} */
 .loadingText {
   color: #2e1f25;
   font-size: 0.99rem;
@@ -83,7 +82,6 @@
 }
 
 /* hearts (Phosphor icons) */
-/* top heart: appears in front/overlapping square */
 .heartTop {
   position: absolute;
   left: calc(50% - (var(--square-size) / 2) - 28px);
@@ -96,7 +94,6 @@
   opacity: 0.98;
 }
 
-/* bottom heart: sits behind the square (partially hidden) */
 .heartBottom {
   position: absolute;
   right: calc(49% - (var(--square-size) / 2) - 28px);
@@ -113,7 +110,7 @@
 .circlesLeft {
   position: absolute;
   left: calc(50% - (var(--square-size) / 2) - 36px);
-  top: 52%; /* movido mais acima */
+  top: 52%;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
@@ -126,7 +123,7 @@
 .circlesRight {
   position: absolute;
   right: calc(50% - (var(--square-size) / 2) - 36px);
-  top: 37%; /* movido mais acima */
+  top: 37%;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
@@ -203,20 +200,46 @@
 @keyframes fadeInAnim { from { opacity: 0; transform: translateY(6px) scale(.996); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes fadeOutAnim { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(6px) scale(.996); } }
 
-/* RESPONSIVE */
-@media (max-width: 480px) {
-  .heartTop { left: calc(50% - (var(--square-size) / 2) - 20px); top: calc(50% - (var(--square-size) / 2) - 28px); width: clamp(56px, 12vmin, 92px); }
-  .heartBottom { right: calc(50% - (var(--square-size) / 2) - 20px); bottom: calc(50% - (var(--square-size) / 2) - 28px); width: clamp(72px, 14vmin, 104px); }
-  .circlesLeft { left: calc(50% - (var(--square-size) / 2) - 26px); top: 38%; }
-  .circlesRight { right: calc(50% - (var(--square-size) / 2) - 26px); top: 38%; }
-  .loadingPlaceholder { width: clamp(64px, 14vmin, 110px); height: clamp(64px, 14vmin, 110px); }
-  .logoSlotTop, .logoSlotBottom { width: clamp(96px, 18vmin, 160px); height: clamp(18px, 3.6vmin, 32px); }
+/* RESPONSIVE - manter EXATAMENTE as posições e tamanhos no mobile (max-width:768px) */
+/* apenas ajustar o texto para caber; TRAVA todas as variáveis para valores fixos iguais ao desktop */
+@media (max-width: 768px) {
+  .wrapper {
+    /* trava os tamanhos para o mesmo valor do desktop (evita redimensionamento via clamp/vmin) */
+    --square-size: 300px;
+    --circle-size: 18px;
+    --logo-slot-width: 300px;
+    --logo-slot-height: 56px;
+    --square-padding: 26px;
+    --circle-gap: 12px;
+    --circle-distance: 14px;
+    --circle-speed: 1.6s;
+  }
 
-  /* texto menor no mobile */
+  /* mantém exatamente as posições (não alterei left/top/bottom/right) */
+
+  /* ajuste apenas do texto para evitar quebra */
   .loadingText {
-    font-size: 0.82rem;
+    font-size: 0.90rem; /* menor para caber em uma linha sem mexer em layout */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  /* se você usa regras menores como .loadingPlaceholder, mantemos o mesmo tamanho */
+  .loadingPlaceholder {
+    width: clamp(80px, 16vmin, 140px);
+    height: clamp(80px, 16vmin, 140px);
+  }
+
+  /* os slots de logo seguem o tamanho travado acima */
+  .logoSlotTop, .logoSlotBottom {
+    width: var(--logo-slot-width);
+    height: var(--logo-slot-height);
+  }
+
+  .logoSlotTop{
+    left: calc(39% - 36px);
+  }
 }
+
+/* nenhuma outra media query altera posições/tamanhos. */

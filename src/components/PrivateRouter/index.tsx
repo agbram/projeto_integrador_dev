@@ -37,7 +37,7 @@ export default function PrivateRoute({ children }: Props) {
     const timer = setTimeout(() => {
       if (!isAuthenticated) router.push("/login");
       setLoading(false);
-    }, 1500);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, [isAuthenticated, router]);
@@ -108,7 +108,7 @@ export default function PrivateRoute({ children }: Props) {
               stroke="10"
               bgOpacity="0"
               speed="2"
-              color="black"
+              color="#ffb5e2"
             />
 
             <div className={styles.loadingPlaceholder} aria-hidden="true">

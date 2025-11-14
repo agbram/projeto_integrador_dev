@@ -21,7 +21,7 @@ export default function PedidosModal() {
   const [warningModalShow, setWarningModalShow] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const [showSummary, setShowSummary] = useState(false);
   const [formStep, setFormStep] = useState<
     "checkCustomer" | "selectProducts" | "order"
   >("checkCustomer");
@@ -223,10 +223,10 @@ export default function PedidosModal() {
         items,
       };
 
-      console.log("📦 Enviando pedido:", formattedData);
+      console.log(" Enviando pedido:", formattedData);
 
       const response = await api.post("/orders", formattedData);
-      console.log("✅ Pedido cadastrado:", response.data);
+      console.log(" Pedido cadastrado:", response.data);
 
       fetchPedidos();
       setSuccessMessage("Pedido cadastrado com sucesso!");
@@ -234,12 +234,12 @@ export default function PedidosModal() {
       handleCloseModal();
       
     } catch (error: any) {
-      console.error("❌ Erro ao cadastrar Pedido:", error);
+      console.error("Erro ao cadastrar Pedido:", error);
       
       // ✅ CORREÇÃO: Mensagem de erro mais específica
       if (error.response) {
         const errorData = error.response.data;
-        console.error("📋 Detalhes do erro:", errorData);
+        console.error(" Detalhes do erro:", errorData);
         
         if (error.response.status === 400) {
           setWarningMessage(errorData.message || "Dados inválidos. Verifique as informações do pedido.");
@@ -292,7 +292,7 @@ export default function PedidosModal() {
       {/* 🧩 MODAL PRINCIPAL */}
       <Modal show={modalShow} onHide={handleCloseModal} size="lg" centered>
         <Modal.Body className={styles.modalPedidosBody}>
-          {/* 🧍 Selecionar cliente */}
+          {/*  Selecionar cliente */}
           {formStep === "checkCustomer" && (
             <div className={styles.searchContainer}>
               <h4>Selecione um cliente</h4>
@@ -397,49 +397,64 @@ export default function PedidosModal() {
             </div>
           )}
 
-          {/* 📦 Cadastrar pedido */}
+          {/* Cadastrar pedido */}
           {formStep === "order" && selectedCustomer && (
-            <Card
-              title={`Cadastro de Pedido — ${selectedCustomer.name}`}
-              fields={[
-                { 
-                  name: "deliveryDate", 
-                  label: "Data de Entrega (opcional)",
-                  type: "date",
-                  value: ""
-                },
-                { 
-                  name: "notes", 
-                  label: "Observações",
-                  type: "text",
-                  value: ""
-                },
-              ]}
-              onSubmit={handleSubmit}
-              submitLabel="Cadastrar Pedido"
-              loading={loading}
-              showCancel
-              onCancel={() => setFormStep("selectProducts")}
-              additionalInfo={
-                <div className={styles.orderSummary}>
-                  <h5>📦 Resumo do Pedido</h5>
-                  {orderItems.map(item => {
-                    const product = products.find(p => p.id === item.productId);
-                    return product ? (
-                      <div key={item.productId} className={styles.orderItem}>
-                        <span>{product.name}</span>
-                        <span>Qtd: {item.quantity}</span>
-                        <span>R$ {(product.salePrice * item.quantity).toFixed(2)}</span>
-                      </div>
-                    ) : null;
-                  })}
-                  <div className={styles.orderTotal}>
-                    <strong>Total: R$ {calculateTotal().toFixed(2)}</strong>
-                  </div>
+  <Card
+    title={`Cadastro de Pedido — ${selectedCustomer.name}`}
+    fields={[
+      { 
+        name: "deliveryDate", 
+        label: "Data de Entrega (opcional)",
+        type: "date",
+        value: ""
+      },
+      { 
+        name: "notes", 
+        label: "Observações",
+        type: "text",
+        value: ""
+      },
+    ]}
+    onSubmit={handleSubmit}
+    submitLabel="Cadastrar Pedido"
+    loading={loading}
+    showCancel
+    onCancel={() => setFormStep("selectProducts")}
+    additionalInfo={
+      <div className={styles.orderSummaryContainer}>
+        <button
+          className={styles.orderSummaryToggle}
+          type="button"
+          onClick={() => setShowSummary((prev) => !prev)}
+        >
+          {showSummary ? "Ocultar Resumo do Pedido" : "Mostrar Resumo do Pedido"}
+        </button>
+
+        {showSummary && (
+          <div className={styles.orderSummaryCard}>
+            <h5>Resumo do Pedido</h5>
+            {orderItems.map(item => {
+              const product = products.find(p => p.id === item.productId);
+              return product ? (
+                <div key={item.productId} className={styles.orderItem}>
+                  <span>{product.name}</span> — 
+                  <span> Qtd: {item.quantity}</span>
+                  <br />
+                  <span>R$ {(product.salePrice * item.quantity).toFixed(2)}</span>
                 </div>
-              }
-            />
-          )}
+              ) : null;
+            })}
+            <div className={styles.orderTotal}>
+            </div>
+          </div>
+        )}
+        <br />
+        <strong>Total: R$ {calculateTotal().toFixed(2)}</strong>
+      </div>
+    }
+  />
+)}
+
         </Modal.Body>
       </Modal>
 

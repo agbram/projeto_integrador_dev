@@ -66,6 +66,13 @@
   z-index: 1000;
   position: relative;
   margin-top: 4px;
+  height: 40px;
+  min-height: calc(5 * 40px); /* 40px = altura de cada item (ajuste se necessário) */
+
+  /* 👇 NOVO — ativa barra de rolagem */
+  max-height: calc(7 * 40px); /* opcional: exibe 7 itens antes de rolar */
+  overflow-y: auto;
+
 }
 
 .searchResults {

@@ -4,7 +4,7 @@ import { useState } from "react"
 import styles from "./styles.module.css"
 import ButtonCancelar from "@/components/Buttons/ButtonCancel"
 
-export type FormData = Record<string, string | File>;
+export type FormData = Record<string, string | File | Date | Number>;
 
 type Field = {
   name: string
@@ -12,7 +12,7 @@ type Field = {
   type?: string
   value?: string
   options?: { value: string; label: string }[]
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void // Adicione esta linha se quiser onChange individual
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 type FormProps = {
@@ -27,6 +27,7 @@ type FormProps = {
   onCancel?: () => void
   onDelete?: () => void
   onChange?: (name: string, value: string) => void
+  additionalInfo?: React.ReactNode
 }
 
 export default function Card({ 
@@ -41,13 +42,13 @@ export default function Card({
   onCancel,
   onDelete,
   onChange,
+  additionalInfo
 }: FormProps) {
   const [formData, setFormData] = useState<FormData>({})
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     
-    // Atualiza o estado interno
     if (e.target instanceof HTMLInputElement && e.target.files) {
       const files = e.target.files;
       const file = files[0];
@@ -56,7 +57,6 @@ export default function Card({
       setFormData(prev => ({ ...prev, [name]: value }))
     }
 
-    // Chama o onChange externo se existir
     if (onChange) {
       onChange(name, value)
     }
@@ -82,7 +82,6 @@ export default function Card({
 
       <form className={styles.form} onSubmit={handleSubmit}>
         {fields.map(field => {
-
           const value = formData[field.name] !== undefined ? formData[field.name] : field.value || "";
           
           return (
@@ -117,10 +116,17 @@ export default function Card({
           )
         })}
 
+        {/* ✅ SEÇÃO ADICIONAL: Informações extras */}
+        {additionalInfo && (
+          <div className={styles.additionalInfo}>
+            {additionalInfo}
+          </div>
+        )}
+
         <div className={styles.buttonsRow}>
           {showDelete && onDelete && (
             <ButtonCancelar
-              label= "Desativar"
+              label="Desativar"
               onClick={onDelete}
               variant="outline"
             />
@@ -132,7 +138,6 @@ export default function Card({
               variant="cancelLight"
             />
           )}
-
           
           <button 
             type="submit" 

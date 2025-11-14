@@ -295,8 +295,6 @@ export default function ClientesModal() {
     }
   };
 
-  // const pageActions = usePageActions();
-  // pageActions.setActionBar(<ActionBar title="Clientes" />);
 
   return (
     <>

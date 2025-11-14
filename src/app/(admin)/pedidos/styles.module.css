@@ -1,11 +1,223 @@
-.dev{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 75vh;          /* centraliza verticalmente */
-    color: #D40000;
-    font-size: 70px;
-  font-weight: bold;
+/* ======== CONTAINER PRINCIPAL ======== */
+.searchContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 24px 0;
+}
+
+.searchContainer h4 {
+  align-self: flex-start;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+/* ======== INPUT COM ÍCONE ======== */
+.searchWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+}
+
+.searchIcon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  color: #777;
+  pointer-events: none; /* Ícone apenas decorativo */
+}
+
+.searchInput {
+  width: 100%;
+  max-width: 420px;
+  padding: 12px 16px 12px 42px; /* espaço pro ícone */
+  border-radius: 10px;
+  border: 2px solid #ddd;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: #fff;
+}
+
+.searchInput::placeholder {
+  color: #aaa;
+}
+
+.searchInput:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+}
+
+/* ======== RESULTADOS DA BUSCA ======== */
+.containerResults {
+  width: 100%;
+  max-width: 420px;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  position: relative;
+  margin-top: 4px;
+}
+
+.searchResults {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.searchItem {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.searchItem:not(:last-child) {
+  border-bottom: 1px solid #eee;
+}
+
+.searchItem:hover {
+  background-color: #007bff;
+  color: #fff;
+}
+
+/* ======== RESULTADO VAZIO ======== */
+.noResults {
+  padding: 12px 16px;
+  color: #666;
+  font-style: italic;
   text-align: center;
 }
 
+/* ======== ESTILO DO MODAL ======== */
+.modalPedidosBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  background-color: #f9fafb;
+}
+
+/* ======== SELEÇÃO DE PRODUTOS ======== */
+.productSelectionContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+}
+
+.productSelectionContainer h4 {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.productList {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.productItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.productName {
+  font-weight: 500;
+}
+
+.quantityControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btnQuantity {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btnQuantity:hover {
+  background-color: #0056b3;
+}
+
+.quantityValue {
+  width: 30px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.productsActions {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 480px;
+  margin-top: 20px;
+}
+
+/* ======== RESPONSIVIDADE ======== */
+@media (max-width: 480px) {
+  .searchInput {
+    font-size: 14px;
+    padding: 10px 12px 10px 38px;
+  }
+
+  .searchIcon {
+    left: 10px;
+  }
+
+  .searchItem {
+    padding: 10px 12px;
+  }
+
+  .productItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .productsActions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btnQuantity {
+    width: 28px;
+    height: 28px;
+  }
+
+  .quantityValue {
+    font-size: 14px;
+  }
+}
+
+/* ======== EFEITOS ADICIONAIS ======== */
+.searchInput:focus + .searchIcon {
+  color: #007bff;
+}

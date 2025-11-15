@@ -15,8 +15,8 @@ type Props = {
 
 export default function PrivateRoute({ children }: Props) {
   const router = useRouter();
-  const [phrase, setPhrase] = useState("");
   const { isAuthenticated, isLoading } = useAuth();
+  const [phrase, setPhrase] = useState("");
 
   const getRandomPhrase = () => {
     const phrases = [
@@ -32,11 +32,17 @@ export default function PrivateRoute({ children }: Props) {
   };
 
   useEffect(() => {
-    if(!isLoading && !isAuthenticated){
+    setPhrase(getRandomPhrase());
+  }, []);
+
+  // Redireciona quando terminar o loading e NÃO estiver autenticado
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
       router.push("/login");
     }
   }, [isLoading, isAuthenticated, router]);
 
+  // Se está carregando, mostra o loader
   if (isLoading) {
     return (
       <div
@@ -45,12 +51,9 @@ export default function PrivateRoute({ children }: Props) {
         aria-live="polite"
         aria-label="Carregando"
       >
-        {/* top-left heart (in front of square) */}
         <HeartStraightIcon className={styles.heartTop} weight="fill" />
-        {/* bottom-right heart (behind square) */}
         <HeartStraightIcon className={styles.heartBottom} weight="fill" />
 
-        {/* left vertical circles (4) */}
         <div className={styles.circlesLeft}>
           <span className={styles.circle} data-idx="1" />
           <span className={styles.circle} data-idx="2" />
@@ -58,7 +61,6 @@ export default function PrivateRoute({ children }: Props) {
           <span className={styles.circle} data-idx="4" />
         </div>
 
-        {/* right vertical circles (3) */}
         <div className={styles.circlesRight}>
           <span className={styles.circle} data-idx="1" />
           <span className={styles.circle} data-idx="2" />
@@ -66,26 +68,12 @@ export default function PrivateRoute({ children }: Props) {
           <span className={styles.circle} data-idx="4" />
         </div>
 
-        {/* invisible logo slots: prepare to receive your logos — replace content with <img src=.../> */}
         <div className={styles.logoSlotTop} aria-hidden="true">
           <Image
             src="/imgs/logosv.png"
             alt="Logo"
-            width={300} // tamanho base, pode ser qualquer número
-            height={150} // só precisa manter proporção parecida
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
-            }}
-          />
-        </div>
-        <div className={styles.logoSlotBottom} aria-hidden="true">
-          <Image
-            src="/imgs/logomanagersv.png"
-            alt="Logo"
-            width={300} // tamanho base, pode ser qualquer número
-            height={150} // só precisa manter proporção parecida
+            width={300}
+            height={150}
             style={{
               width: "100%",
               height: "100%",
@@ -94,10 +82,22 @@ export default function PrivateRoute({ children }: Props) {
           />
         </div>
 
-        {/* center translucent glass square */}
+        <div className={styles.logoSlotBottom} aria-hidden="true">
+          <Image
+            src="/imgs/logomanagersv.png"
+            alt="Logo"
+            width={300}
+            height={150}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+            }}
+          />
+        </div>
+
         <div className={styles.centerBox}>
           <div className={styles.square}>
-            {/* {lOADING} */}
             <Ring
               size="80"
               stroke="10"
@@ -105,11 +105,6 @@ export default function PrivateRoute({ children }: Props) {
               speed="2"
               color="#ffb5e2"
             />
-
-            <div className={styles.loadingPlaceholder} aria-hidden="true">
-              {/* Exemplo: seu loader (substitua) */}
-              {/* <YourLoaderComponent /> */}
-            </div>
 
             <div className={styles.loadingTextWrapper}>
               <p className={styles.loadingText}>{phrase}</p>

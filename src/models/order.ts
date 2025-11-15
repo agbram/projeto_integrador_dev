@@ -39,7 +39,8 @@ export default interface Order {
   total: number;
   notes?: string | null;
   status: OrderStatus;
-  deliveryDate?: string | null;
+  orderDate?: string | Date ;
+  deliveryDate?: string | Date;
   createdAt: string;
   updatedAt: string;
   customer?: Customer;

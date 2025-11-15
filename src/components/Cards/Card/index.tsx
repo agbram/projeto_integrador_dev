@@ -13,6 +13,8 @@ type Field = {
   value?: string
   options?: { value: string; label: string }[]
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+  readOnly?: boolean // ✅ Adicionado
+  disabled?: boolean // ✅ Adicionado
 }
 
 type FormProps = {
@@ -49,6 +51,11 @@ export default function Card({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     
+    const fieldConfig = fields.find(field => field.name === name);
+    if (fieldConfig?.readOnly) {
+      return;
+    }
+    
     if (e.target instanceof HTMLInputElement && e.target.files) {
       const files = e.target.files;
       const file = files[0];
@@ -83,6 +90,8 @@ export default function Card({
       <form className={styles.form} onSubmit={handleSubmit}>
         {fields.map(field => {
           const value = formData[field.name] !== undefined ? formData[field.name] : field.value || "";
+          const isReadOnly = field.readOnly; 
+          const isDisabled = loading || disabled || field.disabled; 
           
           return (
             <label key={field.name}>
@@ -93,7 +102,7 @@ export default function Card({
                   value={value.toString()}
                   onChange={handleChange}
                   required
-                  disabled={loading || disabled}
+                  disabled={isDisabled || isReadOnly} 
                 >
                   <option value="">Selecione uma opção</option>
                   {field.options.map(option => (
@@ -108,7 +117,9 @@ export default function Card({
                   name={field.name}
                   value={field.type === 'file' ? undefined : value.toString()}
                   onChange={handleChange}
-                  disabled={loading || disabled}
+                  disabled={isDisabled}
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? styles.readOnlyInput : ''} 
                 />
               )}
               <br />
@@ -116,7 +127,6 @@ export default function Card({
           )
         })}
 
-        {/* ✅ SEÇÃO ADICIONAL: Informações extras */}
         {additionalInfo && (
           <div className={styles.additionalInfo}>
             {additionalInfo}
@@ -126,14 +136,14 @@ export default function Card({
         <div className={styles.buttonsRow}>
           {showDelete && onDelete && (
             <ButtonCancelar
-              label="Desativar"
+              CancelLabel="Desativar"
               onClick={onDelete}
               variant="outline"
             />
           )}
           {showCancel && onCancel && (
             <ButtonCancelar
-              label="Cancelar"
+              CancelLabel="Voltar"
               onClick={onCancel}
               variant="cancelLight"
             />

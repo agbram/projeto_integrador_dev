@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useEffect, useState } from "react";
 import Card, { FormData } from "@/components/Cards/Card";
@@ -64,7 +64,6 @@ export default function PedidosModal() {
     return () => pageAction.setHandleAdd(() => () => {});
   }, []);
 
-  // 🧾 Buscar dados
   const fetchPedidos = async () => {
     try {
       setLoading(true);
@@ -139,44 +138,50 @@ export default function PedidosModal() {
     return item ? item.quantity : 0;
   };
 
-  // ✅ CORREÇÃO: Função para formatar data corretamente
+  // ✅ CORREÇÃO: Função para formatar data corretamente para ISO
   const formatDeliveryDate = (dateString: string): string | null => {
     if (!dateString) return null;
-    
+
     try {
-      // Remove qualquer caractere não numérico exceto /
-      const cleaned = dateString.replace(/[^\d/]/g, '');
-      const parts = cleaned.split('/');
-      
-      if (parts.length === 3) {
-        const [day, month, year] = parts;
-        
-        // Garante que o ano tenha 4 dígitos
-        const fullYear = year.length === 2 ? `20${year}` : year;
-        
-        // Cria a data no formato YYYY-MM-DD
-        const date = new Date(`${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`);
-        
-        if (!isNaN(date.getTime())) {
-          return date.toISOString();
-        }
+      // Se já estiver no formato ISO, retorna diretamente
+      if (dateString.includes("T")) {
+        return dateString;
       }
-      
+
+      // Para formato DD/MM/YYYY ou YYYY-MM-DD
+      const date = new Date(dateString);
+
+      if (!isNaN(date.getTime())) {
+        return date.toISOString();
+      }
+
       return null;
     } catch (error) {
-      console.error('Erro ao formatar data:', error);
+      console.error("Erro ao formatar data:", error);
       return null;
     }
   };
-
-  // 💾 Cadastrar pedido - VERSÃO CORRIGIDA
   const handleSubmit = async (data: FormData) => {
     setLoading(true);
 
     try {
-      // ✅ Validações antes de enviar
       if (!selectedCustomer) {
         setWarningMessage("Selecione um cliente antes de cadastrar o pedido.");
+        setWarningModalShow(true);
+        setLoading(false);
+        return;
+      }
+
+      if (!data.orderDate) {
+        setWarningMessage("A data do pedido é obrigatória.");
+        setWarningModalShow(true);
+        setLoading(false);
+        return;
+      }
+
+      const formattedOrderDate = formatDeliveryDate(String(data.orderDate));
+      if (!formattedOrderDate) {
+        setWarningMessage("Data do pedido inválida.");
         setWarningModalShow(true);
         setLoading(false);
         return;
@@ -189,69 +194,62 @@ export default function PedidosModal() {
         return;
       }
 
-      // Buscar preços dos produtos
-      const selectedProducts = products.filter((p) =>
-        orderItems.some((i) => i.productId === p.id)
-      );
+      // CORREÇÃO: Enviar apenas productId e quantity
+      // O backend vai calcular unitPrice e subtotal automaticamente
+      const items = orderItems.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+      }));
 
-      const items = orderItems.map((item) => {
-        const product = selectedProducts.find((p) => p.id === item.productId);
-        const unitPrice = product?.salePrice ?? 0;
-        const subtotal = unitPrice * item.quantity;
-        return { 
-          productId: item.productId, 
-          quantity: item.quantity, 
-          unitPrice, 
-          subtotal 
-        };
-      });
-
-      const totalCalculated = items.reduce((acc, i) => acc + i.subtotal, 0);
-
-      // ✅ CORREÇÃO: Formatação correta da data
-      const formattedDeliveryDate = data.deliveryDate 
+      const formattedDeliveryDate = data.deliveryDate
         ? formatDeliveryDate(String(data.deliveryDate))
         : null;
 
       const formattedData = {
-        customerId: selectedCustomer.id, // ✅ Garantir que não é null
+        customerId: selectedCustomer.id,
+        orderDate: formattedOrderDate, // Adicionar data do pedido
         deliveryDate: formattedDeliveryDate,
         status: "PENDING",
         notes: data.notes || "",
-        total: totalCalculated, // ✅ Usar sempre o total calculado
-        userId: 1,
-        items,
+        items: items, // Apenas productId e quantity
       };
 
-      console.log(" Enviando pedido:", formattedData);
+      console.log("Enviando pedido:", formattedData);
 
       const response = await api.post("/orders", formattedData);
-      console.log(" Pedido cadastrado:", response.data);
+      console.log("✅ Pedido cadastrado:", response.data);
 
       fetchPedidos();
       setSuccessMessage("Pedido cadastrado com sucesso!");
       setSuccessModalShow(true);
       handleCloseModal();
-      
     } catch (error: any) {
       console.error("Erro ao cadastrar Pedido:", error);
-      
-      // ✅ CORREÇÃO: Mensagem de erro mais específica
+
       if (error.response) {
         const errorData = error.response.data;
-        console.error(" Detalhes do erro:", errorData);
-        
+        console.error("Detalhes do erro:", errorData);
+
         if (error.response.status === 400) {
-          setWarningMessage(errorData.message || "Dados inválidos. Verifique as informações do pedido.");
+          setWarningMessage(
+            errorData.error ||
+              "Dados inválidos. Verifique as informações do pedido."
+          );
         } else {
-          setWarningMessage(`Erro ${error.response.status}: ${errorData.message || 'Erro ao cadastrar pedido'}`);
+          setWarningMessage(
+            `Erro ${error.response.status}: ${
+              errorData.message || "Erro ao cadastrar pedido"
+            }`
+          );
         }
       } else if (error.request) {
-        setWarningMessage("Erro de conexão. Verifique se o servidor está rodando.");
+        setWarningMessage(
+          "Erro de conexão. Verifique se o servidor está rodando."
+        );
       } else {
         setWarningMessage("Erro inesperado. Tente novamente.");
       }
-      
+
       setWarningModalShow(true);
     } finally {
       setLoading(false);
@@ -261,7 +259,7 @@ export default function PedidosModal() {
   // ✅ CORREÇÃO: Calcular total para exibir no additionalInfo
   const calculateTotal = () => {
     return orderItems.reduce((total, item) => {
-      const product = products.find(p => p.id === item.productId);
+      const product = products.find((p) => p.id === item.productId);
       return total + (product ? product.salePrice * item.quantity : 0);
     }, 0);
   };
@@ -368,10 +366,11 @@ export default function PedidosModal() {
                 ))}
               </div>
 
-              {/* ✅ CORREÇÃO: Exibir total parcial */}
               {orderItems.length > 0 && (
                 <div className={styles.partialTotal}>
-                  <strong>Total parcial: R$ {calculateTotal().toFixed(2)}</strong>
+                  <strong>
+                    Total parcial: R$ {calculateTotal().toFixed(2)}
+                  </strong>
                 </div>
               )}
 
@@ -399,62 +398,81 @@ export default function PedidosModal() {
 
           {/* Cadastrar pedido */}
           {formStep === "order" && selectedCustomer && (
-  <Card
-    title={`Cadastro de Pedido — ${selectedCustomer.name}`}
-    fields={[
-      { 
-        name: "deliveryDate", 
-        label: "Data de Entrega (opcional)",
-        type: "date",
-        value: ""
-      },
-      { 
-        name: "notes", 
-        label: "Observações",
-        type: "text",
-        value: ""
-      },
-    ]}
-    onSubmit={handleSubmit}
-    submitLabel="Cadastrar Pedido"
-    loading={loading}
-    showCancel
-    onCancel={() => setFormStep("selectProducts")}
-    additionalInfo={
-      <div className={styles.orderSummaryContainer}>
-        <button
-          className={styles.orderSummaryToggle}
-          type="button"
-          onClick={() => setShowSummary((prev) => !prev)}
-        >
-          {showSummary ? "Ocultar Resumo do Pedido" : "Mostrar Resumo do Pedido"}
-        </button>
+            <Card
+              title={`Cadastro de Pedido — ${selectedCustomer.name}`}
+              fields={[
+                {
+                  name: "orderDate",
+                  label: "Data do Pedido",
+                  type: "date",
+                  value: new Date().toISOString().split("T")[0],
+                  readOnly: true
+                },
+                {
+                  name: "deliveryDate",
+                  label: "Data de Entrega",
+                  type: "date",
+                  value: "",
+                },
+                {
+                  name: "notes",
+                  label: "Observações",
+                  type: "text",
+                  value: "",
+                },
+              ]}
+              onSubmit={handleSubmit}
+              submitLabel="Cadastrar Pedido"
+              loading={loading}
+              showCancel
+              onCancel={() => setFormStep("selectProducts")}
+              additionalInfo={
+                <div className={styles.orderSummaryContainer}>
+                  <button
+                    className={styles.orderSummaryToggle}
+                    type="button"
+                    onClick={() => setShowSummary((prev) => !prev)}
+                  >
+                    {showSummary
+                      ? "Ocultar Resumo do Pedido"
+                      : "Mostrar Resumo do Pedido"}
+                  </button>
 
-        {showSummary && (
-          <div className={styles.orderSummaryCard}>
-            <h5>Resumo do Pedido</h5>
-            {orderItems.map(item => {
-              const product = products.find(p => p.id === item.productId);
-              return product ? (
-                <div key={item.productId} className={styles.orderItem}>
-                  <span>{product.name}</span> — 
-                  <span> Qtd: {item.quantity}</span>
+                  {showSummary && (
+                    <div className={styles.orderSummaryCard}>
+                      <h5>Resumo do Pedido</h5>
+                      {orderItems.map((item) => {
+                        const product = products.find(
+                          (p) => p.id === item.productId
+                        );
+                        return product ? (
+                          <div
+                            key={item.productId}
+                            className={styles.orderItem}
+                          >
+                            <span>{product.name}</span> —
+                            <span> Qtd: {item.quantity}</span>
+                            <br />
+                            <span>
+                              R${" "}
+                              {(product.salePrice * item.quantity).toFixed(2)}
+                            </span>
+                          </div>
+                        ) : null;
+                      })}
+                    </div>
+                  )}
                   <br />
-                  <span>R$ {(product.salePrice * item.quantity).toFixed(2)}</span>
+                  <strong>
+                    Total estimado: R$ {calculateTotal().toFixed(2)}
+                  </strong>
+                  <p className={styles.note}>
+                    <small>* O total final será calculado pelo sistema</small>
+                  </p>
                 </div>
-              ) : null;
-            })}
-            <div className={styles.orderTotal}>
-            </div>
-          </div>
-        )}
-        <br />
-        <strong>Total: R$ {calculateTotal().toFixed(2)}</strong>
-      </div>
-    }
-  />
-)}
-
+              }
+            />
+          )}
         </Modal.Body>
       </Modal>
 

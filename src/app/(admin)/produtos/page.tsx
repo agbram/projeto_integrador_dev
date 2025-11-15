@@ -320,7 +320,7 @@ export default function ProdutosModal() {
           <p>{warningMessage}</p>
         </Modal.Body>
         <Modal.Footer className={styles.modalWarningFooter}>
-          <ButtonCancelar variant="outline" onClick={handleCloseWarningModal} label="Cancelar"/>
+          <ButtonCancelar variant="outline" onClick={handleCloseWarningModal} CancelLabel="Cancelar"/>
           <Button variant="danger" onClick={handleDesativaProduct}>
             Desativar
           </Button>

@@ -228,3 +228,18 @@
 .searchInput:focus + .searchIcon {
   color: #007bff;
 }
+
+.modalWarningFooter{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    justify-items: center;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  margin-top: 220px;
+  justify-content: center;
+  align-items: center;
+}

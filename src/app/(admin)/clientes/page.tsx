@@ -374,7 +374,7 @@ export default function ClientesModal() {
           <p>{warningMessage}</p>
         </Modal.Body>
         <Modal.Footer className={styles.modalWarningFooter}>
-          <ButtonCancelar variant="outline" onClick={handleCloseWarningModal} label="Cancelar"/>
+          <ButtonCancelar variant="outline" onClick={handleCloseWarningModal} CancelLabel="Cancelar"/>
           <Button variant="danger" onClick={handleDesativaUser}>
             Desativar
           </Button>

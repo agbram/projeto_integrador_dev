@@ -12,6 +12,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
 import { usePageActions } from "@/hooks/usePageActions";
 import Order from "@/models/order";
+import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 
 export default function PedidosModal() {
   const [modalShow, setModalShow] = useState(false);
@@ -21,6 +22,8 @@ export default function PedidosModal() {
   const [warningModalShow, setWarningModalShow] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [warningDeleteModalShow, setWarningDeleteModalShow] = useState(false);
+  const [warningDeliveredModalShow, setWarningDeliveredModalShow] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [formStep, setFormStep] = useState<
     "checkCustomer" | "selectProducts" | "order"
@@ -28,6 +31,8 @@ export default function PedidosModal() {
 
   const [pedidos, setPedidos] = useState<Order[]>([]);
   const [selectPedido, setSelectPedido] = useState<Order>();
+  const [pedidoToCancel, setPedidoToCancel] = useState<Order>();
+  const [pedidoToDelivered, setPedidoToDelivered] = useState<Order>(); // ✅ CORREÇÃO: Estado separado para entrega
   const [customers, setCustomers] = useState<{ id: number; name: string }[]>(
     []
   );
@@ -49,6 +54,8 @@ export default function PedidosModal() {
   const [orderItems, setOrderItems] = useState<
     { productId: number; quantity: number }[]
   >([]);
+
+  const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
 
   const pageAction = usePageActions();
 
@@ -74,6 +81,85 @@ export default function PedidosModal() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleUpdateOrderStatus = async (orderId: number, newStatus: string) => {
+    setUpdatingOrderId(orderId);
+    try {
+      const response = await api.put(`/orders/atualiza-status/${orderId}`, {
+        status: newStatus
+      });
+
+      setPedidos(prevOrders => 
+        prevOrders.map(order => 
+          order.id === orderId 
+            ? { 
+                ...order, 
+                status: newStatus as any, 
+                updatedAt: new Date().toISOString() 
+              }
+            : order
+        )
+      );
+
+      console.log(`✅ Pedido ${orderId} marcado como ${newStatus}`);
+      
+      if (newStatus === "DELIVERED") {
+        setSuccessMessage("Pedido marcado como entregue com sucesso!");
+        setSuccessModalShow(true);
+      }
+    } catch (error) {
+      console.error("❌ Erro ao atualizar status do pedido:", error);
+      setWarningMessage("Erro ao atualizar status do pedido");
+      setWarningModalShow(true);
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  };
+
+  const handleEditOrder = (pedido: Order) => {
+    setSelectPedido(pedido);
+    setModalEditShow(true);
+  };
+
+  // ✅ CORREÇÃO: Modal de cancelamento
+  const handleOpenCancelModal = (pedido: Order) => {
+    setPedidoToCancel(pedido);
+    setWarningMessage("Deseja realmente cancelar este pedido?");
+    setWarningDeleteModalShow(true);
+  };
+
+  const handleConfirmCancel = async () => {
+    if (!pedidoToCancel) return;
+    
+    await handleUpdateOrderStatus(pedidoToCancel.id, "CANCELLED");
+    setWarningDeleteModalShow(false);
+    setPedidoToCancel(undefined);
+  };
+
+  const handleCloseCancelModal = () => {
+    setWarningDeleteModalShow(false);
+    setPedidoToCancel(undefined);
+  };
+
+  // ✅ CORREÇÃO: Modal de entrega - funções separadas
+  const handleOpenDeliveredModal = (pedido: Order) => {
+    setPedidoToDelivered(pedido); // ✅ CORREÇÃO: Usando o estado correto
+    setWarningMessage("Esse pedido realmente foi entregue?");
+    setWarningDeliveredModalShow(true); // ✅ CORREÇÃO: Modal específico para entrega
+  };
+
+  const handleConfirmDelivered = async () => {
+    if (!pedidoToDelivered) return;
+    
+    await handleUpdateOrderStatus(pedidoToDelivered.id, "DELIVERED");
+    setWarningDeliveredModalShow(false);
+    setPedidoToDelivered(undefined);
+  };
+
+  const handleCloseDeliveredModal = () => {
+    setWarningDeliveredModalShow(false);
+    setPedidoToDelivered(undefined);
   };
 
   const fetchCustomers = async () => {
@@ -107,7 +193,11 @@ export default function PedidosModal() {
     setOrderItems([]);
   };
 
-  // ➕ Incrementar quantidade
+  const handleCloseEditModal = () => {
+    setModalEditShow(false);
+    setSelectPedido(undefined);
+  };
+
   const handleAddQuantity = (productId: number) => {
     setOrderItems((prev) => {
       const existing = prev.find((i) => i.productId === productId);
@@ -120,7 +210,6 @@ export default function PedidosModal() {
     });
   };
 
-  // ➖ Decrementar quantidade
   const handleRemoveQuantity = (productId: number) => {
     setOrderItems((prev) =>
       prev
@@ -138,17 +227,14 @@ export default function PedidosModal() {
     return item ? item.quantity : 0;
   };
 
-  // ✅ CORREÇÃO: Função para formatar data corretamente para ISO
   const formatDeliveryDate = (dateString: string): string | null => {
     if (!dateString) return null;
 
     try {
-      // Se já estiver no formato ISO, retorna diretamente
       if (dateString.includes("T")) {
         return dateString;
       }
 
-      // Para formato DD/MM/YYYY ou YYYY-MM-DD
       const date = new Date(dateString);
 
       if (!isNaN(date.getTime())) {
@@ -161,6 +247,7 @@ export default function PedidosModal() {
       return null;
     }
   };
+
   const handleSubmit = async (data: FormData) => {
     setLoading(true);
 
@@ -194,8 +281,6 @@ export default function PedidosModal() {
         return;
       }
 
-      // CORREÇÃO: Enviar apenas productId e quantity
-      // O backend vai calcular unitPrice e subtotal automaticamente
       const items = orderItems.map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
@@ -207,11 +292,11 @@ export default function PedidosModal() {
 
       const formattedData = {
         customerId: selectedCustomer.id,
-        orderDate: formattedOrderDate, // Adicionar data do pedido
+        orderDate: formattedOrderDate, 
         deliveryDate: formattedDeliveryDate,
         status: "PENDING",
         notes: data.notes || "",
-        items: items, // Apenas productId e quantity
+        items: items, 
       };
 
       console.log("Enviando pedido:", formattedData);
@@ -224,7 +309,7 @@ export default function PedidosModal() {
       setSuccessModalShow(true);
       handleCloseModal();
     } catch (error: any) {
-      console.error("Erro ao cadastrar Pedido:", error);
+      console.error("❌ Erro ao cadastrar Pedido:", error);
 
       if (error.response) {
         const errorData = error.response.data;
@@ -256,7 +341,6 @@ export default function PedidosModal() {
     }
   };
 
-  // ✅ CORREÇÃO: Calcular total para exibir no additionalInfo
   const calculateTotal = () => {
     return orderItems.reduce((total, item) => {
       const product = products.find((p) => p.id === item.productId);
@@ -264,33 +348,50 @@ export default function PedidosModal() {
     }, 0);
   };
 
+  if (loading && pedidos.length === 0) {
+    return <div className={styles.loadingContainer}>Carregando pedidos...</div>;
+  }
+
   return (
     <>
       <div className={styles.containerPrincipal}>
-        {pedidos.map((p) => (
-          <div key={p.id} className={styles.divContainerCliente}>
-            <CardOrder
-              title={p.customer?.name ?? "Cliente desconhecido"}
-              order={p}
-              loading={loading}
-              actions={[
-                {
-                  label: "Editar",
-                  onClick: () => {
-                    setSelectPedido(p);
-                    setModalEditShow(true);
-                  },
-                },
-              ]}
-            />
+        {pedidos.length === 0 ? (
+          <div className={styles.emptyState}>
+            <h3>Nenhum pedido encontrado</h3>
+            <p>Crie seu primeiro pedido para começar</p>
           </div>
-        ))}
+        ) : (
+          pedidos.map((p) => (
+            <div key={p.id} className={styles.divContainerCliente}>
+              <CardOrder
+                title={p.customer?.name ?? "Cliente desconhecido"}
+                order={p}
+                loading={updatingOrderId === p.id}
+                onStatusUpdate={handleUpdateOrderStatus}
+                onDeliveredClick = {() => handleOpenDeliveredModal(p)}
+                actions={[
+                  {
+                    label: "Editar",
+                    onClick: () => handleEditOrder(p)
+                  },
+                  ...(p.status !== "CANCELLED" && p.status !== "DELIVERED" 
+                    ? [{
+                        label: "Cancelar", 
+                        onClick: () => handleOpenCancelModal(p) 
+                      }]
+                    : []
+                  )
+                ]}
+              />
+            </div>
+          ))
+        )}
       </div>
 
-      {/* 🧩 MODAL PRINCIPAL */}
+      {/* 🧩 MODAL PRINCIPAL - CRIAR PEDIDO */}
       <Modal show={modalShow} onHide={handleCloseModal} size="lg" centered>
         <Modal.Body className={styles.modalPedidosBody}>
-          {/*  Selecionar cliente */}
+          {/* Selecionar cliente */}
           {formStep === "checkCustomer" && (
             <div className={styles.searchContainer}>
               <h4>Selecione um cliente</h4>
@@ -333,7 +434,7 @@ export default function PedidosModal() {
             </div>
           )}
 
-          {/* 🧃 Selecionar produtos */}
+          {/* Selecionar produtos */}
           {formStep === "selectProducts" && selectedCustomer && (
             <div className={styles.productSelectionContainer}>
               <h4>Selecione os produtos para {selectedCustomer.name}</h4>
@@ -350,7 +451,7 @@ export default function PedidosModal() {
                         className={styles.btnQuantity}
                         onClick={() => handleRemoveQuantity(p.id)}
                       >
-                        –
+                        -
                       </button>
                       <span className={styles.quantityValue}>
                         {getQuantity(p.id)}
@@ -455,7 +556,7 @@ export default function PedidosModal() {
                             <br />
                             <span>
                               R${" "}
-                              {(product.salePrice * item.quantity).toFixed(2)}
+                              {product.salePrice.toFixed(2)}
                             </span>
                           </div>
                         ) : null;
@@ -475,6 +576,86 @@ export default function PedidosModal() {
           )}
         </Modal.Body>
       </Modal>
+
+      {/* Modal de confirmação de cancelamento */}
+      <Modal        
+        show={warningDeleteModalShow}
+        onHide={handleCloseCancelModal}
+        size="sm"
+        centered
+      >
+        <Modal.Body className="text-center">
+          <div className="mb-3" style={{ fontSize: "48px", color: "#ffc107"}}>
+            ⚠️
+          </div>
+          <h5><strong>Atenção</strong></h5>
+          <p>{warningMessage}</p>
+        </Modal.Body>
+        <Modal.Footer className={styles.modalWarningFooter}>
+          <ButtonCancelar 
+            variant="outline" 
+            onClick={handleCloseCancelModal} 
+            CancelLabel="Cancelar"
+          />
+          <Button 
+            variant="danger" 
+            onClick={handleConfirmCancel}
+          >
+            Cancelar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* ✅ CORREÇÃO: Modal de confirmação de entrega */}
+      <Modal        
+        show={warningDeliveredModalShow}
+        onHide={handleCloseDeliveredModal} 
+        size="sm"
+        centered
+      >
+        <Modal.Body className="text-center">
+          <div className="mb-3" style={{ fontSize: "48px", color: "#28a745"}}>
+            ✓
+          </div>
+          <h5><strong>Confirmar Entrega</strong></h5>
+          <p>{warningMessage}</p>
+        </Modal.Body>
+        <Modal.Footer className={styles.modalWarningFooter}>
+          <ButtonCancelar 
+            variant="outline" 
+            onClick={handleCloseDeliveredModal} 
+            CancelLabel="Voltar"
+          />
+          <Button 
+            variant="success" 
+            onClick={handleConfirmDelivered}
+          >
+            Confirmar Entrega
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* 🧩 MODAL DE EDIÇÃO */}
+      {selectPedido && (
+        <Modal show={modalEditShow} onHide={handleCloseEditModal} size="lg" centered>
+          <Modal.Header closeButton>
+            <Modal.Title>
+              Editar Pedido #{selectPedido.id}
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseEditModal}>
+              Fechar
+            </Button>
+            <Button variant="primary" onClick={handleCloseEditModal}>
+              Salvar Alterações
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
 
       {/* FAB */}
       <FAB onClick={() => setModalShow(true)} text="Adicionar" />

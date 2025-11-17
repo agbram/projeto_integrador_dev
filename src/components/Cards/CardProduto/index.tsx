@@ -71,6 +71,9 @@ export default function CardProduto({
         <p>
           <strong>Categoria:</strong> {products.category || "—"}
         </p>
+        <p>
+          <strong>Preço de venda:</strong> {products.salePrice?.toFixed(2) || "0.00"}
+        </p>
       </div>
 
       {/* Botões de ação */}

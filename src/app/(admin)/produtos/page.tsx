@@ -244,12 +244,13 @@ export default function ProdutosModal() {
         >
           <Card
             key={selectProduto?.id}
-            title="Editar Cliente" 
+            title="Editar Produto" 
             fields={[
               { name: "name",value: selectProduto?.name.toString(), label: "Nome" },
               { name: "description",value: selectProduto?.description.toString(), label: "Descrição" },
               { name: "costPrice", value: selectProduto?.costPrice.toString(), label: "Preço de custo" },
               { name: "markupPercent",value: selectProduto?.markupPercent.toString(), label: "Percentual de Markup" },
+              { name: "stockQuantity",value: selectProduto?.stockQuantity.toString(), label: "Quantidade em estoque" },
               { name: "fotoData", label: "Alterar imagem atual", type: "file" },
               {
                 name: "category",

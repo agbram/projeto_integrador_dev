@@ -5,6 +5,7 @@ type Product = {
     description: string
     category: string
     costPrice: number
+    salePrice: number
     markupPercent: string
     stockQuantity: number
     fotoUrl: string

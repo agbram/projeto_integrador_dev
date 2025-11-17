@@ -37,6 +37,10 @@
   color: #d00000;
 }
 
+.statusReadyForDelivery{
+    color: green;
+}
+
 /* Exemplo para os nomes alternativos */
 .emProducao {
   color: #ca6702;
@@ -86,24 +90,4 @@
   display: flex;
   justify-content: end;
   margin: 10px 10px 10px 10px;
-}
-
-.deliveredButton {
-  background: green;
-  color: white;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  padding: 9px 18px;
-  cursor: pointer;
-  transition: all 0.22s ease;
-  margin-top: 12px;
-  font-size: 0.9rem;
-  display: flex;
-}
-
-.deliveredbutton:hover {
-  background-color: var(--color-button-hover-bg);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(64, 39, 39, 0.25);
 }

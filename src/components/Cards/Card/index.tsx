@@ -13,8 +13,10 @@ type Field = {
   value?: string
   options?: { value: string; label: string }[]
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
-  readOnly?: boolean // ✅ Adicionado
-  disabled?: boolean // ✅ Adicionado
+  readOnly?: boolean 
+  disabled?: boolean 
+  placeholder?: string
+  max?: number
 }
 
 type FormProps = {
@@ -92,6 +94,8 @@ export default function Card({
           const value = formData[field.name] !== undefined ? formData[field.name] : field.value || "";
           const isReadOnly = field.readOnly; 
           const isDisabled = loading || disabled || field.disabled; 
+          const isPlaceholder = field.placeholder;
+          const isMax = field.max;
           
           return (
             <label key={field.name}>

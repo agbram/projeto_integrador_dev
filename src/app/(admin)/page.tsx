@@ -143,7 +143,6 @@ const confirmFullSync = async () => {
   }
 };
 
-// ✅ FUNÇÃO: Cancelar sync completo
 const cancelFullSync = () => {
   setConfirmFullSyncModalShow(false);
 };
@@ -167,7 +166,6 @@ const cancelFullSync = () => {
     }
   };
 
-  // ✅ Atualizar progresso de uma tarefa - CORREÇÃO: Validação melhorada
   const handleUpdateProgress = async (formData: any) => {
     if (!selectedTask) return;
     
@@ -175,6 +173,18 @@ const cancelFullSync = () => {
       setProgressLoading(true);
       const completedQuantity = Number(formData.completedQuantity);
       
+    if (isNaN(completedQuantity) || completedQuantity <= 0) {
+      setWarningMessage("Digite uma quantidade válida maior que zero.");
+      setWarningModalShow(true);
+      return;
+    }
+
+    if (completedQuantity > selectedTask.pendingQuantity) {
+      setWarningMessage(`Quantidade excede o pendente (${selectedTask.pendingQuantity} unidades)`);
+      setWarningModalShow(true);
+      return;
+    }
+
       if (completedQuantity <= 0) {
         setWarningMessage("A quantidade deve ser maior que zero.");
         setWarningModalShow(true);
@@ -208,7 +218,6 @@ const cancelFullSync = () => {
   };
   
 
-  // ✅ Marcar tarefa como concluída
   const handleCompleteTask = async (taskId: number) => {
     try {
       setProgressLoading(true);
@@ -246,7 +255,6 @@ const cancelFullSync = () => {
     return colors[priority] || '#cccccc';
   };
 
-  // 🎨 Cor do status
   const getStatusColor = (status: string) => {
     const colors: { [key: string]: string } = {
       'PENDING': '#6c757d',
@@ -257,7 +265,7 @@ const cancelFullSync = () => {
     return colors[status] || '#6c757d';
   };
 
-  // 📈 Calcular porcentagem de progresso
+  //  Calcular porcentagem de progresso
   const calculateProgress = (task: ProductionTask) => {
     if (task.totalQuantity === 0) return 0;
     return (task.completedQuantity / task.totalQuantity) * 100;
@@ -307,17 +315,23 @@ const cancelFullSync = () => {
 <div className={styles.syncContainer}>
   <div className={styles.syncButtons}>
     <Button
-      variant="outline-primary"
-      onClick={handleSmartSync}
-      disabled={syncLoading}
-      className={styles.smartSyncButton}
-      title="Sincroniza apenas novos pedidos sem afetar a produção atual"
-    >
-      <GearIcon size={20} className={syncLoading ? styles.spinning : ''} />
-      {syncLoading ? "Sincronizando..." : "Sincronizar Novos Pedidos"}
-    </Button>
+  variant="outline-primary"
+  onClick={handleSmartSync}
+  disabled={syncLoading}
+  className={styles.smartSyncButton}
+>
+  <GearIcon size={20} className={syncLoading ? styles.spinning : ''} />
+  {syncLoading ? (
+    <>
+      <div className={styles.spinner}></div>
+      Sincronizando...
+    </>
+  ) : (
+    "Sincronizar Novos Pedidos"
+  )}
+</Button>
     
-    {/* 🧹 Sync Completo (SECUNDÁRIO) */}
+    {/*  Sync Completo (SECUNDÁRIO) */}
     <Button
       variant="outline-secondary"
       onClick={handleFullSync}
@@ -330,7 +344,7 @@ const cancelFullSync = () => {
     </Button>
   </div>
   
-  {/* 📊 Status de Sincronização */}
+  {/*  Status de Sincronização */}
   <div className={styles.syncStatus}>
     <small>
       <strong>Dica:</strong> Use "Sincronizar Novos Pedidos" para adicionar pedidos sem perder o progresso atual.

@@ -1,3 +1,5 @@
+import Customer from "./Customer";
+
 export interface OrderItem {
   id: number;
   orderId: number;
@@ -22,13 +24,6 @@ export interface OrderItem {
   productionProgress?: number;
   productionStatus?: string;
   productionCounted?: boolean;
-}
-
-export interface Customer {
-  id: number;
-  name: string;
-  email?: string;
-  phone?: string;
 }
 
 export interface User {

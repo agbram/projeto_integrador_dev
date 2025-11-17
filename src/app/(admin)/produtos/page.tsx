@@ -214,7 +214,6 @@ export default function ProdutosModal() {
               { name: "description", label: "Descrição" },
               { name: "costPrice", label: "Preço de custo" },
               { name: "markupPercent", label: "Percentual de Markup" },
-              { name: "stockQuantity", label: "Quantidade em estoque" },
               { name: "fotoData", label: "Imagem", type: "file" },
               {
                 name: "category",
@@ -250,7 +249,6 @@ export default function ProdutosModal() {
               { name: "description",value: selectProduto?.description.toString(), label: "Descrição" },
               { name: "costPrice", value: selectProduto?.costPrice.toString(), label: "Preço de custo" },
               { name: "markupPercent",value: selectProduto?.markupPercent.toString(), label: "Percentual de Markup" },
-              { name: "stockQuantity",value: selectProduto?.stockQuantity.toString(), label: "Quantidade em estoque" },
               { name: "fotoData", label: "Alterar imagem atual", type: "file" },
               {
                 name: "category",

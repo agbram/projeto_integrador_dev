@@ -174,7 +174,7 @@
 /* Estado ativo / selecionado */
 .activeLink,
 .Nav :global(.nav-link).active {
-  background: var(--color-primary-dark) !important; /* cor de destaque */
+  background: var(--color-green-light) !important; /* cor de destaque */
   color: var(--color-bg) !important;
   box-shadow: var(--shadow-medium);
 }
@@ -192,7 +192,7 @@
 }
 
 .fufilledIcon {
-  color: var(--accent-contrast);
+  color: var(--accent-contrast) !important;
 }
 
 .linkText {

@@ -22,7 +22,6 @@ export default function FormLogin() {
           style={{ objectFit: "contain" }}
         />
       </span>
-
       <FormTextLogin />
     </div>
   );

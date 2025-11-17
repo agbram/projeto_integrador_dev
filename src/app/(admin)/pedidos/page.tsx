@@ -32,7 +32,7 @@ export default function PedidosModal() {
   const [pedidos, setPedidos] = useState<Order[]>([]);
   const [selectPedido, setSelectPedido] = useState<Order>();
   const [pedidoToCancel, setPedidoToCancel] = useState<Order>();
-  const [pedidoToDelivered, setPedidoToDelivered] = useState<Order>(); // ✅ CORREÇÃO: Estado separado para entrega
+  const [pedidoToDelivered, setPedidoToDelivered] = useState<Order>(); 
   const [customers, setCustomers] = useState<{ id: number; name: string }[]>(
     []
   );
@@ -117,12 +117,57 @@ export default function PedidosModal() {
     }
   };
 
+const handleSalvarAlteracoes = async (data: FormData) => {
+  if (!selectPedido) return;
+  
+  setLoading(true);
+  try {
+    const formattedData = {
+      status: data.status,
+      deliveryDate: data.deliveryDate ? new Date(data.deliveryDate.toString()).toISOString() : selectPedido.deliveryDate,
+      orderDate: data.orderDate ? new Date(data.orderDate.toString()).toISOString() : selectPedido.orderDate,
+      notes: data.notes || "",
+    };
+
+    console.log("Enviando atualização do pedido:", formattedData);
+
+    const response = await api.put(`/orders/${selectPedido.id}`, formattedData);
+    console.log("Pedido atualizado:", response.data);
+
+    setPedidos(prevPedidos => 
+      prevPedidos.map(pedido => 
+        pedido.id === selectPedido.id ? response.data : pedido
+      )
+    );
+
+    setSuccessMessage("Pedido atualizado com sucesso!");
+    setSuccessModalShow(true);
+    handleCloseEditModal();
+    
+  } catch (error: any) {
+    console.error(" Erro ao atualizar pedido:", error);
+    
+    if (error.response) {
+      const errorData = error.response.data;
+      setWarningMessage(
+        errorData.error || "Erro ao atualizar pedido. Tente novamente."
+      );
+    } else {
+      setWarningMessage("Erro de conexão. Verifique se o servidor está rodando.");
+    }
+    
+    setWarningModalShow(true);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
   const handleEditOrder = (pedido: Order) => {
     setSelectPedido(pedido);
     setModalEditShow(true);
   };
 
-  // ✅ CORREÇÃO: Modal de cancelamento
   const handleOpenCancelModal = (pedido: Order) => {
     setPedidoToCancel(pedido);
     setWarningMessage("Deseja realmente cancelar este pedido?");
@@ -142,11 +187,10 @@ export default function PedidosModal() {
     setPedidoToCancel(undefined);
   };
 
-  // ✅ CORREÇÃO: Modal de entrega - funções separadas
   const handleOpenDeliveredModal = (pedido: Order) => {
-    setPedidoToDelivered(pedido); // ✅ CORREÇÃO: Usando o estado correto
+    setPedidoToDelivered(pedido); 
     setWarningMessage("Esse pedido realmente foi entregue?");
-    setWarningDeliveredModalShow(true); // ✅ CORREÇÃO: Modal específico para entrega
+    setWarningDeliveredModalShow(true); 
   };
 
   const handleConfirmDelivered = async () => {
@@ -606,7 +650,7 @@ export default function PedidosModal() {
         </Modal.Footer>
       </Modal>
 
-      {/* ✅ CORREÇÃO: Modal de confirmação de entrega */}
+      {/* Modal de confirmação de entrega */}
       <Modal        
         show={warningDeliveredModalShow}
         onHide={handleCloseDeliveredModal} 
@@ -635,27 +679,93 @@ export default function PedidosModal() {
         </Modal.Footer>
       </Modal>
 
-      {/* 🧩 MODAL DE EDIÇÃO */}
-      {selectPedido && (
-        <Modal show={modalEditShow} onHide={handleCloseEditModal} size="lg" centered>
-          <Modal.Header closeButton>
-            <Modal.Title>
-              Editar Pedido #{selectPedido.id}
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
+{/* 🧩 MODAL DE EDIÇÃO DE PEDIDO */}
+{selectPedido && (
+  <Modal show={modalEditShow} onHide={handleCloseEditModal} size="lg" centered>
+    <Modal.Header closeButton>
+      <Modal.Title>
+        Editar Pedido #{selectPedido.id}
+      </Modal.Title>
+    </Modal.Header>
+    <Modal.Body className={styles.modalBodyEdit}>
+      <Card
+        key={selectPedido.id}
+        title={`Pedido de ${selectPedido?.customer?.name}` || "Cliente não informado"}
+        fields={[
+          {
+            name: "status",
+            value: selectPedido.status || "PENDING",
+            label: "Status do Pedido",
+            type: "select",
+            options: [
+              { value: "PENDING", label: "Pendente" },
+              { value: "IN_PROGRESS", label: "Em Andamento" },
+              { value: "IN_PRODUCTION", label: "Em Produção" },
+              { value: "READY_FOR_DELIVERY", label: "Pronto para Entrega" },
+              { value: "DELIVERED", label: "Entregue" },
+              { value: "CANCELLED", label: "Cancelado" }
+            ],
+          },
+          {
+            name: "orderDate", 
+            value: selectPedido.orderDate ? new Date(selectPedido.orderDate).toISOString().split('T')[0] : "",
+            label: "Data do Pedido",
+            type: "date",
+          },
+          {
+            name: "deliveryDate",
+            value: selectPedido.deliveryDate ? new Date(selectPedido.deliveryDate).toISOString().split('T')[0] : "",
+            label: "Data de Entrega",
+            type: "date",
+          },
+          {
+            name: "notes",
+            value: selectPedido.notes || "",
+            label: "Observações",
+            type: "textarea",
+            placeholder: "Observações sobre o pedido...",
+          },
+        ]}
+        showCancel
+        onCancel={handleCloseEditModal}
+        onSubmit={handleSalvarAlteracoes}
+        submitLabel="Salvar Alterações"
+        loading={loading}
+        additionalInfo={
+          <div className={styles.pedidoInfoAdicional}>
+            <h6>Informações do Cliente</h6>
+            <div className={styles.clienteInfo}>
+              <p><strong>Cliente:</strong> {selectPedido.customer?.name || "N/A"}</p>
+              {selectPedido.customer?.phone && (
+                <p><strong>Telefone:</strong> {selectPedido.customer.phone}</p>
+              )}
+            </div>
             
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleCloseEditModal}>
-              Fechar
-            </Button>
-            <Button variant="primary" onClick={handleCloseEditModal}>
-              Salvar Alterações
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      )}
+            {selectPedido.items && selectPedido.items.length > 0 && (
+              <div className={styles.itensPedido}>
+                <h6>Itens do Pedido</h6>
+                <div className={styles.itensList}>
+                  {selectPedido.items.map((item, index) => (
+                    <div key={index} className={styles.itemRow}>
+                      <span className={styles.itemQuantity}>{item.quantity}x </span>
+                      <span className={styles.itemName}>{item.product?.name || "Produto não encontrado"} - </span>
+                      <span className={styles.itemPrice}>
+                        R$ {typeof item.unitPrice === "number" ? item.unitPrice.toFixed(2) : "0.00"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className={styles.totalPedido}>
+                  <strong>Total do Pedido: R$ {selectPedido.total?.toFixed(2) || "0.00"}</strong>
+                </div>
+              </div>
+            )}
+          </div>
+        }
+      />
+    </Modal.Body>
+  </Modal>
+)}
 
       {/* FAB */}
       <FAB onClick={() => setModalShow(true)} text="Adicionar" />

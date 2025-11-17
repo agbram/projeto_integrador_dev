@@ -109,7 +109,7 @@ const handleSmartSync = async () => {
     fetchProductionDashboard();
     
   } catch (error: any) {
-    console.error("❌ Erro na sincronização inteligente:", error);
+    console.error("Erro na sincronização inteligente:", error);
     setWarningMessage(
       error.response?.data?.message || "Erro ao sincronizar pedidos. Tente novamente."
     );
@@ -135,7 +135,7 @@ const confirmFullSync = async () => {
     fetchProductionDashboard();
     
   } catch (error: any) {
-    console.error("❌ Erro na sincronização completa:", error);
+    console.error("Erro na sincronização completa:", error);
     setWarningMessage("Erro na sincronização completa. Tente novamente.");
     setWarningModalShow(true);
   } finally {
@@ -157,7 +157,7 @@ const cancelFullSync = () => {
       setSuccessModalShow(true);
       fetchProductionDashboard();
     } catch (error: any) {
-      console.error("❌ Erro ao iniciar produção:", error);
+      console.error("Erro ao iniciar produção:", error);
       setWarningMessage(
         error.response?.data?.error || "Erro ao iniciar produção. Tente novamente."
       );
@@ -197,7 +197,7 @@ const cancelFullSync = () => {
       setModalDetailShow(false);
       setSelectedTask(null);
     } catch (error: any) {
-      console.error("❌ Erro ao atualizar progresso:", error);
+      console.error("Erro ao atualizar progresso:", error);
       setWarningMessage(
         error.response?.data?.error || "Erro ao atualizar progresso. Tente novamente."
       );
@@ -217,7 +217,7 @@ const cancelFullSync = () => {
       setSuccessModalShow(true);
       fetchProductionDashboard();
     } catch (error: any) {
-      console.error("❌ Erro ao concluir tarefa:", error);
+      console.error("Erro ao concluir tarefa:", error);
       setWarningMessage("Erro ao concluir tarefa. Tente novamente.");
       setWarningModalShow(true);
     } finally {

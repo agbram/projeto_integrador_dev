@@ -16,7 +16,7 @@ type CardOrderProps = {
   loading?: boolean;
   actions?: Action[];
   onStatusUpdate?: (orderId: number, newStatus: string) => void;
-  onDeliveredClick?: () => void; // ✅ CORREÇÃO: Prop para o modal de entrega
+  onDeliveredClick?: () => void; 
 };
 
 export default function CardOrder({
@@ -25,7 +25,7 @@ export default function CardOrder({
   loading = false,
   actions,
   onStatusUpdate,
-  onDeliveredClick, // ✅ Recebendo a prop
+  onDeliveredClick, 
 }: CardOrderProps) {
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -39,13 +39,10 @@ export default function CardOrder({
     }
   };
 
-  // ✅ CORREÇÃO: Função atualizada para usar o modal
   const handleMarkAsDelivered = async () => {
     if (onDeliveredClick) {
-      // Se temos a função do modal, usamos ela
       onDeliveredClick();
     } else if (onStatusUpdate) {
-      // Fallback: atualização direta (compatibilidade)
       setIsUpdating(true);
       try {
         await onStatusUpdate(order.id, "DELIVERED");
@@ -128,8 +125,13 @@ export default function CardOrder({
           <strong>Total:</strong> {formatTotal(order.total)}
         </p>
         <p>
+          <strong>Data de criação pedido:</strong> {formatDate(order.orderDate)}
+        </p>
+
+        <p>
           <strong>Data de entrega:</strong> {formatDate(order.deliveryDate)}
         </p>
+
 
         {order.items && order.items.length > 0 && (
           <div className={styles.items}>
@@ -148,13 +150,12 @@ export default function CardOrder({
         )}
       </div>
 
-      {/* ✅ CORREÇÃO: Botão de entrega - agora usa o modal */}
       {order.status === "READY_FOR_DELIVERY" && (onStatusUpdate || onDeliveredClick) && (
         <div className={styles.deliveryAction}>
           <button
             onClick={handleMarkAsDelivered}
             className={styles.deliveredButton}
-            disabled={(isUpdating && !onDeliveredClick) || loading} // ✅ Só desabilita se estiver atualizando sem modal
+            disabled={(isUpdating && !onDeliveredClick) || loading} 
           >
             {isUpdating && !onDeliveredClick ? "Confirmando..." : "Entregue"}
           </button>
@@ -164,7 +165,6 @@ export default function CardOrder({
         </div>
       )}
 
-      {/* ✅ CORREÇÃO: Badge de entrega com melhor layout */}
       {order.status === "DELIVERED" && (
         <div className={styles.deliveredContainer}>
           <div className={styles.deliveredBadge}>

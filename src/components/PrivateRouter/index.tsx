@@ -3,27 +3,21 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { DotWave } from "ldrs/react";
-import {
-  HeartStraight,
-  StarFour,
-  Flower,
-  Sparkle,
-} from "@phosphor-icons/react";
+import { HeartStraightIcon } from "@phosphor-icons/react";
+import { Ring } from "ldrs/react";
+import { Image } from "react-bootstrap";
 import styles from "./styles.module.css";
-import "ldrs/react/DotWave.css";
+import "ldrs/react/Ring.css";
 
 type Props = {
   children: React.ReactNode;
 };
 
 export default function PrivateRoute({ children }: Props) {
-  const { isAuthenticated } = useAuth();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const { isAuthenticated, isLoading } = useAuth();
   const [phrase, setPhrase] = useState("");
 
-  // 🎲 Função simples que retorna uma frase aleatória
   const getRandomPhrase = () => {
     const phrases = [
       "Preparando a confeitaria...",
@@ -34,56 +28,94 @@ export default function PrivateRoute({ children }: Props) {
       "Batendo o chantilly perfeito...",
       "Carregando doçuras e sorrisos...",
     ];
-    const randomIndex = Math.floor(Math.random() * phrases.length);
-    return phrases[randomIndex];
+    return phrases[Math.floor(Math.random() * phrases.length)];
   };
 
   useEffect(() => {
-    // Escolhe a frase ao iniciar
     setPhrase(getRandomPhrase());
+  }, []);
 
-    // Aguarda autenticação
-    const timer = setTimeout(() => {
-      if (!isAuthenticated) router.push("/login");
-      setLoading(false);
-    }, 1500);
+  // Redireciona quando terminar o loading e NÃO estiver autenticado
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isLoading, isAuthenticated, router]);
 
-    return () => clearTimeout(timer);
-  }, [isAuthenticated, router]);
-
-  if (loading) {
+  // Se está carregando, mostra o loader
+  if (isLoading) {
     return (
-      <div className={styles.background}>
-        <HeartStraight
-          weight="fill"
-          size={48}
-          className={`${styles.bgIcon} ${styles.left}`}
-        />
-        <StarFour
-          weight="fill"
-          size={52}
-          className={`${styles.bgIcon} ${styles.right}`}
-        />
-        <Flower
-          weight="fill"
-          size={56}
-          className={`${styles.bgIcon} ${styles.top}`}
-        />
-        <Sparkle
-          weight="fill"
-          size={42}
-          className={`${styles.bgIcon} ${styles.bottom}`}
-        />
+      <div
+        className={styles.wrapper}
+        role="status"
+        aria-live="polite"
+        aria-label="Carregando"
+      >
+        <HeartStraightIcon className={styles.heartTop} weight="fill" />
+        <HeartStraightIcon className={styles.heartBottom} weight="fill" />
 
-        <div className={styles.load}>
-          <DotWave size="100" speed="1" color="var(--color-primary)" />
-          <p className={styles.loadingText}>{phrase}</p>
+        <div className={styles.circlesLeft}>
+          <span className={styles.circle} data-idx="1" />
+          <span className={styles.circle} data-idx="2" />
+          <span className={styles.circle} data-idx="3" />
+          <span className={styles.circle} data-idx="4" />
+        </div>
+
+        <div className={styles.circlesRight}>
+          <span className={styles.circle} data-idx="1" />
+          <span className={styles.circle} data-idx="2" />
+          <span className={styles.circle} data-idx="3" />
+          <span className={styles.circle} data-idx="4" />
+        </div>
+
+        <div className={styles.logoSlotTop} aria-hidden="true">
+          <Image
+            src="/imgs/logosv.png"
+            alt="Logo"
+            width={300}
+            height={150}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+            }}
+          />
+        </div>
+
+        <div className={styles.logoSlotBottom} aria-hidden="true">
+          <Image
+            src="/imgs/logomanagersv.png"
+            alt="Logo"
+            width={300}
+            height={150}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+            }}
+          />
+        </div>
+
+        <div className={styles.centerBox}>
+          <div className={styles.square}>
+            <Ring
+              size="80"
+              stroke="10"
+              bgOpacity="0"
+              speed="2"
+              color="#ffb5e2"
+            />
+
+            <div className={styles.loadingTextWrapper}>
+              <p className={styles.loadingText}>{phrase}</p>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
-  if (!isAuthenticated) return null;
+  if (isAuthenticated) return <>{children}</>;
 
-  return <>{children}</>;
+  return null;
 }

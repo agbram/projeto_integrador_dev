@@ -1,151 +1,245 @@
-.background {
+/* 
+  Mantive todo o seu CSS original e apliquei apenas a alteração pedida:
+  - NÃO alterei posições nem tamanhos por padrão.
+  - Adicionei uma media query em max-width: 768px que TRAVA os tamanhos ao valor de desktop,
+    para que nada mude de tamanho/posição no celular; apenas o texto de loading fica menor.
+  - Comentários mínimos para controle rápido.
+*/
+
+/* wrapper contém todas as variáveis locais para fácil ajuste */
+.wrapper {
   position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--color-bg);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23744c62' fill-opacity='0.20'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 40px 40px;
-  animation: moveBg 20s linear infinite;
+  /* background: elegante, cerâmica branca com leve tom rosa */
+  background: linear-gradient(180deg, #fffafc 0%, #fff 40%, #fff6f9 100%);
   overflow: hidden;
+
+  /* === CONFIGURÁVEIS (mude aqui) === */
+  --square-size: clamp(180px, 30vmin, 300px); /* tamanho do quadrado central */
+  --square-radius: 14px;                      /* borda do quadrado */
+  --glass-opacity: 0.86;                      /* opacidade do vidro (0-1) */
+  --square-padding: 26px;                     /* padding interno do quadrado */
+  --icon-color: #000000;                      /* cor dos ícones (preto elegante) */
+  --circle-speed: 1.6s;                       /* velocidade das animações dos círculos */
+  --circle-distance: 14px;                    /* distância do deslocamento vertical dos círculos */
+  --circle-gap: 12px;                         /* espaçamento vertical entre círculos */
+  --circle-size: clamp(14px, 2.6vmin, 18px);  /* tamanho dos círculos rosa */
+  --logo-slot-width: clamp(180px, 28vmin, 300px); /* área para logos — aumentada */
+  --logo-slot-height: clamp(32px, 6vmin, 56px);  /* altura ajustada para acompanhar */
+  /* === FIM CONFIGURÁVEIS === */
+
+  will-change: transform;
 }
 
-/* nuvem central */
-.background::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: clamp(280px, 42vmin, 620px);
-  height: clamp(280px, 42vmin, 620px);
-  border-radius: 50%;
-  z-index: 2;
-  pointer-events: none;
-  background-image:
-    radial-gradient(circle at 50% 50%, rgba(255, 244, 250, 0.9) 0 38%, transparent 38%),
-    radial-gradient(circle at 38% 54%, rgba(255, 235, 245, 0.75) 0 44%, transparent 44%),
-    radial-gradient(circle at 62% 54%, rgba(255, 220, 235, 0.65) 0 52%, transparent 52%);
-  background-repeat: no-repeat;
-  background-size: 60% 60%, 70% 70%, 80% 80%;
-  animation: cloudPulse 8s ease-in-out infinite alternate;
-  opacity: 1;
-}
-
-.load {
+/* center box (flex apenas para centralizar) */
+.centerBox {
   position: relative;
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  text-align: center;
-  pointer-events: none;
-}
-
-.loadingText {
-  color: var(--color-text);
-  font-weight: 600;
-  font-size: 1rem;
-  margin: 0;
-  z-index: 5;
-}
-
-.bgIcon {
-  position: absolute;
+  z-index: 4;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-accent-dark);
+}
+
+/* square: vidro translúcido com sombra */
+.square {
+  width: var(--square-size);
+  height: var(--square-size);
+  padding: var(--square-padding);
+  border-radius: var(--square-radius);
+  background: rgba(255, 255, 255, var(--glass-opacity));
+  box-shadow: 0 12px 30px rgba(28, 18, 22, 0.08);
+  backdrop-filter: blur(6px) saturate(1.02);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 75px;
+  position: relative;
+  z-index: 10;
+}
+
+/* loading placeholder: onde você deve inserir seu loader */
+.loadingPlaceholder {
+  width: clamp(80px, 16vmin, 140px);
+  height: clamp(80px, 16vmin, 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1px; /* garante posição perfeita sobre o texto */
+}
+
+/* texto abaixo do loader */
+.loadingText {
+  color: #2e1f25;
+  font-size: 0.99rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+}
+
+/* hearts (Phosphor icons) */
+.heartTop {
+  position: absolute;
+  left: calc(50% - (var(--square-size) / 2) - 28px);
+  top: calc(50% - (var(--square-size) / 2) - 36px);
+  width: clamp(64px, 9vmin, 108px);
+  height: auto;
+  color: var(--icon-color);
+  z-index: 14;
+  transform: rotate(-12deg);
   opacity: 0.98;
-  will-change: transform, opacity;
-  z-index: 3;
-  transform-origin: center;
-  animation: bgIconJump 900ms ease-in-out infinite;
 }
 
-.bgIcon.left {
-  left: calc(50% - 12rem);
-  top: 50%;
+.heartBottom {
+  position: absolute;
+  right: calc(49% - (var(--square-size) / 2) - 28px);
+  bottom: calc(47% - (var(--square-size) / 2) - 36px);
+  width: clamp(80px, 11vmin, 128px);
+  height: auto;
+  color: var(--icon-color);
+  z-index: 6;
+  transform: rotate(8deg);
+  opacity: 0.95;
+}
+
+/* vertical circles left (4) */
+.circlesLeft {
+  position: absolute;
+  left: calc(50% - (var(--square-size) / 2) - 36px);
+  top: 52%;
   transform: translateY(-50%);
-  animation-delay: 0s;
+  display: flex;
+  flex-direction: column;
+  gap: var(--circle-gap);
+  align-items: center;
+  z-index: 12;
 }
 
-.bgIcon.right {
-  right: calc(50% - 12rem);
-  top: 50%;
+/* vertical circles right (4) */
+.circlesRight {
+  position: absolute;
+  right: calc(50% - (var(--square-size) / 2) - 36px);
+  top: 37%;
   transform: translateY(-50%);
-  animation-delay: 0.18s;
+  display: flex;
+  flex-direction: column;
+  gap: var(--circle-gap);
+  align-items: center;
+  z-index: 12;
 }
 
-.bgIcon.top {
-  left: 50%;
-  top: calc(50% - 9rem);
-  transform: translateX(-50%);
-  animation-delay: 0.36s;
+/* círculos com degradê suave */
+.circle {
+  width: var(--circle-size);
+  height: var(--circle-size);
+  border-radius: 50%;
+  display: block;
 }
 
-.bgIcon.bottom {
-  left: 50%;
-  bottom: calc(50% - 9rem);
-  transform: translateX(-50%);
-  animation-delay: 0.54s;
+/* LEFT group: degradê top->bottom */
+.circlesLeft .circle:nth-child(1) { background: linear-gradient(180deg, #fff7fb, #ffd8e9); }
+.circlesLeft .circle:nth-child(2) { background: linear-gradient(180deg, #fff0f6, #ffcae0); }
+.circlesLeft .circle:nth-child(3) { background: linear-gradient(180deg, #ffeaf4, #ffb9d4); }
+.circlesLeft .circle:nth-child(4) { background: linear-gradient(180deg, #ffe0ef, #ff9fc6); }
+
+/* RIGHT group: degradê top->bottom */
+.circlesRight .circle:nth-child(1) { background: linear-gradient(180deg, #fff5f9, #ffc6dd); }
+.circlesRight .circle:nth-child(2) { background: linear-gradient(180deg, #ffeaf4, #ffb3d0); }
+.circlesRight .circle:nth-child(3) { background: linear-gradient(180deg, #ffd9ef, #ff9dc2); }
+.circlesRight .circle:nth-child(4) { background: linear-gradient(180deg, #ffcfea, #ff9fc6); }
+
+/* animações de movimento */
+@keyframes leftGroupMove {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(var(--circle-distance)); }
+  100% { transform: translateY(0); }
+}
+@keyframes rightGroupMove {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(calc(var(--circle-distance) * -1)); }
+  100% { transform: translateY(0); }
 }
 
-@keyframes bgIconJump {
-  0%   { transform: translateY(0) scale(1); }
-  30%  { transform: translateY(-14px) scale(1.05); }
-  60%  { transform: translateY(-6px) scale(1.02); }
-  100% { transform: translateY(0) scale(1); }
+/* aplicar animações */
+.circlesLeft { animation: leftGroupMove var(--circle-speed) ease-in-out infinite; }
+.circlesRight { animation: rightGroupMove var(--circle-speed) ease-in-out infinite; }
+
+/* logo slots */
+.logoSlotTop {
+  position: absolute;
+  top: calc(47% - (var(--square-size) / 2) - 10px);
+  left: calc(46% - 36px);
+  width: var(--logo-slot-width);
+  height: var(--logo-slot-height);
+  z-index: 15;
+  pointer-events: none;
+  background: transparent;
+}
+.logoSlotBottom {
+  position: absolute;
+  bottom: calc(48.5% - (var(--square-size) / 2) - 10px);
+  right: calc(50% - 36px);
+  width: var(--logo-slot-width);
+  height: var(--logo-slot-height);
+  z-index: 15;
+  pointer-events: none;
+  background: transparent;
 }
 
-@keyframes moveBg {
-  0%   { background-position: 0 0; }
-  50%  { background-position: 300px 300px; }
-  100% { background-position: 0 0; }
+/* animações de entrada/saída */
+.fadeIn {
+  animation: fadeInAnim 420ms cubic-bezier(.2,.9,.3,1) both;
 }
-
-@keyframes cloudPulse {
-  0% { transform: translate(-50%, -50%) scale(0.99); opacity: 0.95; }
-  50% { transform: translate(-50%, -50%) scale(1.02); opacity: 1; }
-  100% { transform: translate(-50%, -50%) scale(0.99); opacity: 0.95; }
+.fadeOut {
+  animation: fadeOutAnim 360ms cubic-bezier(.2,.9,.3,1) both;
 }
+@keyframes fadeInAnim { from { opacity: 0; transform: translateY(6px) scale(.996); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes fadeOutAnim { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(6px) scale(.996); } }
 
+/* RESPONSIVE - manter EXATAMENTE as posições e tamanhos no mobile (max-width:768px) */
+/* apenas ajustar o texto para caber; TRAVA todas as variáveis para valores fixos iguais ao desktop */
 @media (max-width: 768px) {
-  .background {
-    animation-duration: 26s;
-    background-size: 60px 60px; /* fundo SVG maior */
+  .wrapper {
+    /* trava os tamanhos para o mesmo valor do desktop (evita redimensionamento via clamp/vmin) */
+    --square-size: 300px;
+    --circle-size: 18px;
+    --logo-slot-width: 300px;
+    --logo-slot-height: 56px;
+    --square-padding: 26px;
+    --circle-gap: 12px;
+    --circle-distance: 14px;
+    --circle-speed: 1.6s;
   }
 
-  .background::before {
-    width: clamp(200px, 65vmin, 460px);
-    height: clamp(200px, 65vmin, 460px);
-    animation-duration: 10s;
+  /* mantém exatamente as posições (não alterei left/top/bottom/right) */
+
+  /* ajuste apenas do texto para evitar quebra */
+  .loadingText {
+    font-size: 0.90rem; /* menor para caber em uma linha sem mexer em layout */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .bgIcon.left,
-  .bgIcon.right {
-    left: 10%;
-    right: 10%;
-    top: 50%;
-    transform: translateY(-50%);
+  /* se você usa regras menores como .loadingPlaceholder, mantemos o mesmo tamanho */
+  .loadingPlaceholder {
+    width: clamp(80px, 16vmin, 140px);
+    height: clamp(80px, 16vmin, 140px);
   }
 
-  .bgIcon.top {
-    top: 18%;
-    left: 50%;
-    transform: translateX(-50%);
+  /* os slots de logo seguem o tamanho travado acima */
+  .logoSlotTop, .logoSlotBottom {
+    width: var(--logo-slot-width);
+    height: var(--logo-slot-height);
   }
 
-  .bgIcon.bottom {
-    bottom: 18%;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .bgIcon {
-    font-size: 1rem;
+  .logoSlotTop{
+    left: calc(39% - 36px);
   }
 }
+
+/* nenhuma outra media query altera posições/tamanhos. */

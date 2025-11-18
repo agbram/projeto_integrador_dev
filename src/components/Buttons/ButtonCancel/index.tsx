@@ -1,14 +1,14 @@
 import styles from "./styles.module.css"
 
 type CancelProps = {
-  label?: string
+  CancelLabel?: string
   onClick: () => void
   disabled?: boolean
   variant?: VariantType
 }
 
 export default function ButtonCancelar({
-  label = "Cancelar",
+  CancelLabel,
   onClick,
   disabled = false,
   variant = "default"
@@ -31,7 +31,7 @@ export default function ButtonCancelar({
       onClick={onClick}
       disabled={disabled}
     >
-      {label}
+      {CancelLabel}
     </button>
   )
 }

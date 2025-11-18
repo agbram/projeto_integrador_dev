@@ -1,5 +1,5 @@
 .container{
-    display: none;
+    display: none !important;
     position: fixed;
     bottom: 64px;
     right: 32px;

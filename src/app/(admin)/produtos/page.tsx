@@ -214,7 +214,6 @@ export default function ProdutosModal() {
               { name: "description", label: "Descrição" },
               { name: "costPrice", label: "Preço de custo" },
               { name: "markupPercent", label: "Percentual de Markup" },
-              { name: "stockQuantity", label: "Quantidade em estoque" },
               { name: "fotoData", label: "Imagem", type: "file" },
               {
                 name: "category",
@@ -244,7 +243,7 @@ export default function ProdutosModal() {
         >
           <Card
             key={selectProduto?.id}
-            title="Editar Cliente" 
+            title="Editar Produto" 
             fields={[
               { name: "name",value: selectProduto?.name.toString(), label: "Nome" },
               { name: "description",value: selectProduto?.description.toString(), label: "Descrição" },
@@ -307,7 +306,7 @@ export default function ProdutosModal() {
           <p>{warningMessage}</p>
         </Modal.Body>
         <Modal.Footer className={styles.modalWarningFooter}>
-          <ButtonCancelar variant="outline" onClick={handleCloseWarningModal} label="Cancelar"/>
+          <ButtonCancelar variant="outline" onClick={handleCloseWarningModal} CancelLabel="Cancelar"/>
           <Button variant="danger" onClick={handleDesativaProduct}>
             Desativar
           </Button>

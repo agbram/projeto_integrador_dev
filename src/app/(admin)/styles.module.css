@@ -1,11 +1,387 @@
-.dev{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 75vh;          /* centraliza verticalmente */
-    color: #D40000;
-    font-size: 70px;
-  font-weight: bold;
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 📊 Container de Resumo */
+.summaryContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.summaryCard {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   text-align: center;
+  border-left: 4px solid #007bff;
+}
+
+.summaryCard h3 {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.summaryNumber {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 🔄 Botão de Sincronização */
+.syncContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.syncButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  color: (--color-button-text)
+}
+
+/* 📋 Container Principal de Tarefas */
+.containerPrincipal {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.taskCardContainer {
+  display: flex;
+}
+
+.taskCard {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 20px;
+  width: 100%;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.taskCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Cabeçalho da Tarefa */
+.taskHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.taskTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  flex: 1;
+}
+
+.statusBadges {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+.statusBadge,
+.priorityBadge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Descrição do Produto */
+.productDescription {
+  color: #666;
+  font-size: 14px;
+  margin: 0 0 12px 0;
+  font-style: italic;
+}
+
+/* Informações da Tarefa */
+.taskInfo {
+  margin-bottom: 16px;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.infoItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.infoItem:last-child {
+  border-bottom: none;
+}
+
+.infoItem strong {
+  color: #333;
+}
+
+/* Barra de Progresso */
+.progressContainer {
+  margin: 16px 0;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  display: block;
+}
+
+/* Ações da Tarefa */
+.taskActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+
+/* Modal */
+.modalBody {
+  padding: 0;
+}
+
+.taskDetails {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.taskDetails h5 {
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.detailItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.detailItem:last-child {
+  border-bottom: none;
+}
+
+/* Estados de Loading e Vazio */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  grid-column: 1 / -1;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  grid-column: 1 / -1;
+  color: #666;
+}
+
+.emptyState h3 {
+  margin: 16px 0 8px 0;
+  color: #333;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .summaryContainer {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .containerPrincipal {
+    grid-template-columns: 1fr;
+  }
+  
+  .taskHeader {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .statusBadges {
+    flex-direction: row;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .taskActions {
+    justify-content: center;
+  }
+}
+
+/* Container de Sincronização Melhorado */
+.syncContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.syncButtons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Botão de Sync Inteligente (PRINCIPAL) */
+.smartSyncButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border: none;
+  font-weight: 600;
+}
+
+.smartSyncButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0056b3, #004085);
+  transform: translateY(-1px);
+}
+
+/* Botão de Sync Completo (SECUNDÁRIO) */
+.fullSyncButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  border: 1px solid #6c757d;
+  color: #6c757d;
+}
+
+.fullSyncButton:hover:not(:disabled) {
+  background: #6c757d;
+  color: white;
+}
+
+/* Status de Sincronização */
+.syncStatus {
+  text-align: center;
+}
+
+.syncStatus small {
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Spinning animation */
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .syncButtons {
+    flex-direction: column;
+  }
+  
+  .smartSyncButton,
+  .fullSyncButton {
+    width: 100%;
+    justify-content: center;
+  }
 }
 

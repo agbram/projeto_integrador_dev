@@ -4,7 +4,7 @@ import { useState } from "react"
 import styles from "./styles.module.css"
 import ButtonCancelar from "@/components/Buttons/ButtonCancel"
 
-export type FormData = Record<string, string | File>;
+export type FormData = Record<string, string | File | Date | Number>;
 
 type Field = {
   name: string
@@ -12,7 +12,11 @@ type Field = {
   type?: string
   value?: string
   options?: { value: string; label: string }[]
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void // Adicione esta linha se quiser onChange individual
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+  readOnly?: boolean 
+  disabled?: boolean 
+  placeholder?: string
+  max?: number
 }
 
 type FormProps = {
@@ -27,6 +31,7 @@ type FormProps = {
   onCancel?: () => void
   onDelete?: () => void
   onChange?: (name: string, value: string) => void
+  additionalInfo?: React.ReactNode
 }
 
 export default function Card({ 
@@ -41,13 +46,18 @@ export default function Card({
   onCancel,
   onDelete,
   onChange,
+  additionalInfo
 }: FormProps) {
   const [formData, setFormData] = useState<FormData>({})
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     
-    // Atualiza o estado interno
+    const fieldConfig = fields.find(field => field.name === name);
+    if (fieldConfig?.readOnly) {
+      return;
+    }
+    
     if (e.target instanceof HTMLInputElement && e.target.files) {
       const files = e.target.files;
       const file = files[0];
@@ -56,7 +66,6 @@ export default function Card({
       setFormData(prev => ({ ...prev, [name]: value }))
     }
 
-    // Chama o onChange externo se existir
     if (onChange) {
       onChange(name, value)
     }
@@ -82,8 +91,11 @@ export default function Card({
 
       <form className={styles.form} onSubmit={handleSubmit}>
         {fields.map(field => {
-
           const value = formData[field.name] !== undefined ? formData[field.name] : field.value || "";
+          const isReadOnly = field.readOnly; 
+          const isDisabled = loading || disabled || field.disabled; 
+          const isPlaceholder = field.placeholder;
+          const isMax = field.max;
           
           return (
             <label key={field.name}>
@@ -94,7 +106,7 @@ export default function Card({
                   value={value.toString()}
                   onChange={handleChange}
                   required
-                  disabled={loading || disabled}
+                  disabled={isDisabled || isReadOnly} 
                 >
                   <option value="">Selecione uma opção</option>
                   {field.options.map(option => (
@@ -109,7 +121,9 @@ export default function Card({
                   name={field.name}
                   value={field.type === 'file' ? undefined : value.toString()}
                   onChange={handleChange}
-                  disabled={loading || disabled}
+                  disabled={isDisabled}
+                  readOnly={isReadOnly}
+                  className={isReadOnly ? styles.readOnlyInput : ''} 
                 />
               )}
               <br />
@@ -117,22 +131,27 @@ export default function Card({
           )
         })}
 
+        {additionalInfo && (
+          <div className={styles.additionalInfo}>
+            {additionalInfo}
+          </div>
+        )}
+
         <div className={styles.buttonsRow}>
           {showDelete && onDelete && (
             <ButtonCancelar
-              label= "Desativar"
+              CancelLabel="Desativar"
               onClick={onDelete}
               variant="outline"
             />
           )}
           {showCancel && onCancel && (
             <ButtonCancelar
-              label="Cancelar"
+              CancelLabel="Voltar"
               onClick={onCancel}
               variant="cancelLight"
             />
           )}
-
           
           <button 
             type="submit" 

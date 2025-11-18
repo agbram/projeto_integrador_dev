@@ -5,7 +5,7 @@ import { createContext, ReactNode, useCallback, useMemo, useState } from "react"
 // TODO: Ajustar para ter apenas setActionBar() e actionBar 
 
 type HandleAddType = () => void;
-type HandleFilterType = (showDisabled: boolean) => void;
+type HandleFilterType = () => void;
 
 
 type PageActionsType = {

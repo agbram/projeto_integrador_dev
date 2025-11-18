@@ -6,6 +6,9 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import FAB from "@/components/FAB";
 import api from "@/services/api";
+import "bootstrap/dist/css/bootstrap.min.css";
+import styles from "./styles.module.css"
+import { HourglassMediumIcon } from "@phosphor-icons/react/dist/ssr";
 
 export default function DespesasModal() {
   const [modalShow, setModalShow] = useState(false);
@@ -46,6 +49,7 @@ export default function DespesasModal() {
 
   return (
     <>
+      <h1 className={styles.dev}>EM DESEVOLVIMENTO...<HourglassMediumIcon size={60} /></h1>
       <FAB
         onClick={() => setModalShow(true)}
         text="+"

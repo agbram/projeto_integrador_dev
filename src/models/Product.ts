@@ -6,7 +6,7 @@ type Product = {
     category: string
     costPrice: number
     salePrice: number
-    markupPercent: string
+    markupPercent: number
     stockQuantity: number
     fotoUrl: string
     isActive: string

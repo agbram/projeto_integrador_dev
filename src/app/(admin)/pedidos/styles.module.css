@@ -325,3 +325,54 @@
   justify-content: center;
   align-items: center;
 }
+
+.editButton {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Estilos específicos para os botões com ícones */
+.botaocancelar,
+.botaoeditar,
+.botaonotafiscal {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  padding: 4px 0;
+}
+
+/* Mantenha os estilos existentes dos botões principais */
+.actionsSection {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.actionButton {
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-size: 0.9rem;
+  min-width: 140px;
+  border: 2px solid transparent;
+  background: #f8f9fa; /* Cor de fundo neutra para os botões */
+  
+}
+
+.actionButton:hover:not(:disabled) {
+  background: #e9ecef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.actionButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}

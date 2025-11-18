@@ -5,9 +5,12 @@ import Order from "@/models/order";
 import { CheckCircleIcon } from "@phosphor-icons/react";
 import { ReactNode, useState } from "react";
 
+type Variant = "notaFiscal" | "cancel" | "edit";
+
 type Action = {
   label: ReactNode;
   onClick(): void;
+  variant?: Variant;
 };
 
 type CardOrderProps = {
@@ -25,7 +28,7 @@ export default function CardOrder({
   loading = false,
   actions,
   onStatusUpdate,
-  onDeliveredClick, 
+  onDeliveredClick,
 }: CardOrderProps) {
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -92,105 +95,117 @@ export default function CardOrder({
   };
 
   return (
-    <div className={styles.container}>
-      <h3 className={styles.title}>
-        Pedido #{String(order.id).padStart(4, "0")}
-      </h3>
+    <div className={styles.card}>
+      <div className={styles.cardHeader}>
+        <h3 className={styles.cardTitle}>
+          Pedido #{String(order.id).padStart(4, "0")}
+        </h3>
+        <div 
+          className={styles.statusBadge}
+          style={{ 
+            backgroundColor: `${getStatusColor(order.status)}15`,
+            border: `1px solid ${getStatusColor(order.status)}`,
+            color: getStatusColor(order.status),
+          }}
+        >
+          {formatStatus(order.status)}
+        </div>
+      </div>
 
-      <div className={styles.info}>
-        <p>
-          <strong>Cliente:</strong>{" "}
-          {order.customer?.name || `ID: ${order.customerId}`}
-        </p>
+      <div className={styles.cardBody}>
+        <div className={styles.infoGrid}>
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Cliente:</span>
+            <span className={styles.infoValue}>
+              {order.customer?.name || `ID: ${order.customerId}`}
+            </span>
+          </div>
 
-        {order.notes && (
-          <p>
-            <strong>Observações:</strong> {order.notes}
-          </p>
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Total:</span>
+            <span className={styles.infoValue}>{formatTotal(order.total)}</span>
+          </div>
+
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Data do pedido:</span>
+            <span className={styles.infoValue}>{formatDate(order.orderDate)}</span>
+          </div>
+
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Data de entrega:</span>
+            <span className={styles.infoValue}>{formatDate(order.deliveryDate)}</span>
+          </div>
+
+          {order.notes && (
+            <div className={styles.fullWidthItem}>
+              <span className={styles.infoLabel}>Observações:</span>
+              <span className={styles.infoValue}>{order.notes}</span>
+            </div>
+          )}
+
+          {order.items && order.items.length > 0 && (
+            <div className={styles.fullWidthItem}>
+              <span className={styles.infoLabel}>Itens:</span>
+              <div className={styles.itemsList}>
+                {order.items.map((item, index) => (
+                  <div key={index} className={styles.item}>
+                    <span className={styles.itemQuantity}>{item.quantity}x</span>
+                    <span className={styles.itemName}>{item.product?.name}</span>
+                    <span className={styles.itemPrice}>
+                      R$ {typeof item.unitPrice === "number" ? item.unitPrice.toFixed(2) : "0.00"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className={styles.cardFooter}>
+        {order.status === "READY_FOR_DELIVERY" && (onStatusUpdate || onDeliveredClick) && (
+          <div className={styles.deliverySection}>
+            <button
+              onClick={handleMarkAsDelivered}
+              className={styles.deliveredButton}
+              disabled={(isUpdating && !onDeliveredClick) || loading} 
+            >
+              {isUpdating && !onDeliveredClick ? "Confirmando..." : "Marcar como Entregue"}
+            </button>
+            <small className={styles.deliveryHelpText}>
+              Clique para confirmar que o pedido foi entregue ao cliente
+            </small>
+          </div>
         )}
 
-        <p>
-          <strong>Status: </strong>
-          <span 
-            className={styles.status} 
-            style={{ 
-              border: `2px solid ${getStatusColor(order.status)}`, 
-              color: getStatusColor(order.status),
-            }}
-          >
-            {formatStatus(order.status)}
-          </span>
-        </p>
-        <p>
-          <strong>Total:</strong> {formatTotal(order.total)}
-        </p>
-        <p>
-          <strong>Data de criação pedido:</strong> {formatDate(order.orderDate)}
-        </p>
+        {order.status === "DELIVERED" && (
+          <div className={styles.deliveredSection}>
+            <div className={styles.deliveredBadge}>
+              <CheckCircleIcon size={20} color="green" weight="fill" />
+              <span>Pedido Entregue</span>
+            </div>
+            <small className={styles.deliveredDate}>
+              Entregue em: {formatDate(order.updatedAt)}
+            </small>
+          </div>
+        )}
 
-        <p>
-          <strong>Data de entrega:</strong> {formatDate(order.deliveryDate)}
-        </p>
-
-
-        {order.items && order.items.length > 0 && (
-          <div className={styles.items}>
-            <strong>Itens:</strong>
-            <ul>
-              {order.items.map((item, index) => (
-                <li key={index}>
-                  {item.quantity}x {item.product?.name} - R${" "}
-                  {typeof item.unitPrice === "number"
-                    ? item.unitPrice.toFixed(2)
-                    : "0.00"}
-                </li>
-              ))}
-            </ul>
+        {actions && actions.length > 0 && (
+          <div className={styles.actionsSection}>
+            {actions.map((action, idx) => (
+              <button
+                key={idx}
+                onClick={action.onClick}
+                className={`${styles.actionButton} ${styles[action.variant ?? ""]}`}
+                disabled={loading}
+                
+              >
+                {action.label}
+              </button>
+            ))}
           </div>
         )}
       </div>
-
-      {order.status === "READY_FOR_DELIVERY" && (onStatusUpdate || onDeliveredClick) && (
-        <div className={styles.deliveryAction}>
-          <button
-            onClick={handleMarkAsDelivered}
-            className={styles.deliveredButton}
-            disabled={(isUpdating && !onDeliveredClick) || loading} 
-          >
-            {isUpdating && !onDeliveredClick ? "Confirmando..." : "Entregue"}
-          </button>
-          <small className={styles.deliveryHelpText}>
-            Clique para confirmar que o pedido foi entregue ao cliente
-          </small>
-        </div>
-      )}
-
-      {order.status === "DELIVERED" && (
-        <div className={styles.deliveredContainer}>
-          <div className={styles.deliveredBadge}>
-            <CheckCircleIcon size={20} color="green" weight="fill" />
-            <span>Pedido Entregue</span>
-          </div>
-          <small className={styles.deliveredDate}>
-            <strong>Entregue em: {formatDate(order.updatedAt)}</strong>
-          </small>
-        </div>
-      )}
-
-      {actions && actions.length > 0 && (
-        <div className={styles.actions}>
-          {actions.map((action, idx) => (
-            <button
-              key={idx}
-              onClick={action.onClick}
-              className={styles.button}
-              disabled={loading}
-            >
-              {action.label}
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

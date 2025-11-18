@@ -12,6 +12,9 @@ import {
   FilePdfIcon,
   PlusIcon,
   MinusIcon,
+  PencilIcon,
+  ReceiptIcon,
+  ReceiptXIcon,
 } from "@phosphor-icons/react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
@@ -638,19 +641,41 @@ export default function PedidosModal() {
                 onStatusUpdate={handleUpdateOrderStatus}
                 onDeliveredClick={() => handleOpenDeliveredModal(p)}
                 actions={[
+                  ...(p.status === "IN_PRODUCTION" || p.status === "PENDING"
+                    ? [
+                        {
+                          label: (
+                            <div className={styles.botaoeditar}>
+                              <PencilIcon size={18} />
+                              <span>Editar</span>
+                            </div>
+                          ),
+                          onClick: () => handleEditOrder(p),
+                          variant: "edit"
+                        },
+                      ]
+                    : []),
                   {
-                    label: "Editar",
-                    onClick: () => handleEditOrder(p),
-                  },
-                  {
-                    label: "Nota Fiscal",
+                    label: (
+                      <div className={styles.botaonotafiscal}>
+                        <ReceiptIcon size={18} />
+                        <span>Nota Fiscal</span>
+                      </div>
+                    ),
                     onClick: () => gerarNotaFiscal(p),
+                    variant: "notaFiscal"
                   },
                   ...(p.status !== "CANCELLED" && p.status !== "DELIVERED"
                     ? [
                         {
-                          label: "Cancelar",
+                          label: (
+                            <div className={styles.botaocancelar}>
+                              <ReceiptXIcon size={18} />
+                              <span>Cancelar</span>
+                            </div>
+                          ),
                           onClick: () => handleOpenCancelModal(p),
+                          variant: "cancel"
                         },
                       ]
                     : []),

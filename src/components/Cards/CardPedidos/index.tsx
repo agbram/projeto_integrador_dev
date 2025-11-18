@@ -3,10 +3,10 @@
 import styles from "./styles.module.css";
 import Order from "@/models/order";
 import { CheckCircleIcon } from "@phosphor-icons/react";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 
 type Action = {
-  label: string;
+  label: ReactNode;
   onClick(): void;
 };
 
@@ -140,8 +140,8 @@ export default function CardOrder({
               {order.items.map((item, index) => (
                 <li key={index}>
                   {item.quantity}x {item.product?.name} - R${" "}
-                  {typeof item.subtotal === "number"
-                    ? item.subtotal.toFixed(2)
+                  {typeof item.unitPrice === "number"
+                    ? item.unitPrice.toFixed(2)
                     : "0.00"}
                 </li>
               ))}

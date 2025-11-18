@@ -102,7 +102,7 @@ const handleSmartSync = async () => {
     const response = await api.post("/task/sync-new-orders");
     
     setSuccessMessage(
-      `✅ ${response.data.summary.successCount} novos pedidos sincronizados! Produção atual preservada.`
+      `${response.data.summary.successCount} novos pedidos sincronizados! Produção atual preservada.`
     );
     setSuccessModalShow(true);
     

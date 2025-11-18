@@ -268,13 +268,6 @@ export default function ProdutosModal() {
         </Modal.Body>
       </Modal>
 
-      {/* FAB */}
-      <FAB
-        onClick={() => setModalShow(true)}
-        text={
-          <UserPlusIcon weight="bold" size={24} style={{ marginLeft: 8 }} />
-        }
-      />
 
       {/* Modal de sucesso */}
       <Modal
@@ -295,13 +288,7 @@ export default function ProdutosModal() {
         <Modal.Footer
           className={`justify-content-center ${styles.successProdutosFooter}`}
         >
-          <Button
-            variant="success"
-            onClick={() => setSuccessModalShow(false)}
-            className={styles.successProdutosButton}
-          >
-            OK
-          </Button>
+          
         </Modal.Footer>
       </Modal>
 

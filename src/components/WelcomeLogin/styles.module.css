@@ -1,52 +1,173 @@
-.WelcomeLogin {
+.root {
+  /* Paleta principal */
+  --primary-dark: #2e1c1c;
+  --primary-light: #442a27;
+  --accent: #f7a6b8;
+  --accent-dark: #d47b92;
+  --text-strong: #3a2b2b;
+  --text-soft: #6b5a5a;
+
+  /* Efeito vidro */
+  --glass-bg: rgba(46, 28, 28, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-highlight: rgba(247, 166, 184, 0.06);
+
+  --panel-radius: 22px;
+  --blur: 14px;
+  --shadow: 0 10px 25px rgba(0,0,0,0.18);
+}
+
+
+/* ==========================
+   TELA INTEIRA
+========================== */
+.WelcomeScreen {
+  width: 100%;
+  height: 100vh;
+
+  background-image: url("/welcomeWallpaper.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
   display: flex;
-  flex-direction: column;
   justify-content: center;
-  flex-grow: 1;
-  max-width: 520px; /* Aumentei levemente a largura máxima */
+  align-items: center;
+  padding: 32px;
   position: relative;
-  color: #F2EBE9;
-  z-index: 1;
+
+  /* Texto mais bem integrado ao tema */
+  color: var(--text-strong);
 }
 
-.welcomeContent {
+
+/* ==========================
+   PALAVRAS SUPERIORES
+========================== */
+.topWords {
+  position: absolute;
+  top: 26px;
+  left: 32px;
+
+  display: flex;
+  gap: 22px;
+
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-soft);
+  letter-spacing: 0.4px;
+
+  /* Ajuste: leve efeito de sombra pra destacar em fundos claros */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+
+/* ==========================
+   PAINEL DECORATIVO
+========================== */
+.decorativePanel {
+  position: absolute;
+  top: 28px;
+  right: 28px;
+
+  width: 90px;
+  height: 90px;
+
+  background: var(--glass-highlight);
+  border-radius: var(--panel-radius);
+  border: 1px solid var(--glass-border);
+
+  /* Blur menor para diferenciar do painel principal */
+  backdrop-filter: blur(calc(var(--blur) - 4px));
+}
+
+
+/* ==========================
+   PAINEL PRINCIPAL (VIDRO)
+========================== */
+.mainPanel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--panel-radius);
+  backdrop-filter: blur(var(--blur));
+
+  padding: 32px;
+  max-width: 480px;
+
+  box-shadow: var(--shadow);
+
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
-  justify-content: center;
+  gap: 16px;
+
+  /* Dica: ajustar margens no mobile */
+  margin-top: 20px;
 }
 
+
+/* ==========================
+   ÍCONES
+========================== */
 .welcomeIcon {
   display: flex;
   justify-content: flex-start;
-  gap: 10px; /* Espaço entre os ícones */
-  margin-bottom: 2rem; 
+  gap: 12px;
+  margin-bottom: 1rem;
+
+  /* Ícones grandes pedem respiro visual */
 }
 
+
+/* ==========================
+   TÍTULO
+========================== */
 .welcomeTitle {
-  font-size: 2.8rem; /* Aumentei de 2.4 para 2.8rem */
+  font-size: 2.2rem;
   font-weight: 700;
-  margin-bottom: 1.5rem; 
-  line-height: 1.2;
-  color: #F2EBE9;
+  margin: 0;
+  color: var(--text-strong);
+
+  /* Sombra leve para realçar com o vidro */
+  text-shadow: 0 2px 5px rgba(0,0,0,0.18);
 }
 
 .highlight {
-  color: #FFA0C2;
+  color: var(--accent-dark);
 }
 
+
+/* ==========================
+   TEXTO PRINCIPAL
+========================== */
 .welcomeText {
-  font-size: 1.10rem; /* Aumentei de 1 para 1.15rem */
-  opacity: 0.9;
-  line-height: 1.6; /* Aumentei o line-height para melhor legibilidade */
-  color: #F2EBE9;
-  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  opacity: 0.95;
+  color: var(--text-strong);
 }
 
+
+/* ==========================
+   RODAPÉ
+========================== */
 .welcomeFooter {
-  font-size: 0.9rem; /* Aumentei de 0.8 para 0.9rem */
-  opacity: 0.8; /* Aumentei levemente a opacidade */
-  color: #C8829A;
-  margin-top: auto;
-  padding-top: 2rem;
+  font-size: 0.9rem;
+  color: var(--accent-dark);
+  opacity: 0.9;
+  margin-top: 10px;
+}
+
+
+/* ==========================
+   RESPONSIVIDADE
+========================== */
+@media (min-width: 768px) {
+  /* Ativa o painel do lado no desktop */
+  .painelBoasVindas {
+    display: flex;
+  }
+
+  .mainPanel {
+    margin-top: 0; /* Remove margem no desktop */
+  }
 }

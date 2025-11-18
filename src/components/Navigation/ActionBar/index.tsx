@@ -18,6 +18,7 @@ import { usePathname } from "next/navigation";
 import styles from "./styles.module.css";
 import { usePageActions } from "@/hooks/usePageActions";
 
+
 type Props = {
   onSearch?: (q: string) => void;
   onFilter?: () => void;
@@ -29,9 +30,10 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
   const [q, setQ] = useState("");
   const rawPath = usePathname();
   const pathname = rawPath ?? "/";
-
+  
   const pageAction = usePageActions();
-  const { handleFilter } = usePageActions();
+
+
 
   function getPageTitle() {
     if (title) return title;
@@ -92,6 +94,7 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
             type="submit"
             aria-label="Pesquisar"
             className={styles.iconBtn}
+            onClick={pageAction.handleFilter}
           >
             <MagnifyingGlassIcon size={16} />
           </button>

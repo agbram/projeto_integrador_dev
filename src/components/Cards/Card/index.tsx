@@ -4,7 +4,7 @@ import { useState } from "react"
 import styles from "./styles.module.css"
 import ButtonCancelar from "@/components/Buttons/ButtonCancel"
 
-export type FormData = Record<string, string | File | Date | Number>;
+export type FormData = Record<string, string | File | Date | Number >;
 
 type Field = {
   name: string

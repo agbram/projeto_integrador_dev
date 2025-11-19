@@ -125,11 +125,6 @@ const formatDate = (dateString: string | Date | undefined) => {
           </div>
 
           <div className={styles.infoItem}>
-            <span className={styles.infoLabel}>Total:</span>
-            <span className={styles.infoValue}>{formatTotal(order.total)}</span>
-          </div>
-
-          <div className={styles.infoItem}>
             <span className={styles.infoLabel}>Data do pedido:</span>
             <span className={styles.infoValue}>{formatDate(order.orderDate)}</span>
           </div>
@@ -138,6 +133,13 @@ const formatDate = (dateString: string | Date | undefined) => {
             <span className={styles.infoLabel}>Data de entrega:</span>
             <span className={styles.infoValue}>{formatDate(order.deliveryDate)}</span>
           </div>
+
+          {order.discount !== 0 && (
+            <div className={styles.discountItem}>
+              <span className={styles.discountLabel}>Desconto: </span> 
+              <span className={styles.discountValue}>R$ {order.discount}</span> 
+            </div>
+          )}
 
           {order.notes && (
             <div className={styles.fullWidthItem}>
@@ -162,6 +164,12 @@ const formatDate = (dateString: string | Date | undefined) => {
               </div>
             </div>
           )}
+
+          <div className={styles.totalfullWidthItem}>
+            <span className={styles.totalLabel}>Total:</span>
+            <span className={styles.totalOrder}>{formatTotal(order.total)}</span>
+          </div>
+
         </div>
       </div>
 

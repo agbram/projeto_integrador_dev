@@ -54,6 +54,7 @@ export default interface Order {
   updatedAt: string;
   customer?: Customer;
   user?: User;
+  discount?: number;
   items?: OrderItem[];
   
   productionSynced?: boolean;

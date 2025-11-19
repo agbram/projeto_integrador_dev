@@ -60,6 +60,24 @@
   gap: 8px;
 }
 
+.discountItem {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: start;
+  gap: 8px;
+}
+
+.discountLabel {
+  font-weight: 600;
+  color: red;
+  font-size: 0.9rem;
+}
+
+.discountValue {
+  color: red;
+  font-size: 0.95rem;
+}
+
 .fullWidthItem {
   display: flex;
   flex-direction: column;
@@ -97,6 +115,27 @@
 .itemQuantity {
   font-weight: 600;
   color: var(--color-title-text);
+}
+
+.totalfullWidthItem {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  justify-content: space-between;
+  padding: 8px;
+  border-radius: 10px;
+  background-color: #C9CCD6;
+}
+
+.totalLabel {
+  font-weight: 650;
+  color: var(--color-title-text);
+  font-size: 0.9rem;
+}
+
+.totalOrder {
+  font-weight: 700;
+  font-size: 0.9rem;
 }
 
 .itemName {

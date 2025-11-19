@@ -31,6 +31,7 @@ export default function PedidosModal() {
   const [warningModalShow, setWarningModalShow] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [discount, setDiscount] = useState(0);
   const [warningDeleteModalShow, setWarningDeleteModalShow] = useState(false);
   const [warningDeliveredModalShow, setWarningDeliveredModalShow] =
     useState(false);
@@ -569,13 +570,16 @@ export default function PedidosModal() {
         status: "PENDING",
         notes: data.notes || "",
         items: items,
+        discount: (parseFloat(discount.toFixed(2))) || 0
       };
 
       console.log("Enviando pedido:", formattedData);
 
       const response = await api.post("/orders", formattedData);
-      console.log("✅ Pedido cadastrado:", response.data);
+      console.log("Pedido cadastrado:", response.data);
 
+      setOrderItems([]);
+      setDiscount(0);
       fetchPedidos();
       setSuccessMessage("Pedido cadastrado com sucesso!");
       setSuccessModalShow(true);
@@ -612,12 +616,15 @@ export default function PedidosModal() {
       setLoading(false);
     }
   };
+  const calculateSubtotal = () => {
+  return orderItems.reduce((total, item) => total + (item.unitPrice * item.quantity), 0);
+};
 
-  const calculateTotal = () => {
-    return orderItems.reduce((total, item) => {
-      return total + item.unitPrice * item.quantity;
-    }, 0);
-  };
+const calculateTotal = () => {
+  const subtotal = calculateSubtotal();
+  const totalWithDiscount = subtotal - discount;
+  return Math.max(totalWithDiscount, 0); // Garante que não fique negativo
+};
 
   if (loading && pedidos.length === 0) {
     return <div className={styles.loadingContainer}>Carregando pedidos...</div>;
@@ -687,243 +694,286 @@ export default function PedidosModal() {
       </div>
 
       {/* MODAL PRINCIPAL - CRIAR PEDIDO */}
-      <Modal show={modalShow} onHide={handleCloseModal} size="lg" centered>
-        <Modal.Body className={styles.modalPedidosBody}>
-          {/* Selecionar cliente */}
-          {formStep === "checkCustomer" && (
-            <div className={styles.searchContainer}>
-              <h4>Selecione um cliente</h4>
-              <div className={styles.searchWrapper}>
-                <MagnifyingGlassIcon className={styles.searchIcon} width={20} />
-                <input
-                  type="text"
-                  className={styles.searchInput}
-                  placeholder="Buscar cliente..."
-                  value={customerSearchTerm}
-                  onChange={(e) => setCustomerSearchTerm(e.target.value)}
-                  onFocus={() => setIsCustomerSearchFocused(true)}
-                  onBlur={() =>
-                    setTimeout(() => setIsCustomerSearchFocused(false), 200)
-                  }
-                />
-              </div>
+<Modal show={modalShow} onHide={handleCloseModal} size="lg" centered>
+  <Modal.Body className={styles.modalPedidosBody}>
+    {/* Selecionar cliente - mantém igual */}
+    {formStep === "checkCustomer" && (
+      <div className={styles.searchContainer}>
+        <h4>Selecione um cliente</h4>
+        <div className={styles.searchWrapper}>
+          <MagnifyingGlassIcon className={styles.searchIcon} width={20} />
+          <input
+            type="text"
+            className={styles.searchInput}
+            placeholder="Buscar cliente..."
+            value={customerSearchTerm}
+            onChange={(e) => setCustomerSearchTerm(e.target.value)}
+            onFocus={() => setIsCustomerSearchFocused(true)}
+            onBlur={() =>
+              setTimeout(() => setIsCustomerSearchFocused(false), 200)
+            }
+          />
+        </div>
 
-              {isCustomerSearchFocused && (
-                <div className={styles.containerResults}>
-                  {customers
-                    .filter((c) =>
-                      c.name
-                        .toLowerCase()
-                        .includes(customerSearchTerm.toLowerCase())
-                    )
-                    .slice(0, 10)
-                    .map((c) => (
-                      <div
-                        key={c.id}
-                        className={styles.searchItem}
-                        onMouseDown={() => {
-                          setSelectedCustomer(c);
-                          setFormStep("selectProducts");
-                          setCustomerSearchTerm("");
-                        }}
-                      >
-                        {c.name}
+        {isCustomerSearchFocused && (
+          <div className={styles.containerResults}>
+            {customers
+              .filter((c) =>
+                c.name
+                  .toLowerCase()
+                  .includes(customerSearchTerm.toLowerCase())
+              )
+              .slice(0, 10)
+              .map((c) => (
+                <div
+                  key={c.id}
+                  className={styles.searchItem}
+                  onMouseDown={() => {
+                    setSelectedCustomer(c);
+                    setFormStep("selectProducts");
+                    setCustomerSearchTerm("");
+                  }}
+                >
+                  {c.name}
+                </div>
+              ))}
+          </div>
+        )}
+      </div>
+    )}
+
+    {/* Selecionar produtos - ATUALIZADO com desconto */}
+    {formStep === "selectProducts" && selectedCustomer && (
+      <div className={styles.productSelectionContainer}>
+        <h4>Selecione os produtos para {selectedCustomer.name}</h4>
+
+        {/* Barra de pesquisa de produtos */}
+        <div className={styles.searchContainer}>
+          <div className={styles.searchWrapper}>
+            <MagnifyingGlassIcon
+              className={styles.searchIcon}
+              width={20}
+            />
+            <input
+              type="text"
+              className={styles.searchInput}
+              placeholder="Buscar produto..."
+              value={productSearchTerm}
+              onChange={(e) => setProductSearchTerm(e.target.value)}
+              onFocus={() => setIsProductSearchFocused(true)}
+              onBlur={() =>
+                setTimeout(() => setIsProductSearchFocused(false), 200)
+              }
+            />
+          </div>
+
+          {isProductSearchFocused && productSearchTerm && (
+            <div className={styles.containerResults}>
+              {filteredProducts
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .slice(0, 5)
+                .map((product) => (
+                  <div
+                    key={product.id}
+                    className={styles.searchItem}
+                    onMouseDown={() => handleAddProduct(product)}
+                  >
+                    <div className={styles.searchItemContent}>
+                      <div className={styles.productName}>
+                        {product.name}
                       </div>
-                    ))}
+                      <div className={styles.searchItemAdd}>
+                        <div className={styles.productPrice}>
+                          R$ {product.salePrice.toFixed(2)}
+                        </div>
+                        <PlusIcon size={20} className={styles.addIcon} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              {filteredProducts.length === 0 && productSearchTerm && (
+                <div className={styles.noResults}>
+                  Nenhum produto encontrado
                 </div>
               )}
             </div>
           )}
+        </div>
 
-          {/* Selecionar produtos */}
-          {formStep === "selectProducts" && selectedCustomer && (
-            <div className={styles.productSelectionContainer}>
-              <h4>Selecione os produtos para {selectedCustomer.name}</h4>
-
-              {/* Barra de pesquisa de produtos */}
-              <div className={styles.searchContainer}>
-                <div className={styles.searchWrapper}>
-                  <MagnifyingGlassIcon
-                    className={styles.searchIcon}
-                    width={20}
-                  />
-                  <input
-                    type="text"
-                    className={styles.searchInput}
-                    placeholder="Buscar produto..."
-                    value={productSearchTerm}
-                    onChange={(e) => setProductSearchTerm(e.target.value)}
-                    onFocus={() => setIsProductSearchFocused(true)}
-                    onBlur={() =>
-                      setTimeout(() => setIsProductSearchFocused(false), 200)
-                    }
-                  />
+        {/* Lista de produtos adicionados */}
+        {orderItems.length > 0 && (
+          <div className={styles.selectedProducts}>
+            <h5>Produtos Selecionados</h5>
+            {orderItems.map((item) => (
+              <div
+                key={item.productId}
+                className={styles.selectedProductItem}
+              >
+                <div className={styles.productInfo}>
+                  <span className={styles.productName}>
+                    {item.productName}
+                  </span>
+                  <span className={styles.productPrice}>
+                    R$ {item.unitPrice.toFixed(2)}
+                  </span>
                 </div>
+                <div className={styles.quantityControls}>
+                  <button
+                    className={styles.btnQuantity}
+                    onClick={() => handleRemoveQuantity(item.productId)}
+                  >
+                    <MinusIcon size={16} />
+                  </button>
+                  <span className={styles.quantityValue}>
+                    {item.quantity}
+                  </span>
+                  <button
+                    className={styles.btnQuantity}
+                    onClick={() => handleAddQuantity(item.productId)}
+                  >
+                    <PlusIcon size={16} />
+                  </button>
+                </div>
+                <div className={styles.itemTotal}>
+                  R$ {(item.unitPrice * item.quantity).toFixed(2)}
+                </div>
+              </div>
+            ))}
 
-                {isProductSearchFocused && productSearchTerm && (
-                  <div className={styles.containerResults}>
-                    {filteredProducts
-                      .sort((a, b) => a.name.localeCompare(b.name)) // Ordena alfabeticamente
-                      .slice(0, 5) // Limita a 5 resultados
-                      .map((product) => (
-                        <div
-                          key={product.id}
-                          className={styles.searchItem}
-                          onMouseDown={() => handleAddProduct(product)}
-                        >
-                          <div className={styles.searchItemContent}>
-                            <div className={styles.productName}>
-                              {product.name}
-                            </div>
-                            <div className={styles.searchItemAdd}>
-                            <div className={styles.productPrice}>
-                              R$ {product.salePrice.toFixed(2)}
-                            </div>
-                          </div>
-                          <PlusIcon size={20} className={styles.addIcon} />
-                            </div>
-                        </div>
-                      ))}
-                    {filteredProducts.length === 0 && productSearchTerm && (
-                      <div className={styles.noResults}>
-                        Nenhum produto encontrado
-                      </div>
-                    )}
+            {/* NOVO: Campo de desconto */}
+            <div className={styles.discountSection}>
+              <label className={styles.discountLabel}>
+                Desconto (Atacado):
+              </label>
+              <div className={styles.discountInputWrapper}>
+                <span className={styles.currencySymbol}>R$</span>
+                <input
+                  type="text"
+                  step="0.01"
+                  min="0"
+                  max={calculateSubtotal()} 
+                  value={discount}
+                  onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
+                  className={styles.discountInput}
+                  placeholder="0,00"
+                />
+              </div>
+            </div>
+
+            <div className={styles.partialTotal}>
+              <div className={styles.totalLine}>
+                <span>Subtotal:</span>
+                <span>R$ {calculateSubtotal().toFixed(2)}</span>
+              </div>
+              {discount > 0 && (
+                <div className={styles.totalLine}>
+                  <span>Desconto:</span>
+                  <span className={styles.discountText}>
+                    - R$ {discount.toFixed(2)}
+                  </span>
+                </div>
+              )}
+              <div className={styles.totalLine}>
+                <strong>Total:</strong>
+                <strong>R$ {calculateTotal().toFixed(2)}</strong>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className={styles.productsActions}>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setFormStep("checkCustomer");
+              setSelectedCustomer(null);
+              setOrderItems([]);
+              setDiscount(0); // Reseta o desconto ao voltar
+            }}
+          >
+            Voltar
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => setFormStep("order")}
+            disabled={orderItems.length === 0}
+          >
+            Avançar
+          </Button>
+        </div>
+      </div>
+    )}
+
+    {formStep === "order" && selectedCustomer && (
+      <Card
+        title={`Cadastro de Pedido — ${selectedCustomer.name}`}
+        fields={[
+          {
+            name: "orderDate",
+            label: "Data do Pedido",
+            type: "date",
+            value: new Date().toISOString().split("T")[0],
+            readOnly: true,
+          },
+          {
+            name: "deliveryDate",
+            label: "Data de Entrega",
+            type: "date",
+            value: "",
+          },
+          {
+            name: "notes",
+            label: "Observações",
+            type: "text",
+            value: "",
+          },
+        ]}
+        onSubmit={handleSubmit}
+        submitLabel="Cadastrar Pedido"
+        loading={loading}
+        showCancel
+        onCancel={() => setFormStep("selectProducts")}
+        additionalInfo={
+          <div className={styles.orderSummaryContainer}>
+            <button
+              className={styles.orderSummaryToggle}
+              type="button"
+              onClick={() => setShowSummary((prev) => !prev)}
+            >
+              {showSummary
+                ? "Ocultar Resumo do Pedido"
+                : "Mostrar Resumo do Pedido"}
+            </button>
+
+            {showSummary && (
+              <div className={styles.orderSummaryCard}>
+                <h5>Resumo do Pedido</h5>
+                {orderItems.map((item) => (
+                  <div key={item.productId} className={styles.orderItem}>
+                    <span>{item.productName}</span> —
+                    <span> Qtd: {item.quantity}</span>
+                    <br />
+                    <span>R$ {item.unitPrice.toFixed(2)}</span>
+                  </div>
+                ))}
+                {discount > 0 && (
+                  <div className={styles.orderDiscount}>
+                    <span>Desconto aplicado:</span>
+                    <span>- R$ {discount.toFixed(2)}</span>
                   </div>
                 )}
               </div>
-
-              {/* Lista de produtos adicionados */}
-              {orderItems.length > 0 && (
-                <div className={styles.selectedProducts}>
-                  <h5>Produtos Selecionados</h5>
-                  {orderItems.map((item) => (
-                    <div
-                      key={item.productId}
-                      className={styles.selectedProductItem}
-                    >
-                      <div className={styles.productInfo}>
-                        <span className={styles.productName}>
-                          {item.productName}
-                        </span>
-                        <span className={styles.productPrice}>
-                          R$ {item.unitPrice.toFixed(2)}
-                        </span>
-                      </div>
-                      <div className={styles.quantityControls}>
-                        <button
-                          className={styles.btnQuantity}
-                          onClick={() => handleRemoveQuantity(item.productId)}
-                        >
-                          <MinusIcon size={16} />
-                        </button>
-                        <span className={styles.quantityValue}>
-                          {item.quantity}
-                        </span>
-                        <button
-                          className={styles.btnQuantity}
-                          onClick={() => handleAddQuantity(item.productId)}
-                        >
-                          <PlusIcon size={16} />
-                        </button>
-                      </div>
-                      <div className={styles.itemTotal}>
-                        R$ {(item.unitPrice * item.quantity).toFixed(2)}
-                      </div>
-                    </div>
-                  ))}
-
-                  <div className={styles.partialTotal}>
-                    <strong>Total: R$ {calculateTotal().toFixed(2)}</strong>
-                  </div>
-                </div>
-              )}
-
-              <div className={styles.productsActions}>
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    setFormStep("checkCustomer");
-                    setSelectedCustomer(null);
-                    setOrderItems([]);
-                  }}
-                >
-                  Voltar
-                </Button>
-                <Button
-                  variant="primary"
-                  onClick={() => setFormStep("order")}
-                  disabled={orderItems.length === 0}
-                >
-                  Avançar
-                </Button>
-              </div>
+            )}
+            <br />
+            <div className={styles.finalTotal}>
+              <strong>Total: R$ {calculateTotal().toFixed(2)}</strong>
             </div>
-          )}
-
-          {/* Cadastrar pedido */}
-          {formStep === "order" && selectedCustomer && (
-            <Card
-              title={`Cadastro de Pedido — ${selectedCustomer.name}`}
-              fields={[
-                {
-                  name: "orderDate",
-                  label: "Data do Pedido",
-                  type: "date",
-                  value: new Date().toISOString().split("T")[0],
-                  readOnly: true,
-                },
-                {
-                  name: "deliveryDate",
-                  label: "Data de Entrega",
-                  type: "date",
-                  value: "",
-                },
-                {
-                  name: "notes",
-                  label: "Observações",
-                  type: "text",
-                  value: "",
-                },
-              ]}
-              onSubmit={handleSubmit}
-              submitLabel="Cadastrar Pedido"
-              loading={loading}
-              showCancel
-              onCancel={() => setFormStep("selectProducts")}
-              additionalInfo={
-                <div className={styles.orderSummaryContainer}>
-                  <button
-                    className={styles.orderSummaryToggle}
-                    type="button"
-                    onClick={() => setShowSummary((prev) => !prev)}
-                  >
-                    {showSummary
-                      ? "Ocultar Resumo do Pedido"
-                      : "Mostrar Resumo do Pedido"}
-                  </button>
-
-                  {showSummary && (
-                    <div className={styles.orderSummaryCard}>
-                      <h5>Resumo do Pedido</h5>
-                      {orderItems.map((item) => (
-                        <div key={item.productId} className={styles.orderItem}>
-                          <span>{item.productName}</span> —
-                          <span> Qtd: {item.quantity}</span>
-                          <br />
-                          <span>R$ {item.unitPrice.toFixed(2)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <br />
-                  <strong>Total: R$ {calculateTotal().toFixed(2)}</strong>
-                </div>
-              }
-            />
-          )}
-        </Modal.Body>
-      </Modal>
+          </div>
+        }
+      />
+    )}
+  </Modal.Body>
+</Modal>
 
       {/* Modal de confirmação de cancelamento */}
       <Modal

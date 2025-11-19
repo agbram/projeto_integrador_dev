@@ -3,14 +3,15 @@
 import styles from "./styles.module.css";
 import Order from "@/models/order";
 import { CheckCircleIcon } from "@phosphor-icons/react";
+import { time } from "console";
 import { ReactNode, useState } from "react";
 
-type Variant = "notaFiscal" | "cancel" | "edit";
+enum Variant { NotaFiscal = "notaFiscal", Cancel =  "cancel", Edit = "edit"};
 
 type Action = {
   label: ReactNode;
   onClick(): void;
-  variant?: Variant;
+  variant?: Variant | string;
 };
 
 type CardOrderProps = {
@@ -32,15 +33,17 @@ export default function CardOrder({
 }: CardOrderProps) {
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const formatDate = (dateString: string | Date | undefined) => {
-    if (!dateString) return "—";
-    try {
-      const date = new Date(dateString);
-      return isNaN(date.getTime()) ? "—" : date.toLocaleDateString("pt-BR");
-    } catch {
-      return "—";
-    }
-  };
+const formatDate = (dateString: string | Date | undefined) => {
+  if (!dateString) return "—";
+  try {
+    const date = new Date(dateString);
+    return isNaN(date.getTime())
+      ? "—"
+      : date.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" });
+  } catch {
+    return "—";
+  }
+};
 
   const handleMarkAsDelivered = async () => {
     if (onDeliveredClick) {
@@ -198,7 +201,6 @@ export default function CardOrder({
                 onClick={action.onClick}
                 className={`${styles.actionButton} ${styles[action.variant ?? ""]}`}
                 disabled={loading}
-                
               >
                 {action.label}
               </button>

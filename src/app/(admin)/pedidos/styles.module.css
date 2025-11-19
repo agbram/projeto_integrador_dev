@@ -376,3 +376,72 @@
   cursor: not-allowed;
   transform: none;
 }
+
+/* Estilos para a seção de desconto */
+.discountSection {
+  margin: 15px 0;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.discountLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.discountInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.currencySymbol {
+  font-weight: 600;
+  color: #495057;
+}
+
+.discountInput {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.discountInput:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* Estilos para o total */
+.totalLine {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  padding: 5px 0;
+}
+
+.discountText {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.orderDiscount {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #dee2e6;
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.finalTotal {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 2px solid #007bff;
+}

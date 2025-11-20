@@ -1,33 +1,17 @@
 /* styles.module.css */
 
-/* PALETA DE CORES - EDITÁVEL */
 .root {
-  --color-card-bg: #ffffff;
-  --color-card-border: #e1e5e9;
-  --color-card-shadow: rgba(23, 43, 77, 0.12);
-  --color-card-shadow-hover: rgba(23, 43, 77, 0.16);
-  --color-title: #172b4d;
-  --color-text: #44546a;
-  --color-text-light: #626f86;
-  --color-border: #dcdfe4;
-  --color-accent: #0c66e4;
-  --color-accent-hover: #0055cc;
-  --color-button-bg: #0c66e4;
-  --color-button-text: #ffffff;
-  --color-button-hover-bg: #0055cc;
-  --color-highlight: #1d7a3c;
-  --color-overlay: rgba(0, 0, 0, 0.5);
-  --color-sidebar-bg: #ffffff;
+  /* As cores foram movidas para dentro de .root como solicitado */
 }
 
 /* CARD PRINCIPAL */
 .container {
-  background-color: var(--color-card-bg);
-  border: 1px solid var(--color-card-border);
+  background-color: #ffffff;
+  border: 1px solid #e1e5e9;
   border-radius: 12px;
-  box-shadow: 0 2px 12px var(--color-card-shadow);
-  width: 320px; /* LARGURA DESKTOP - PODE EDITAR */
-  height: 500px; /* ALTURA DESKTOP - PODE EDITAR */
+  box-shadow: 0 2px 12px rgba(23, 43, 77, 0.12);
+  width: 320px;
+  height: 500px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -37,14 +21,14 @@
 }
 
 .container:hover {
-  box-shadow: 0 4px 20px var(--color-card-shadow-hover);
+  box-shadow: 0 4px 20px rgba(23, 43, 77, 0.16);
   transform: translateY(-2px);
 }
 
 /* VERSÃO MOBILE DO CARD */
 .container.mobile {
-  width: 280px; /* CARD MENOR NO MOBILE - PODE EDITAR */
-  height: 380px; /* ALTURA REDUZIDA - PODE EDITAR */
+  width: 280px;
+  height: 380px;
   cursor: pointer;
   margin: 8px;
 }
@@ -56,14 +40,14 @@
 /* CONTAINER DA IMAGEM */
 .imageContainer {
   width: 100%;
-  height: 180px; /* ALTURA DA IMAGEM DESKTOP */
+  height: 180px;
   overflow: hidden;
   flex-shrink: 0;
   position: relative;
 }
 
 .container.mobile .imageContainer {
-  height: 140px; /* IMAGEM MENOR NO MOBILE */
+  height: 140px;
 }
 
 .cardImage {
@@ -116,7 +100,7 @@
 
 /* CABEÇALHO */
 .header {
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid #dcdfe4;
   padding-bottom: 12px;
   margin-bottom: 4px;
 }
@@ -129,7 +113,7 @@
 .title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--color-title);
+  color: #172b4d;
   margin: 0;
   line-height: 1.3;
 }
@@ -156,19 +140,19 @@
 .label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--color-text-light);
+  color: #626f86;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .value {
   font-size: 0.95rem;
-  color: var(--color-text);
+  color: #44546a;
   line-height: 1.4;
 }
 
 .value.highlight {
-  color: var(--color-highlight);
+  color: #1d7a3c;
   font-weight: 600;
   font-size: 1rem;
 }
@@ -197,38 +181,40 @@
 
 .priceLabel {
   font-size: 0.9rem;
-  color: var(--color-text-light);
+  color: #626f86;
 }
 
 .priceValue {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--color-highlight);
+  color: #1d7a3c;
 }
 
 .mobileCategory {
   font-size: 0.85rem;
-  color: var(--color-text-light);
+  color: #626f86;
   font-style: italic;
 }
 
-/* BOTÕES */
+/* BOTÕES - CORREÇÃO APLICADA AQUI */
 .actions {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
   margin-top: auto;
   padding-top: 16px;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid #dcdfe4;
+  margin-bottom: 8px; /* Margem adicionada para afastar do final do card */
 }
 
 .container.mobile .actions {
   padding-top: 12px;
+  margin-bottom: 8px; /* Também aplicado no mobile */
 }
 
 .button {
-  background: var(--color-button-bg);
-  color: var(--color-button-text);
+  background: #0c66e4;
+  color: #ffffff;
   font-weight: 500;
   border: none;
   border-radius: 6px;
@@ -240,7 +226,7 @@
 }
 
 .button:hover {
-  background-color: var(--color-button-hover-bg);
+  background-color: #0055cc;
   transform: translateY(-1px);
 }
 
@@ -251,7 +237,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--color-overlay);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 1000;
   animation: fadeIn 0.3s ease;
 }
@@ -263,7 +249,7 @@
   bottom: 0;
   width: 90%;
   max-width: 400px;
-  background: var(--color-sidebar-bg);
+  background: #ffffff;
   z-index: 1001;
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
   animation: slideInRight 0.3s ease;
@@ -276,14 +262,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-card-bg);
+  border-bottom: 1px solid #dcdfe4;
+  background: #ffffff;
 }
 
 .sidebarTitle {
   font-size: 1.3rem;
   font-weight: 600;
-  color: var(--color-title);
+  color: #172b4d;
   margin: 0;
 }
 
@@ -291,14 +277,14 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--color-text);
+  color: #44546a;
   padding: 8px;
   border-radius: 6px;
   transition: background-color 0.2s ease;
 }
 
 .closeButton:hover {
-  background-color: var(--color-border);
+  background-color: #dcdfe4;
 }
 
 .sidebarContent {
@@ -326,7 +312,7 @@
 .productName {
   font-size: 1.4rem;
   font-weight: 600;
-  color: var(--color-title);
+  color: #172b4d;
   margin: 0 0 20px 0;
 }
 
@@ -337,7 +323,7 @@
 .sectionTitle {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--color-text-light);
+  color: #626f86;
   margin: 0 0 8px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -345,7 +331,7 @@
 
 .sectionText {
   font-size: 0.95rem;
-  color: var(--color-text);
+  color: #44546a;
   line-height: 1.5;
   margin: 0;
 }
@@ -362,23 +348,23 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid #dcdfe4;
 }
 
 .detailLabel {
   font-size: 0.9rem;
-  color: var(--color-text-light);
+  color: #626f86;
 }
 
 .detailValue {
   font-size: 0.95rem;
-  color: var(--color-text);
+  color: #44546a;
   font-weight: 500;
 }
 
 .detailValueHighlight {
   font-size: 1rem;
-  color: var(--color-highlight);
+  color: #1d7a3c;
   font-weight: 600;
 }
 
@@ -388,12 +374,13 @@
   gap: 12px;
   margin-top: 30px;
   padding-top: 20px;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid #dcdfe4;
+  margin-bottom: 20px; /* Margem adicionada no sidebar também */
 }
 
 .sidebarButton {
-  background: var(--color-button-bg);
-  color: var(--color-button-text);
+  background: #0c66e4;
+  color: #ffffff;
   font-weight: 500;
   border: none;
   border-radius: 8px;
@@ -405,7 +392,7 @@
 }
 
 .sidebarButton:hover {
-  background-color: var(--color-button-hover-bg);
+  background-color: #0055cc;
 }
 
 /* ANIMAÇÕES */
@@ -455,3 +442,4 @@
     font-size: 1.2rem;
   }
 }
+

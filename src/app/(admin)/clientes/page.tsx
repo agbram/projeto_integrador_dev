@@ -97,7 +97,7 @@ export default function ClientesModal() {
   const [showDisabled, setShowDisabled] = useState(false);
   const { setHandleFilter } = usePageActions();
 
-   useEffect(() => {
+  useEffect(() => {
     // registra o handler que será chamado pelo header
     setHandleFilter(() => (show: boolean) => {
       setShowDisabled(show);
@@ -105,19 +105,19 @@ export default function ClientesModal() {
 
     // cleanup opcional: restaura no-op quando desmontar
     return () => {
-      setHandleFilter(() => () => {});
+      setHandleFilter(() => () => { });
     };
   }, [setHandleFilter]);
 
-   useEffect(() => {
+  useEffect(() => {
     // registra o handler apenas quando o componente montar (ou quando pageAction mudar)
     pageAction.setHandleAdd(() => {
       setModalShow(true);
-      
+
     });
     // opcional: cleanup para restaurar handler padrão (não obrigatório)
     return () => {
-      pageAction.setHandleAdd(() => () => {}); // no-op ao desmontar
+      pageAction.setHandleAdd(() => () => { }); // no-op ao desmontar
     };
   }, []);
 
@@ -148,7 +148,7 @@ export default function ClientesModal() {
   const verificarDocumento = async (data: any) => {
     const doc = data.document.replace(/\D/g, "");
     const type = doc.length <= 11 ? CustomerType.PF_CPF : CustomerType.PJ_CNPJ;
-    
+
     if (!doc) {
       setWarningMessage("Por favor, informe um CPF ou CNPJ.");
       setWarningModalShow(true);
@@ -190,12 +190,12 @@ export default function ClientesModal() {
 
   const handleCadastroSubmit = async (data: any) => {
     setLoading(true);
-    try {      
+    try {
       const fullData = {
         ...docDataCheck,
         ...data,
       };
-      
+
       console.log("Dados do cliente:", fullData);
       const response = await api.post("/customers", fullData);
       console.log("Cliente cadastrado:", response.data);
@@ -219,20 +219,20 @@ export default function ClientesModal() {
 
   const handleSalvarAlteracoes = async (data: any) => {
     setLoading(true);
-    try {      
+    try {
       const fullData = {
         ...data
       };
-      
+
       console.log("Editando cliente:", fullData);
       const response = await api.put(`/customers/${selectCliente?.id}`, fullData);
       console.log("Cliente alterado com sucesso:", response.data);
 
       // ✅ Atualizar a lista de clientes
-      setClientes(prev => prev.map(cliente => 
+      setClientes(prev => prev.map(cliente =>
         cliente.id === selectCliente?.id ? response.data : cliente
       ));
-      
+
       setSuccessMessage("Cliente atualizado com sucesso!");
       setSuccessModalShow(true);
       setModalEditShow(false);
@@ -272,11 +272,11 @@ export default function ClientesModal() {
 
   const handleDesativaUser = async () => {
     setLoading(true);
-    try {      
+    try {
       const response = await api.delete(`/customers/${selectCliente?.id}`);
       console.log("Cliente desativado com sucesso:", response.data);
 
-      setClientes(prev => prev.map(cliente => 
+      setClientes(prev => prev.map(cliente =>
         cliente.id === selectCliente?.id ? response.data : cliente
       ));
       setWarningDeleteModalShow(false);
@@ -329,18 +329,22 @@ export default function ClientesModal() {
       )}
     </div>
 
+
       {/* Modal de Edição */}
       <Modal
         show={modalEditShow}
         onHide={handleCloseEditModal}
         centered
+        size="lg"
+        className={styles.modalClientes}
       >
-        <Modal.Body
-        className={styles.modalBodyEdit}
-        >
+        <Modal.Header closeButton className={styles.modalClientesHeader}>
+          <Modal.Title className={styles.modalClientesTitle}>Editar Cliente</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className={styles.modalBodyEdit}>
           <Card
             key={selectCliente?.id}
-            title="Editar Cliente" 
+            title=""
             fields={[
               { name: "name", value: selectCliente?.name || "", label: "Nome" },
               { name: "contact", value: selectCliente?.contact || "", label: "Contato" },
@@ -359,33 +363,10 @@ export default function ClientesModal() {
             showCancel
             onCancel={handleCloseEditModal}
             onSubmit={handleSalvarAlteracoes}
-            submitLabel="Salvar"
+            submitLabel="Salvar Alterações"
             loading={loading}
           />
         </Modal.Body>
-      </Modal>
-
-
-      {/*Modal de alerta de delete*/}
-      <Modal
-        show={warningDeleteModalShow}
-        onHide={() => setWarningDeleteModalShow(false)}
-        size="sm"
-        centered
-      >
-        <Modal.Body className="text-center">
-          <div className="mb-3" style={{ fontSize: "48px", color: "#ffc107"}}>
-            ⚠️
-          </div>
-          <h5><strong>Atenção</strong></h5>
-          <p>{warningMessage}</p>
-        </Modal.Body>
-        <Modal.Footer className={styles.modalWarningFooter}>
-          <ButtonCancelar variant="outline" onClick={handleCloseWarningModal} CancelLabel="Cancelar"/>
-          <Button variant="danger" onClick={handleDesativaUser}>
-            Desativar
-          </Button>
-        </Modal.Footer>
       </Modal>
 
       {/* Modal de Cadastro */}
@@ -394,11 +375,17 @@ export default function ClientesModal() {
         onHide={handleCloseModal}
         size="lg"
         centered
+        className={styles.modalClientes}
       >
-        <Modal.Body>
+        <Modal.Header closeButton className={styles.modalClientesHeader}>
+          <Modal.Title className={styles.modalClientesTitle}>
+            {formStep === "check" ? "Verificar CPF ou CNPJ" : "Cadastro de Cliente"}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className={styles.modalClientesBody}>
           {formStep === "check" && (
             <Card
-              title="Verificar CPF ou CNPJ"
+              title=""
               fields={[
                 {
                   name: "document",
@@ -422,7 +409,7 @@ export default function ClientesModal() {
 
           {formStep === "register" && (
             <Card
-              title="Cadastro de cliente"
+              title=""
               fields={[
                 { name: "name", label: "Nome" },
                 { name: "contact", label: "Contato" },
@@ -432,7 +419,7 @@ export default function ClientesModal() {
                   name: "modality",
                   label: "Modalidade do Cliente",
                   type: "select",
-                  options: modalityOptions  
+                  options: modalityOptions
                 },
               ]}
               onSubmit={handleCadastroSubmit}
@@ -445,11 +432,28 @@ export default function ClientesModal() {
         </Modal.Body>
       </Modal>
 
-      {/* FAB */}
-      <FAB
-        onClick={() => setModalShow(true)}
-        text={<UserPlusIcon weight="bold" size={24} style={{ marginLeft: 8 }}  />}
-      />
+      {/* Modal de alerta de delete */}
+      <Modal
+        show={warningDeleteModalShow}
+        onHide={() => setWarningDeleteModalShow(false)}
+        size="sm"
+        centered
+        className={styles.warningClientesModal}
+      >
+        <Modal.Body className={styles.warningClientesBody}>
+          <div className={styles.warningClientesIconContainer} aria-hidden>
+            <span className={styles.warningClientesIcon}>⚠</span>
+          </div>
+          <h5 className={styles.warningClientesTitle}>Confirmação</h5>
+          <p className={styles.warningClientesMessage}>{warningMessage}</p>
+        </Modal.Body>
+        <Modal.Footer className={styles.modalWarningFooter}>
+          <ButtonCancelar variant="outline" onClick={handleCloseWarningModal} CancelLabel="Cancelar" />
+          <Button variant="danger" onClick={handleDesativaUser} className={styles.warningClientesButton}>
+            Desativar
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       {/* Modal de sucesso */}
       <Modal
@@ -457,17 +461,21 @@ export default function ClientesModal() {
         onHide={() => setSuccessModalShow(false)}
         size="sm"
         centered
+        className={styles.successClientesModal}
       >
-        <Modal.Body className="text-center">
-          <div className="mb-3" style={{ fontSize: "48px", color: "#28a745" }}>
-            ✓
+        <Modal.Body className={styles.successClientesBody}>
+          <div className={styles.successClientesIconContainer} aria-hidden>
+            <span className={styles.successClientesIcon}>✓</span>
           </div>
-          <h5>{successMessage}</h5>
+          <h5 className={styles.successClientesTitle}>{successMessage}</h5>
         </Modal.Body>
-        <Modal.Footer className="justify-content-center">
-          <Button variant="success" onClick={() => setSuccessModalShow(false)}>
+        <Modal.Footer className={styles.successClientesFooter}>
+          <button
+            className={styles.successClientesButton}
+            onClick={() => setSuccessModalShow(false)}
+          >
             OK
-          </Button>
+          </button>
         </Modal.Footer>
       </Modal>
 
@@ -477,18 +485,22 @@ export default function ClientesModal() {
         onHide={() => setWarningModalShow(false)}
         size="sm"
         centered
+        className={styles.warningClientesModal}
       >
-        <Modal.Body className="text-center">
-          <div className="mb-3" style={{ fontSize: "48px", color: "#ffc107" }}>
-            ⚠️
+        <Modal.Body className={styles.warningClientesBody}>
+          <div className={styles.warningClientesIconContainer} aria-hidden>
+            <span className={styles.warningClientesIcon}>⚠</span>
           </div>
-          <h5>Atenção</h5>
-          <p>{warningMessage}</p>
+          <h5 className={styles.warningClientesTitle}>Atenção</h5>
+          <p className={styles.warningClientesMessage}>{warningMessage}</p>
         </Modal.Body>
-        <Modal.Footer className="justify-content-center">
-          <Button variant="warning" onClick={() => setWarningModalShow(false)}>
+        <Modal.Footer className={styles.warningClientesFooter}>
+          <button
+            className={styles.warningClientesButton}
+            onClick={() => setWarningModalShow(false)}
+          >
             Entendi
-          </Button>
+          </button>
         </Modal.Footer>
       </Modal>
     </>

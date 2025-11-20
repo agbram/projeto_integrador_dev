@@ -1,141 +1,326 @@
+/* ===== MODALS PROFISSIONAIS E ELEGANTES ===== */
+
+/* Base comum para todos os modals */
 .modalProdutos,
 .successProdutosModal,
 .warningProdutosModal {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Overlay do modal mais profissional */
+.modalProdutos :global(.modal-backdrop),
+.successProdutosModal :global(.modal-backdrop),
+.warningProdutosModal :global(.modal-backdrop) {
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.modalProdutos :global(.modal-content),
+.successProdutosModal :global(.modal-content),
+.warningProdutosModal :global(.modal-content) {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+/* Header do modal elegante COM DEGRADÊ AZUL E TÍTULO CENTRALIZADO */
+.modalHeader {
+  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+}
+
+.modalProdutos :global(.modal-header),
+.successProdutosModal :global(.modal-header),
+.warningProdutosModal :global(.modal-header) {
+  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.modalTitle {
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin: 0;
+  text-align: center;
+  flex: 1;
+}
+
+.modalProdutos :global(.modal-header .btn-close),
+.successProdutosModal :global(.modal-header .btn-close),
+.warningProdutosModal :global(.modal-header .btn-close) {
+  filter: invert(1);
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+  position: absolute;
+  right: 1.5rem;
+}
+
+.modalProdutos :global(.modal-header .btn-close:hover),
+.successProdutosModal :global(.modal-header .btn-close:hover),
+.warningProdutosModal :global(.modal-header .btn-close:hover) {
+  opacity: 1;
+}
+
+/* Body do modal */
 .modalProdutosBody,
 .successProdutosBody,
 .warningProdutosBody {
-  background-color: var(--color-bg);
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 0 0 12px 12px;
+}
+
+.modalBodyEdit {
+  background-color: #f8f9fa;
   padding: 2rem;
 }
 
-.divContainerCliente{
-  display: flex;
-  flex-direction: row;
-  margin-top: 20px;
-}
-
-.modalWarningFooter{
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    justify-items: center;
-}
-
-
-.containerPrincipal{
+/* Container principal */
+.containerPrincipal {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: start;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 24px;
   width: 100%;
   max-width: 1200px;
-  margin: 10px auto;
+  margin: 20px auto;
+  padding: 0 16px;
 }
 
-.modalProdutosFooter {
-  background-color: #D9C6A3;
-  border-top: 1px solid #c2b292;
-  padding: 1rem 2rem;
+.divContainerCliente {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  margin-top: 24px;
+  flex-wrap: wrap;
 }
 
-.modalProdutosButton,
-.successProdutosButton,
-.warningProdutosButton {
-  background-color: var(--color-btn-bg);
-  border: var(--color-btn-border);
-  color: var(--color-btn-text);
-  padding: 0.5rem 1.5rem;
-  font-weight: 600;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  cursor: pointer;
+/* ===== MODAL DE SUCESSO - MENOR E SEM DEGRADÊ ===== */
+.successProdutosModal :global(.modal-content) {
+  border: 1px solid #d1e7dd;
+  max-width: 400px;
 }
 
-.modalProdutosButton:hover,
-.successProdutosButton:hover,
-.warningProdutosButton:hover {
-  background-color: var(--color-btn-hover-bg);
-  color: var(--color-btn-hover-text);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-medium);
-}
-
-.successProdutosIconContainer,
-.warningProdutosIconContainer {
+.successProdutosIconContainer {
   display: flex;
   justify-content: center;
+  margin-bottom: 1rem;
 }
 
 .successProdutosIcon {
-  font-size: 48px;
-  color: var(--color-success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background-color: #10b981;
+  color: white;
+  border-radius: 50%;
+  font-size: 1.8rem;
   font-weight: bold;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
-.successProdutosTitle,
-.warningProdutosTitle {
-  color: var(--color-primary);
+.successProdutosTitle {
+  color: #065f46;
   font-weight: 600;
-  margin-bottom: 0;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
 }
 
-.warningProdutosMessage {
-  color: var(--color-muted);
-  margin-bottom: 0;
-  line-height: 1.5;
+.successProdutosBody {
+  padding: 1.5rem;
 }
 
-.modalProdutosCard {
-  background: var(--color-bg);
-  border: none;
-  border-radius: 10px;
-  box-shadow: var(--shadow-soft);
-  overflow: hidden;
+.successProdutosFooter {
+  border-top: 1px solid #d1e7dd;
+  background-color: #f8f9fa;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: center;
 }
 
-.modalProdutosCardTitle {
-  color: var(--color-primary);
-  font-weight: 700;
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
+/* ===== MODAL DE AVISO/ALERTA - MENOR E SEM DEGRADÊ ===== */
+.warningProdutosModal :global(.modal-content) {
+  border: 1px solid #fecaca;
+  max-width: 400px;
 }
 
-:global(.modalProdutos) .modal-content {
-  border: none;
-  border-radius: 10px;
-  box-shadow: var(--shadow-strong);
-}
-
-:global(.modalProdutos) .modal-header {
-  border-bottom: 1px solid var(--color-border);
-  background: linear-gradient(90deg, var(--color-header-grad-start), var(--color-header-grad-end));
-  color: var(--color-on-header);
-  border-radius: 10px 10px 0 0;
-  padding: 1rem 1.25rem;
-}
-
-:global(.modalProdutos) .modal-header .btn-close {
-  filter: invert(1);
-}
-
-.modalProdutos .icon-center,
-.successProdutosIconContainer,
 .warningProdutosIconContainer {
   display: flex;
   justify-content: center;
-  align-items: center;
+  margin-bottom: 1rem;
 }
 
-.modalProdutosFooter .actions,
-.successProdutosFooter .actions,
-.warningProdutosFooter .actions {
+.warningProdutosIcon {
   display: flex;
-  gap: 0.75rem;
-  justify-content: flex-end;
   align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background-color: #dc2626;
+  color: white;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.warningProdutosTitle {
+  color: #991b1b;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.warningProdutosMessage {
+  color: #dc2626;
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+
+.warningProdutosBody {
+  padding: 1.5rem;
+}
+
+.warningProdutosFooter {
+  border-top: 1px solid #fecaca;
+  background-color: #fefefe;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== MODAL DE DELETE ===== */
+.modalWarningFooter {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  align-items: center;
+  border-top: 1px solid #f8d7da;
+  background-color: #fefefe;
+  padding: 1.25rem 2rem;
+}
+
+/* ===== BOTÕES ELEMENTARES ===== */
+.successProdutosButton,
+.warningProdutosButton {
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 0.9rem;
+  min-width: 100px;
+}
+
+/* Botão de sucesso - VERDE SÓLIDO */
+.successProdutosButton {
+  background-color: #10b981;
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.successProdutosButton:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+/* Botão de warning - VERMELHO SÓLIDO */
+.warningProdutosButton {
+  background-color: #dc2626;
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.warningProdutosButton:hover {
+  background-color: #b91c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+}
+
+/* ===== ANIMAÇÕES SUAVES ===== */
+.modalProdutos :global(.modal),
+.successProdutosModal :global(.modal),
+.warningProdutosModal :global(.modal) {
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .modalProdutosBody,
+  .successProdutosBody,
+  .warningProdutosBody,
+  .modalBodyEdit {
+    padding: 1.5rem;
+  }
+  
+  .containerPrincipal {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .divContainerCliente {
+    flex-direction: column;
+  }
+  
+  .modalWarningFooter {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .successProdutosButton,
+  .warningProdutosButton {
+    min-width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .successProdutosIcon,
+  .warningProdutosIcon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+  
+  .modalProdutos :global(.modal-header),
+  .successProdutosModal :global(.modal-header),
+  .warningProdutosModal :global(.modal-header) {
+    padding: 1rem 1.25rem;
+  }
+  
+  .successProdutosModal :global(.modal-content),
+  .warningProdutosModal :global(.modal-content) {
+    max-width: 90%;
+    margin: 0 auto;
+  }
 }

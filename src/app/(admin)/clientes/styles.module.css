@@ -1,14 +1,326 @@
-.divContainerCliente{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    max-height: fit-content;
+/* ===== CONTAINER PRINCIPAL E CARDS ===== */
+
+.containerPrincipal {
+  display: flex;
+  flex-direction: column; /* Mudei para column */
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0px; /* Espaçamento reduzido entre os cards */
+  width: 100%;
+  max-width: 1200px;
+  margin: 10px auto;
+  padding: 0 16px;
 }
 
-.modalWarningFooter{
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    justify-items: center;
+.divContainerCliente {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-height: fit-content;
+  margin: 4px 0; /* Espaçamento mínimo entre os cards */
+}
+
+/* ===== MODALS PROFISSIONAIS PARA CLIENTES ===== */
+
+/* Base comum para todos os modals */
+.modalClientes,
+.successClientesModal,
+.warningClientesModal {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Overlay do modal mais profissional */
+.modalClientes :global(.modal-backdrop),
+.successClientesModal :global(.modal-backdrop),
+.warningClientesModal :global(.modal-backdrop) {
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.modalClientes :global(.modal-content),
+.successClientesModal :global(.modal-content),
+.warningClientesModal :global(.modal-content) {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+/* Header do modal elegante COM DEGRADÊ AZUL E TÍTULO CENTRALIZADO */
+.modalClientesHeader {
+  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+}
+
+.modalClientes :global(.modal-header),
+.successClientesModal :global(.modal-header),
+.warningClientesModal :global(.modal-header) {
+  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.modalClientesTitle {
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin: 0;
+  text-align: center;
+  flex: 1;
+}
+
+.modalClientes :global(.modal-header .btn-close),
+.successClientesModal :global(.modal-header .btn-close),
+.warningClientesModal :global(.modal-header .btn-close) {
+  filter: invert(1);
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+  position: absolute;
+  right: 1.5rem;
+}
+
+.modalClientes :global(.modal-header .btn-close:hover),
+.successClientesModal :global(.modal-header .btn-close:hover),
+.warningClientesModal :global(.modal-header .btn-close:hover) {
+  opacity: 1;
+}
+
+/* Body do modal */
+.modalClientesBody,
+.successClientesBody,
+.warningClientesBody {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 0 0 12px 12px;
+}
+
+.modalBodyEdit {
+  background-color: #f8f9fa;
+  padding: 2rem;
+}
+
+/* ===== MODAL DE SUCESSO - MENOR E SEM DEGRADÊ ===== */
+.successClientesModal :global(.modal-content) {
+  border: 1px solid #d1e7dd;
+  max-width: 400px;
+}
+
+.successClientesIconContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.successClientesIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background-color: #10b981;
+  color: white;
+  border-radius: 50%;
+  font-size: 1.8rem;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.successClientesTitle {
+  color: #065f46;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.successClientesBody {
+  padding: 1.5rem;
+}
+
+.successClientesFooter {
+  border-top: 1px solid #d1e7dd;
+  background-color: #f8f9fa;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== MODAL DE AVISO/ALERTA - MENOR E SEM DEGRADÊ ===== */
+.warningClientesModal :global(.modal-content) {
+  border: 1px solid #fecaca;
+  max-width: 400px;
+}
+
+.warningClientesIconContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.warningClientesIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background-color: #dc2626;
+  color: white;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.warningClientesTitle {
+  color: #991b1b;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.warningClientesMessage {
+  color: #dc2626;
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+
+.warningClientesBody {
+  padding: 1.5rem;
+}
+
+.warningClientesFooter {
+  border-top: 1px solid #fecaca;
+  background-color: #fefefe;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== MODAL DE DELETE ===== */
+.modalWarningFooter {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  align-items: center;
+  border-top: 1px solid #f8d7da;
+  background-color: #fefefe;
+  padding: 1.25rem 2rem;
+}
+
+/* ===== BOTÕES ELEMENTARES ===== */
+.successClientesButton,
+.warningClientesButton {
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 0.9rem;
+  min-width: 100px;
+}
+
+/* Botão de sucesso - VERDE SÓLIDO */
+.successClientesButton {
+  background-color: #10b981;
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.successClientesButton:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+/* Botão de warning - VERMELHO SÓLIDO */
+.warningClientesButton {
+  background-color: #dc2626;
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.warningClientesButton:hover {
+  background-color: #b91c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+}
+
+/* ===== ANIMAÇÕES SUAVES ===== */
+.modalClientes :global(.modal),
+.successClientesModal :global(.modal),
+.warningClientesModal :global(.modal) {
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .modalClientesBody,
+  .successClientesBody,
+  .warningClientesBody,
+  .modalBodyEdit {
+    padding: 1.5rem;
+  }
+  
+  .containerPrincipal {
+    gap: 4px; /* Espaçamento ainda menor em mobile */
+  }
+  
+  .divContainerCliente {
+    margin: 2px 0; /* Espaçamento mínimo em mobile */
+  }
+  
+  .modalWarningFooter {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .successClientesButton,
+  .warningClientesButton {
+    min-width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .successClientesIcon,
+  .warningClientesIcon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+  
+  .modalClientes :global(.modal-header),
+  .successClientesModal :global(.modal-header),
+  .warningClientesModal :global(.modal-header) {
+    padding: 1rem 1.25rem;
+  }
+  
+  .successClientesModal :global(.modal-content),
+  .warningClientesModal :global(.modal-content) {
+    max-width: 90%;
+    margin: 0 auto;
+  }
 }

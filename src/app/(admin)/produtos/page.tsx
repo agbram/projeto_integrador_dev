@@ -196,19 +196,20 @@ export default function ProdutosModal() {
         ))}
       </div>
 
-      {/* Modal principal */}
+      {/* Modal principal - ATUALIZADO */}
       <Modal
         show={modalShow}
-        onHide={() => {
-          setModalShow(false);
-        }}
+        onHide={() => setModalShow(false)}
         size="lg"
         centered
-        className={styles.modalProdutos} /* root específico para este modal */
+        className={styles.modalProdutos}
       >
+        <Modal.Header closeButton className={styles.modalHeader}>
+          <Modal.Title className={styles.modalTitle}>Cadastro de Produtos</Modal.Title>
+        </Modal.Header>
         <Modal.Body className={styles.modalProdutosBody}>
           <Card
-            title="Cadastro de Produtos"
+            title=""
             fields={[
               { name: "name", label: "Nome" },
               { name: "description", label: "Descrição" },
@@ -226,33 +227,35 @@ export default function ProdutosModal() {
             submitLabel="Cadastrar"
             loading={loading}
             showCancel
-            onCancel={() => {
-              setModalShow(false);
-            }}
+            onCancel={() => setModalShow(false)}
           />
         </Modal.Body>
       </Modal>
 
+      {/* Modal de Edição - ATUALIZADO */}
       <Modal
         show={modalEditShow}
         onHide={handleCloseEditModal}
         centered
+        size="lg"
+        className={styles.modalProdutos}
       >
-        <Modal.Body
-        className={styles.modalBodyEdit}
-        >
+        <Modal.Header closeButton className={styles.modalHeader}>
+          <Modal.Title className={styles.modalTitle}>Editar Produto</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className={styles.modalBodyEdit}>
           <Card
             key={selectProduto?.id}
-            title="Editar Produto" 
+            title=""
             fields={[
-              { name: "name",value: selectProduto?.name.toString(), label: "Nome" },
-              { name: "description",value: selectProduto?.description.toString(), label: "Descrição" },
+              { name: "name", value: selectProduto?.name.toString(), label: "Nome" },
+              { name: "description", value: selectProduto?.description.toString(), label: "Descrição" },
               { name: "costPrice", value: selectProduto?.costPrice.toString(), label: "Preço de custo" },
-              { name: "markupPercent",value: selectProduto?.markupPercent.toString(), label: "Percentual de Markup" },
+              { name: "markupPercent", value: selectProduto?.markupPercent.toString(), label: "Percentual de Markup" },
               { name: "fotoData", label: "Alterar imagem atual", type: "file" },
               {
                 name: "category",
-                label: "Tipo do Produtos",
+                label: "Tipo do Produto",
                 type: "select",
                 options: categoryOptions,
               },
@@ -262,14 +265,13 @@ export default function ProdutosModal() {
             showCancel
             onCancel={handleCloseEditModal}
             onSubmit={handleSalvarAlteracoes}
-            submitLabel="Salvar"
+            submitLabel="Salvar Alterações"
             loading={loading}
           />
         </Modal.Body>
       </Modal>
 
-
-      {/* Modal de sucesso */}
+      {/* Modal de Sucesso - ATUALIZADO */}
       <Modal
         show={successModalShow}
         onHide={() => setSuccessModalShow(false)}
@@ -277,43 +279,56 @@ export default function ProdutosModal() {
         centered
         className={styles.successProdutosModal}
       >
-        <Modal.Body className={`text-center ${styles.successProdutosBody}`}>
+        <Modal.Body className={styles.successProdutosBody}>
           <div className={styles.successProdutosIconContainer} aria-hidden>
             <span className={styles.successProdutosIcon}>✓</span>
           </div>
           <h5 className={styles.successProdutosTitle}>
-            Produto cadastrado com sucesso!
+            {successMessage || "Produto cadastrado com sucesso!"}
           </h5>
         </Modal.Body>
-        <Modal.Footer
-          className={`justify-content-center ${styles.successProdutosFooter}`}
-        >
-          
+        <Modal.Footer className={styles.successProdutosFooter}>
+          <button 
+            className={styles.successProdutosButton}
+            onClick={() => setSuccessModalShow(false)}
+          >
+            Continuar
+          </button>
         </Modal.Footer>
       </Modal>
 
+      {/* Modal de Confirmação Delete - ATUALIZADO */}
       <Modal
         show={warningDeleteModalShow}
         onHide={() => setWarningDeleteModalShow(false)}
         size="sm"
         centered
+        className={styles.warningProdutosModal}
       >
-        <Modal.Body className="text-center">
-          <div className="mb-3" style={{ fontSize: "48px", color: "#ffc107"}}>
-            ⚠️
+        <Modal.Body className={styles.warningProdutosBody}>
+          <div className={styles.warningProdutosIconContainer} aria-hidden>
+            <span className={styles.warningProdutosIcon}>⚠</span>
           </div>
-          <h5><strong>Atenção</strong></h5>
-          <p>{warningMessage}</p>
+          <h5 className={styles.warningProdutosTitle}>Confirmação</h5>
+          <p className={styles.warningProdutosMessage}>{warningMessage}</p>
         </Modal.Body>
         <Modal.Footer className={styles.modalWarningFooter}>
-          <ButtonCancelar variant="outline" onClick={handleCloseWarningModal} CancelLabel="Cancelar"/>
-          <Button variant="danger" onClick={handleDesativaProduct}>
+          <ButtonCancelar 
+            variant="outline" 
+            onClick={handleCloseWarningModal} 
+            CancelLabel="Cancelar"
+          />
+          <Button 
+            variant="danger" 
+            onClick={handleDesativaProduct}
+            className={styles.warningProdutosButton}
+          >
             Desativar
           </Button>
         </Modal.Footer>
       </Modal>
 
-      {/* Modal de aviso */}
+      {/* Modal de Aviso - ATUALIZADO */}
       <Modal
         show={warningModalShow}
         onHide={() => setWarningModalShow(false)}
@@ -321,23 +336,20 @@ export default function ProdutosModal() {
         centered
         className={styles.warningProdutosModal}
       >
-        <Modal.Body className={`text-center ${styles.warningProdutosBody}`}>
+        <Modal.Body className={styles.warningProdutosBody}>
           <div className={styles.warningProdutosIconContainer} aria-hidden>
-            <span className={styles.warningProdutosIcon}>⚠️</span>
+            <span className={styles.warningProdutosIcon}>⚠</span>
           </div>
           <h5 className={styles.warningProdutosTitle}>Atenção</h5>
           <p className={styles.warningProdutosMessage}>{warningMessage}</p>
         </Modal.Body>
-        <Modal.Footer
-          className={`justify-content-center ${styles.warningProdutosFooter}`}
-        >
-          <Button
-            variant="warning"
-            onClick={() => setWarningModalShow(false)}
+        <Modal.Footer className={styles.warningProdutosFooter}>
+          <button
             className={styles.warningProdutosButton}
+            onClick={() => setWarningModalShow(false)}
           >
             Entendi
-          </Button>
+          </button>
         </Modal.Footer>
       </Modal>
     </>

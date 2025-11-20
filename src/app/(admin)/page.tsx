@@ -86,6 +86,12 @@ export default function ProductionTasksModal() {
     fetchProductionDashboard();
   }, []);
 
+const handleForceRefresh = () => {
+  fetchProductionDashboard();
+  setSuccessMessage("Lista de produção atualizada!");
+  setSuccessModalShow(true);
+};
+
 const handleSmartSync = async () => {
   try {
     setSyncLoading(true);
@@ -330,6 +336,15 @@ const cancelFullSync = () => {
     "Sincronizar Novos Pedidos"
   )}
 </Button>
+
+    <Button
+      variant="outline-info"
+      onClick={handleForceRefresh}
+      disabled={loading}
+      className={styles.refreshButton}
+    >
+      🔄 Atualizar Lista
+    </Button>
     
     {/*  Sync Completo (SECUNDÁRIO) */}
     <Button

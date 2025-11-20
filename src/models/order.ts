@@ -60,3 +60,4 @@ export default interface Order {
   productionSynced?: boolean;
   syncedAt?: string | Date;
 }
+

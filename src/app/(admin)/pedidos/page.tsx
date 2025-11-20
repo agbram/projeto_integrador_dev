@@ -263,42 +263,72 @@ export default function PedidosModal() {
     }
   };
 
-  const handleUpdateOrderStatus = async (
-    orderId: number,
-    newStatus: string
-  ) => {
-    setUpdatingOrderId(orderId);
-    try {
-      const response = await api.put(`/orders/atualiza-status/${orderId}`, {
-        status: newStatus,
-      });
-
-      setPedidos((prevOrders) =>
-        prevOrders.map((order) =>
-          order.id === orderId
-            ? {
-                ...order,
-                status: newStatus as any,
-                updatedAt: new Date().toISOString(),
-              }
-            : order
-        )
-      );
-
-      console.log(`✅ Pedido ${orderId} marcado como ${newStatus}`);
-
-      if (newStatus === "DELIVERED") {
-        setSuccessMessage("Pedido marcado como entregue com sucesso!");
-        setSuccessModalShow(true);
-      }
-    } catch (error) {
-      console.error("❌ Erro ao atualizar status do pedido:", error);
-      setWarningMessage("Erro ao atualizar status do pedido");
-      setWarningModalShow(true);
-    } finally {
-      setUpdatingOrderId(null);
+  const handleRemoveFromProduction = async (orderId: number) => {
+  try {
+    console.log(`🔄 Removendo pedido ${orderId} da produção...`);
+    
+    // Chamar a API para remover o pedido da produção
+    const response = await api.delete(`/order/${orderId}`);
+    
+    console.log(`✅ Pedido ${orderId} removido da produção:`, response.data);
+    return { success: true, message: 'Pedido removido da produção' };
+  } catch (error: any) {
+    console.error(`❌ Erro ao remover pedido ${orderId} da produção:`, error);
+    
+    if (error.response?.status === 404) {
+      console.log(`ℹ️ Pedido ${orderId} não estava na produção`);
+      return { success: true, message: 'Pedido não estava na produção' };
     }
-  };
+    
+    throw new Error(error.response?.data?.message || 'Erro ao remover da produção');
+  }
+};
+
+const handleUpdateOrderStatus = async (
+  orderId: number,
+  newStatus: string
+) => {
+  setUpdatingOrderId(orderId);
+  try {
+    const response = await api.put(`/orders/atualiza-status/${orderId}`, {
+      status: newStatus,
+    });
+
+    setPedidos((prevOrders) =>
+      prevOrders.map((order) =>
+        order.id === orderId
+          ? {
+              ...order,
+              status: newStatus as any,
+              updatedAt: new Date().toISOString(),
+            }
+          : order
+      )
+    );
+
+    console.log(`✅ Pedido ${orderId} marcado como ${newStatus}`);
+
+    if (newStatus === "CANCELLED") {
+      try {
+        await handleRemoveFromProduction(orderId);
+        console.log(`🗑️ Pedido ${orderId} removido da produção após cancelamento`);
+      } catch (productionError) {
+        console.error(`⚠️ Aviso: Não foi possível remover pedido ${orderId} da produção:`, productionError);
+      }
+    }
+
+    if (newStatus === "DELIVERED") {
+      setSuccessMessage("Pedido marcado como entregue com sucesso!");
+      setSuccessModalShow(true);
+    }
+  } catch (error) {
+    console.error("❌ Erro ao atualizar status do pedido:", error);
+    setWarningMessage("Erro ao atualizar status do pedido");
+    setWarningModalShow(true);
+  } finally {
+    setUpdatingOrderId(null);
+  }
+};
 
   const handleSalvarAlteracoes = async (data: FormData) => {
     if (!selectPedido) return;

@@ -12,3 +12,5 @@ type Product = {
     isActive: string
 
 }
+
+export default Product;

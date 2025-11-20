@@ -3,10 +3,13 @@
 import styles from "./styles.module.css";
 import Order from "@/models/order";
 import { CheckCircleIcon } from "@phosphor-icons/react";
-import { time } from "console";
 import { ReactNode, useState } from "react";
 
-enum Variant { NotaFiscal = "notaFiscal", Cancel =  "cancel", Edit = "edit"};
+enum Variant { 
+  NotaFiscal = "notaFiscal", 
+  Cancel = "cancel", 
+  Edit = "edit"
+};
 
 type Action = {
   label: ReactNode;
@@ -33,17 +36,60 @@ export default function CardOrder({
 }: CardOrderProps) {
   const [isUpdating, setIsUpdating] = useState(false);
 
-const formatDate = (dateString: string | Date | undefined) => {
-  if (!dateString) return "—";
+// ✅ FUNÇÕES CORRETAS PARA DATAS - CardOrder
+const formatDisplayDate = (dateString: string | null): string => {
+  if (!dateString) return 'Não definida';
+  
   try {
     const date = new Date(dateString);
-    return isNaN(date.getTime())
-      ? "—"
-      : date.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" });
-  } catch {
-    return "—";
+    if (isNaN(date.getTime())) return 'Data inválida';
+    
+    // ✅ SOLUÇÃO: Adiciona 3 horas para compensar o fuso brasileiro
+    const adjustedDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
+    
+    const day = String(adjustedDate.getUTCDate()).padStart(2, '0');
+    const month = String(adjustedDate.getUTCMonth() + 1).padStart(2, '0');
+    const year = adjustedDate.getUTCFullYear();
+    
+    return `${day}/${month}/${year}`;
+  } catch (error) {
+    console.error('❌ Erro ao formatar data:', error);
+    return 'Data inválida';
   }
 };
+
+const formatDateTime = (dateString: string | null): string => {
+  if (!dateString) return 'Não definida';
+  
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Data inválida';
+    
+    const adjustedDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
+    
+    const day = String(adjustedDate.getUTCDate()).padStart(2, '0');
+    const month = String(adjustedDate.getUTCMonth() + 1).padStart(2, '0');
+    const year = adjustedDate.getUTCFullYear();
+    
+    return `${day}/${month}/${year}`;
+  } catch (error) {
+    console.error('❌ Erro ao formatar data/hora:', error);
+    return 'Data inválida';
+  }
+};
+
+  const formatCurrency = (value: number | string | undefined | null): string => {
+    if (value === undefined || value === null) return "R$ 0,00";
+    
+    const num = typeof value === 'string' ? parseFloat(value) : value;
+    
+    if (isNaN(num)) return "R$ 0,00";
+    
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(num);
+  };
 
   const handleMarkAsDelivered = async () => {
     if (onDeliveredClick) {
@@ -81,20 +127,9 @@ const formatDate = (dateString: string | Date | undefined) => {
       'READY_FOR_DELIVERY': 'Pronto para Entrega',
       'PRODUCTION_COMPLETE': 'Produção Concluída',
       'DELIVERED': 'Entregue',
-      'CANCELLED': 'Cancelada'
+      'CANCELLED': 'Cancelado'
     };
     return statusMap[status] || status;
-  };
-
-  const formatTotal = (total: number | string | undefined) => {
-    if (typeof total === "number") {
-      return `R$ ${total.toFixed(2)}`;
-    }
-    if (typeof total === "string") {
-      const num = parseFloat(total);
-      return `R$ ${isNaN(num) ? "0.00" : num.toFixed(2)}`;
-    }
-    return "R$ 0.00";
   };
 
   return (
@@ -126,18 +161,22 @@ const formatDate = (dateString: string | Date | undefined) => {
 
           <div className={styles.infoItem}>
             <span className={styles.infoLabel}>Data do pedido:</span>
-            <span className={styles.infoValue}>{formatDate(order.orderDate)}</span>
+            <span className={styles.infoValue}>
+              {formatDisplayDate(order.orderDate?.toString() || null)}
+            </span>
           </div>
 
           <div className={styles.infoItem}>
             <span className={styles.infoLabel}>Data de entrega:</span>
-            <span className={styles.infoValue}>{formatDate(order.deliveryDate)}</span>
+            <span className={styles.infoValue}>
+              {formatDisplayDate(order.deliveryDate?.toString() || null)}
+            </span>
           </div>
 
-          {order.discount !== 0 && (
-            <div className={styles.discountItem}>
-              <span className={styles.discountLabel}>Desconto: </span> 
-              <span className={styles.discountValue}>R$ {order.discount}</span> 
+          {order.discount && order.discount > 0 && (
+            <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>Desconto:</span>
+              <span className={styles.discountValue}>{formatCurrency(order.discount)}</span>
             </div>
           )}
 
@@ -152,24 +191,29 @@ const formatDate = (dateString: string | Date | undefined) => {
             <div className={styles.fullWidthItem}>
               <span className={styles.infoLabel}>Itens:</span>
               <div className={styles.itemsList}>
-                {order.items.map((item, index) => (
-                  <div key={index} className={styles.item}>
-                    <span className={styles.itemQuantity}>{item.quantity}x</span>
-                    <span className={styles.itemName}>{item.product?.name}</span>
-                    <span className={styles.itemPrice}>
-                      R$ {typeof item.unitPrice === "number" ? item.unitPrice.toFixed(2) : "0.00"}
-                    </span>
-                  </div>
-                ))}
+                {order.items.map((item, index) => {                  
+                  return (
+                    <div key={index} className={styles.item}>
+                      <span className={styles.itemQuantity}>{item.quantity}x</span>
+                      <span className={styles.itemName}>
+                        {item.product?.name}
+                      </span>
+                      <span className={styles.itemPrice}>
+                        {formatCurrency(item.unitPrice)}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
 
-          <div className={styles.totalfullWidthItem}>
+          <div className={styles.totalItem}>
             <span className={styles.totalLabel}>Total:</span>
-            <span className={styles.totalOrder}>{formatTotal(order.total)}</span>
+            <span className={styles.totalValue}>
+              {formatCurrency(order.total)}
+            </span>
           </div>
-
         </div>
       </div>
 
@@ -196,7 +240,7 @@ const formatDate = (dateString: string | Date | undefined) => {
               <span>Pedido Entregue</span>
             </div>
             <small className={styles.deliveredDate}>
-              Entregue em: {formatDate(order.updatedAt)}
+              Entregue em: {formatDateTime(order.updatedAt?.toString() || null)}
             </small>
           </div>
         )}

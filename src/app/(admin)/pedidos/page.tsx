@@ -156,8 +156,7 @@ export default function PedidosModal() {
     doc.text(`Nº do Pedido: ${pedido.id}`, 120, 79);
     doc.text(
       `Data: ${
-        pedido.orderDate
-          ? new Date(pedido.orderDate).toLocaleDateString("pt-BR")
+        pedido.orderDate ? formatDateForDisplay(pedido.orderDate.toString())
           : "A combinar"
       }`,
       120,
@@ -165,9 +164,7 @@ export default function PedidosModal() {
     );
     doc.text(
       `Entrega: ${
-        pedido.deliveryDate
-          ? new Date(pedido.deliveryDate).toLocaleDateString("pt-BR")
-          : "A combinar"
+        pedido.deliveryDate ? formatDateForDisplay(pedido.deliveryDate.toString()) : "A combinar"
       }`,
       120,
       91
@@ -237,7 +234,6 @@ export default function PedidosModal() {
     doc.save(`nota-fiscal-pedido-${pedido.id}.pdf`);
   };
 
-  // ✅ Função auxiliar para converter status
   const getStatusText = (status: string) => {
     const statusMap: { [key: string]: string } = {
       PENDING: "Pendente",
@@ -263,12 +259,64 @@ export default function PedidosModal() {
     }
   };
 
-  const handleRemoveFromProduction = async (orderId: number) => {
+  const formatInputDateForDisplay = (dateString: string): string => {
+  if (!dateString) return '';
+  
+  try {
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
+  } catch (error) {
+    console.error('❌ Erro ao converter data do input:', error);
+    return dateString;
+  }
+};
+
+const handleDateForBackend = (dateString: string): string => {
+  if (!dateString) return '';
+  
+  try {
+    // Se já está no formato YYYY-MM-DD, retorna direto
+    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return dateString;
+    }
+    
+    // Converte para data local
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      console.error('❌ Data inválida:', dateString);
+      return '';
+    }
+    
+    return getLocalDateString(date);
+  } catch (error) {
+    console.error('❌ Erro ao processar data:', error);
+    return '';
+  }
+};
+
+const formatDateForDisplay = (dateString: string | null): string => {
+  if (!dateString) return 'Não definida';
+  
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Data inválida';
+    
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    
+    return `${day}/${month}/${year}`;
+  } catch (error) {
+    console.error('❌ Erro ao formatar data para exibição:', error);
+    return 'Data inválida';
+  }
+};
+
+const handleRemoveFromProduction = async (orderId: number) => {
   try {
     console.log(`🔄 Removendo pedido ${orderId} da produção...`);
     
-    // Chamar a API para remover o pedido da produção
-    const response = await api.delete(`/order/${orderId}`);
+    const response = await api.post(`/${orderId}/remove-from-production`);
     
     console.log(`✅ Pedido ${orderId} removido da produção:`, response.data);
     return { success: true, message: 'Pedido removido da produção' };
@@ -276,14 +324,13 @@ export default function PedidosModal() {
     console.error(`❌ Erro ao remover pedido ${orderId} da produção:`, error);
     
     if (error.response?.status === 404) {
-      console.log(`ℹ️ Pedido ${orderId} não estava na produção`);
+      console.log(`Pedido ${orderId} não estava na produção`);
       return { success: true, message: 'Pedido não estava na produção' };
     }
     
     throw new Error(error.response?.data?.message || 'Erro ao remover da produção');
   }
 };
-
 const handleUpdateOrderStatus = async (
   orderId: number,
   newStatus: string
@@ -309,11 +356,14 @@ const handleUpdateOrderStatus = async (
     console.log(`✅ Pedido ${orderId} marcado como ${newStatus}`);
 
     if (newStatus === "CANCELLED") {
+
       try {
-        await handleRemoveFromProduction(orderId);
-        console.log(`🗑️ Pedido ${orderId} removido da produção após cancelamento`);
+        setTimeout(async () => {
+          await handleRemoveFromProduction(orderId);
+          console.log(`🗑️ Pedido ${orderId} removido da produção após cancelamento`);
+        }, 1000);
       } catch (productionError) {
-        console.error(`⚠️ Aviso: Não foi possível remover pedido ${orderId} da produção:`, productionError);
+        console.error(`Aviso: Não foi possível remover pedido ${orderId} da produção:`, productionError);
       }
     }
 
@@ -322,7 +372,7 @@ const handleUpdateOrderStatus = async (
       setSuccessModalShow(true);
     }
   } catch (error) {
-    console.error("❌ Erro ao atualizar status do pedido:", error);
+    console.error("Erro ao atualizar status do pedido:", error);
     setWarningMessage("Erro ao atualizar status do pedido");
     setWarningModalShow(true);
   } finally {
@@ -335,26 +385,23 @@ const handleUpdateOrderStatus = async (
 
     setLoading(true);
     try {
-      const orderDate = data.orderDate
-        ? new Date(data.orderDate.toString()).toISOString()
-        : selectPedido.orderDate
-        ? new Date(selectPedido.orderDate).toISOString()
-        : undefined;
 
-      const deliveryDate = data.deliveryDate
-        ? new Date(data.deliveryDate.toString()).toISOString()
-        : selectPedido.deliveryDate
-        ? new Date(selectPedido.deliveryDate).toISOString()
-        : undefined;
+    const formattedOrderDate = data.orderDate 
+      ? handleDateForBackend(String(data.orderDate))
+      : selectPedido.orderDate
+      ? handleDateForBackend(String(selectPedido.orderDate))
+      : '';
+
+    const formattedDeliveryDate = data.deliveryDate 
+      ? handleDateForBackend(String(data.deliveryDate))
+      : selectPedido.deliveryDate
+      ? handleDateForBackend(String(selectPedido.deliveryDate))
+      : null;
 
       const formattedData = {
         status: data.status,
-        deliveryDate: data.deliveryDate
-          ? new Date(data.deliveryDate.toString()).toISOString()
-          : selectPedido.deliveryDate,
-        orderDate: data.orderDate
-          ? new Date(data.orderDate.toString()).toISOString()
-          : selectPedido.orderDate,
+        deliveryDate: formattedDeliveryDate,
+        orderDate: formattedOrderDate,
         notes: data.notes || "",
       };
 
@@ -385,7 +432,7 @@ const handleUpdateOrderStatus = async (
         );
       } else {
         setWarningMessage(
-          "Erro de conexão. Verifique se o servidor está rodando."
+          "Erro de conexão. Verifique se o servidor está funcionando."
         );
       }
 
@@ -530,27 +577,6 @@ const handleUpdateOrderStatus = async (
     return item ? item.quantity : 0;
   };
 
-  const formatDeliveryDate = (dateString: string): string | null => {
-    if (!dateString) return null;
-
-    try {
-      if (dateString.includes("T")) {
-        return dateString;
-      }
-
-      const date = new Date(dateString);
-
-      if (!isNaN(date.getTime())) {
-        return date.toISOString();
-      }
-
-      return null;
-    } catch (error) {
-      console.error("Erro ao formatar data:", error);
-      return null;
-    }
-  };
-
   const handleSubmit = async (data: FormData) => {
     setLoading(true);
 
@@ -568,8 +594,11 @@ const handleUpdateOrderStatus = async (
         setLoading(false);
         return;
       }
+      const formattedOrderDate = handleDateForBackend(String(data.orderDate));
+      const formattedDeliveryDate = data.deliveryDate 
+      ? handleDateForBackend(String(data.deliveryDate))
+      : null;
 
-      const formattedOrderDate = formatDeliveryDate(String(data.orderDate));
       if (!formattedOrderDate) {
         setWarningMessage("Data do pedido inválida.");
         setWarningModalShow(true);
@@ -588,10 +617,6 @@ const handleUpdateOrderStatus = async (
         productId: item.productId,
         quantity: item.quantity,
       }));
-
-      const formattedDeliveryDate = data.deliveryDate
-        ? formatDeliveryDate(String(data.deliveryDate))
-        : null;
 
       const formattedData = {
         customerId: selectedCustomer.id,
@@ -653,12 +678,28 @@ const handleUpdateOrderStatus = async (
 const calculateTotal = () => {
   const subtotal = calculateSubtotal();
   const totalWithDiscount = subtotal - discount;
-  return Math.max(totalWithDiscount, 0); // Garante que não fique negativo
+  return Math.max(totalWithDiscount, 0); 
 };
 
   if (loading && pedidos.length === 0) {
     return <div className={styles.loadingContainer}>Carregando pedidos...</div>;
   }
+
+const getLocalDateString = (date: Date = new Date()): string => {
+  const now = new Date();
+  const offset = now.getTimezoneOffset(); // offset em minutos
+  const brazilOffset = 180; // Brasil é UTC-3 (180 minutos)
+  const totalOffset = (offset + brazilOffset) * 60 * 1000; // converte para milissegundos
+  
+  const adjustedDate = new Date(now.getTime() + totalOffset);
+  
+  const year = adjustedDate.getUTCFullYear();
+  const month = String(adjustedDate.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(adjustedDate.getUTCDate()).padStart(2, '0');
+  
+  return `${year}-${month}-${day}`;
+};
+
 
   return (
     <>
@@ -870,7 +911,6 @@ const calculateTotal = () => {
               </div>
             ))}
 
-            {/* NOVO: Campo de desconto */}
             <div className={styles.discountSection}>
               <label className={styles.discountLabel}>
                 Desconto (Atacado):
@@ -942,7 +982,7 @@ const calculateTotal = () => {
             name: "orderDate",
             label: "Data do Pedido",
             type: "date",
-            value: new Date().toISOString().split("T")[0],
+            value: getLocalDateString(),
             readOnly: true,
           },
           {
@@ -1097,20 +1137,13 @@ const calculateTotal = () => {
                 },
                 {
                   name: "orderDate",
-                  value: selectPedido.orderDate
-                    ? new Date(selectPedido.orderDate)
-                        .toISOString()
-                        .split("T")[0]
-                    : "",
+                  value: selectPedido.orderDate ? getLocalDateString(new Date(selectPedido.orderDate)) : getLocalDateString(),
                   label: "Data do Pedido",
                   type: "date",
                 },
                 {
                   name: "deliveryDate",
-                  value: selectPedido.deliveryDate
-                    ? new Date(selectPedido.deliveryDate)
-                        .toISOString()
-                        .split("T")[0]
+                  value: selectPedido.deliveryDate ? getLocalDateString(new Date(selectPedido.deliveryDate))
                     : "",
                   label: "Data de Entrega",
                   type: "date",

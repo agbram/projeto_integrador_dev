@@ -3,9 +3,18 @@
 import Customer from "@/models/Customer"
 import styles from "./styles.module.css"
 import { useState } from "react"
-import { CaretDown, User, IdentificationCard, Phone, Envelope, MapPin, Buildings, IdentificationCardIcon, CaretDownIcon, EnvelopeIcon, MapPinIcon, BuildingsIcon, UserIcon, PhoneIcon } from "@phosphor-icons/react"
+import { 
+  IdentificationCardIcon, 
+  CaretDownIcon, 
+  EnvelopeIcon, 
+  MapPinIcon, 
+  BuildingsIcon, 
+  UserIcon, 
+  PhoneIcon,
+  ShoppingCartIcon,
+  FireIcon // ✅ Ícone de fogo para clientes quentes
+} from "@phosphor-icons/react"
 
-// Tipos
 type Action = {
   label: string
   onClick(): void
@@ -18,37 +27,65 @@ type CardClienteProps = {
   actions?: Action[]
 }
 
-// Função para formatar CPF/CNPJ
+// ✅ SISTEMA DE CORES TERMÔMETRO
+const getOrderCountColor = (ordersCount: number): string => {
+  if (ordersCount === 0) return '#e3f2fd'; // Azul muito claro
+  if (ordersCount <= 5) return '#bbdefb';  // Azul claro
+  if (ordersCount <= 10) return '#64b5f6'; // Azul médio
+  if (ordersCount <= 20) return '#4fc3f7'; // Azul esverdeado
+  if (ordersCount <= 30) return '#4db6ac'; // Verde água
+  if (ordersCount <= 40) return '#81c784'; // Verde
+  if (ordersCount <= 50) return '#aed581'; // Verde amarelado
+  if (ordersCount <= 60) return '#fff176'; // Amarelo claro
+  if (ordersCount <= 70) return '#ffd54f'; // Amarelo
+  if (ordersCount <= 80) return '#ffb74d'; // Laranja claro
+  if (ordersCount <= 90) return '#ff8a65'; // Laranja
+  if (ordersCount <= 100) return '#ff5252'; // Vermelho
+  return '#d32f2f'; // Vermelho escuro (100+)
+};
+
+// ✅ Determina se o texto deve ser claro ou escuro
+const getTextColor = (backgroundColor: string): string => {
+  const hex = backgroundColor.replace('#', '');
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? '#000000' : '#ffffff';
+};
+
+// ✅ Função para determinar se é um cliente "quente" (muitos pedidos)
+const isHotCustomer = (ordersCount: number): boolean => {
+  return ordersCount > 50;
+};
+
 const formatDocument = (type: string, document: string): string => {
   const cleanDoc = document.replace(/\D/g, '')
-  
   if (type === "PF_CPF") {
-    // Formata CPF: 000.000.000-00
     return cleanDoc.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
   } else {
-    // Formata CNPJ: 00.000.000/0000-00
     return cleanDoc.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5')
   }
 }
 
-// Função para formatar telefone
 const formatPhone = (phone: string): string => {
   const cleanPhone = phone.replace(/\D/g, '')
-  
   if (cleanPhone.length === 11) {
-    // Formata celular: (00) 00000-0000
     return cleanPhone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
   } else if (cleanPhone.length === 10) {
-    // Formata telefone fixo: (00) 0000-0000
     return cleanPhone.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3')
   } else {
-    // Retorna o original se não conseguir formatar
     return phone
   }
 }
 
 export default function CardCliente({ title, customer, loading = false, actions }: CardClienteProps) {
   const [showDetails, setShowDetails] = useState(false)
+  const ordersCount = customer.ordersCount || 0
+  
+  const backgroundColor = getOrderCountColor(ordersCount)
+  const textColor = getTextColor(backgroundColor)
+  const isHot = isHotCustomer(ordersCount)
 
   return (
     <div className={styles.container}>
@@ -56,9 +93,15 @@ export default function CardCliente({ title, customer, loading = false, actions 
         <div className={styles.headerContent}>
           <div className={styles.avatar}>
             <UserIcon size={24} weight="fill" />
+            {/* ✅ Ícone de fogo para clientes quentes */}
+            {isHot && (
+              <div className={styles.fireBadge}>
+                <FireIcon size={12} weight="fill" />
+              </div>
+            )}
           </div>
           <div className={styles.mainInfo}>
-            <h3 className={styles.title}>{title || "Cliente"}</h3>
+            <h3 className={styles.title}>{customer.name}</h3>
             <div className={styles.basicInfo}>
               <span className={styles.infoItem}>
                 <IdentificationCardIcon size={16} />
@@ -67,6 +110,19 @@ export default function CardCliente({ title, customer, loading = false, actions 
               <span className={styles.infoItem}>
                 <PhoneIcon size={16} />
                 {formatPhone(customer.contact)}
+              </span>
+              {/* ✅ BADGE COM COR DINÂMICA */}
+              <span 
+                className={`${styles.infoItem} ${styles.ordersCount}`}
+                style={{
+                  backgroundColor: backgroundColor,
+                  color: textColor,
+                  border: isHot ? '2px solid #ff6b35' : 'none'
+                }}
+              >
+                <ShoppingCartIcon size={16} />
+                {isHot && <FireIcon size={12} style={{ marginRight: '2px' }} />}
+                {ordersCount} pedido{ordersCount !== 1 ? 's' : ''}
               </span>
             </div>
           </div>
@@ -112,6 +168,30 @@ export default function CardCliente({ title, customer, loading = false, actions 
             <div>
               <span className={styles.detailLabel}>Modalidade</span>
               <span>{customer.modality}</span>
+            </div>
+          </div>
+
+          {/* ✅ INDICADOR VISUAL DO TERMÔMETRO */}
+          <div className={styles.detailItem}>
+            <ShoppingCartIcon size={18} className={styles.detailIcon} />
+            <div>
+              <span className={styles.detailLabel}>Nível de Atividade</span>
+              <div className={styles.thermometer}>
+                <div 
+                  className={styles.thermometerFill}
+                  style={{ 
+                    width: `${Math.min(ordersCount, 100)}%`,
+                    backgroundColor: backgroundColor
+                  }}
+                ></div>
+                <span 
+                  className={styles.ordersCountText}
+                  style={{ color: backgroundColor }}
+                >
+                  {ordersCount} pedido{ordersCount !== 1 ? 's' : ''}
+                  {isHot && ' 🔥'}
+                </span>
+              </div>
             </div>
           </div>
         </div>

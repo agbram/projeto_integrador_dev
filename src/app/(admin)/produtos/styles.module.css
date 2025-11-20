@@ -139,3 +139,11 @@
   justify-content: flex-end;
   align-items: center;
 }
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  margin-top: 220px;
+  justify-content: center;
+  align-items: center;
+}

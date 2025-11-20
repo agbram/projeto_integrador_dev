@@ -1,9 +1,5 @@
 /* styles.module.css */
 
-.root {
-  /* As cores foram movidas para dentro de .root como solicitado */
-}
-
 /* CARD PRINCIPAL */
 .container {
   background-color: #ffffff;
@@ -11,7 +7,7 @@
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(23, 43, 77, 0.12);
   width: 320px;
-  height: 500px;
+  height: 580px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -86,7 +82,7 @@
 
 /* CONTEÚDO */
 .content {
-  padding: 20px;
+  padding: 30px;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -129,6 +125,7 @@
   flex-direction: column;
   gap: 12px;
   flex-grow: 1;
+  justify-content: space-between;
 }
 
 .infoItem {

@@ -447,3 +447,17 @@
   justify-content: flex-end;
   font-size: 18px;
 }
+
+.containerPrincipal {
+  padding: 16px;
+  transition: all 0.3s ease;
+}
+
+.divContainerCliente {
+  transition: all 0.3s ease;
+  margin-bottom: 16px;
+}
+
+.divContainerCliente:hover {
+  transform: translateY(-2px);
+}

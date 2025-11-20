@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Card, { FormData } from "@/components/Cards/Card";
 import CardOrder from "@/components/Cards/CardPedidos";
 import Button from "react-bootstrap/Button";
@@ -22,6 +22,7 @@ import { usePageActions } from "@/hooks/usePageActions";
 import Order from "@/models/order";
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 import jsPDF from "jspdf";
+import { useSearchParams } from "next/navigation";
 
 export default function PedidosModal() {
   const [modalShow, setModalShow] = useState(false);
@@ -85,6 +86,8 @@ export default function PedidosModal() {
   const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
 
   const pageAction = usePageActions();
+  const searchParams = useSearchParams();
+  const highlightOrderId = searchParams.get('highlight');
 
   const statusOptions = [
     { value: "PENDING", label: "Pendente" },
@@ -92,6 +95,28 @@ export default function PedidosModal() {
     { value: "DELIVERED", label: "Entregue" },
     { value: "CANCELLED", label: "Cancelado" },
   ];
+
+    useEffect(() => {
+    if (highlightOrderId) {
+      const timer = setTimeout(() => {
+        const element = document.getElementById(`order-${highlightOrderId}`);
+        if (element) {
+          // Scroll suave até o elemento
+          element.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'center'
+          });
+
+          // Remove o parâmetro da URL sem recarregar a página
+          const url = new URL(window.location.href);
+          url.searchParams.delete('highlight');
+          window.history.replaceState({}, '', url.toString());
+        }
+      }, 100); // Pequeno delay para garantir que o DOM foi renderizado
+
+      return () => clearTimeout(timer);
+    }
+  }, [highlightOrderId, pedidos]);
 
   useEffect(() => {
     pageAction.setHandleAdd(() => setModalShow(true));
@@ -247,7 +272,7 @@ export default function PedidosModal() {
     return statusMap[status] || status;
   };
 
-  const fetchPedidos = async () => {
+  const fetchOrders = async () => {
     try {
       setLoading(true);
       const response = await api.get("/orders");
@@ -504,7 +529,24 @@ const handleUpdateOrderStatus = async (
   };
 
   useEffect(() => {
-    fetchPedidos();
+       const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get('/orders');
+        // Ordena do mais recente para o mais antigo
+        const sortedOrders = response.data.sort((a: Order, b: Order) => 
+          new Date(b.orderDate ? b.orderDate.toString() : "").getTime() - new Date(a.orderDate ? a.orderDate.toString() : "").getTime()
+        );
+        setPedidos(sortedOrders);
+      } catch (err) {
+        console.log('Erro ao carregar pedidos');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
     fetchCustomers();
     fetchProducts();
   }, []);
@@ -635,7 +677,7 @@ const handleUpdateOrderStatus = async (
 
       setOrderItems([]);
       setDiscount(0);
-      fetchPedidos();
+      fetchOrders();
       setSuccessMessage("Pedido cadastrado com sucesso!");
       setSuccessModalShow(true);
       handleCloseModal();
@@ -700,18 +742,21 @@ const getLocalDateString = (date: Date = new Date()): string => {
   return `${year}-${month}-${day}`;
 };
 
-
   return (
     <>
-      <div className={styles.containerPrincipal}>
-        {pedidos.length === 0 ? (
-          <div className={styles.emptyState}>
-            <h3>Nenhum pedido encontrado</h3>
-            <p>Crie seu primeiro pedido para começar</p>
-          </div>
-        ) : (
-          pedidos.map((p) => (
-            <div key={p.id} className={styles.divContainerCliente}>
+<div className={styles.containerPrincipal}>
+  {pedidos.length === 0 ? (
+    <div className={styles.emptyState}>
+      <h3>Nenhum pedido encontrado</h3>
+      <p>Crie seu primeiro pedido para começar</p>
+    </div>
+  ) : (
+    pedidos.map((p) => (
+      <div 
+        key={p.id} 
+        id={`order-${p.id}`}
+        className={styles.divContainerCliente}
+      >
               <CardOrder
                 title={p.customer?.name ?? "Cliente desconhecido"}
                 order={p}
@@ -737,7 +782,7 @@ const getLocalDateString = (date: Date = new Date()): string => {
                     label: (
                       <div className={styles.botaonotafiscal}>
                         <ReceiptIcon size={18} />
-                        <span>Nota Fiscal</span>
+                        <span>Recibo</span>
                       </div>
                     ),
                     onClick: () => gerarNotaFiscal(p),

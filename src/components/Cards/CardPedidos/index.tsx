@@ -51,7 +51,7 @@ const formatDisplayDate = (dateString: string | null): string => {
     
     return `${day}/${month}/${year}`;
   } catch (error) {
-    console.error('❌ Erro ao formatar data:', error);
+    console.error('Erro ao formatar data:', error);
     return 'Data inválida';
   }
 };
@@ -71,7 +71,7 @@ const formatDateTime = (dateString: string | null): string => {
     
     return `${day}/${month}/${year}`;
   } catch (error) {
-    console.error('❌ Erro ao formatar data/hora:', error);
+    console.error('Erro ao formatar data/hora:', error);
     return 'Data inválida';
   }
 };
@@ -166,8 +166,8 @@ const formatDateTime = (dateString: string | null): string => {
 
           <div className={styles.infoItem}>
             <span className={styles.infoLabel}>Data de entrega:</span>
-            <span className={styles.infoValue}>
-              {formatDisplayDate(order.deliveryDate?.toString() || null)}
+            <span className={styles.infoValue}><strong>{formatDisplayDate(order.deliveryDate?.toString() || null)}</strong>
+              
             </span>
           </div>
 

@@ -319,14 +319,14 @@
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: linear-gradient(135deg, #007bff, #0056b3);
+  background-color:#007bff;
   color: white;
   border: none;
   font-weight: 600;
 }
 
 .smartSyncButton:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0056b3, #004085);
+  background-color:#0056b3;
   transform: translateY(-1px);
 }
 

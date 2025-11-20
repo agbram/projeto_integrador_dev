@@ -299,7 +299,13 @@ export default function ClientesModal() {
   return (
     <>
       <div className={styles.containerPrincipal}>
-        {clientes.map((cliente) => (
+        {clientes.length === 0 ? (
+          <div className={styles.emptyState}>
+            <h3>Nenhum Cliente encontrado</h3>
+            <p>Cadastre seu primeiro cliente para começar</p>
+          </div>
+        ) : (
+        clientes.map((cliente) => (
           <div
             key={cliente.id}
             className={styles.divContainerCliente}
@@ -319,8 +325,9 @@ export default function ClientesModal() {
               ]}
             />
           </div>
-        ))}
-      </div>
+        ))
+      )}
+    </div>
 
       {/* Modal de Edição */}
       <Modal

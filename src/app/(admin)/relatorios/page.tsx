@@ -32,6 +32,8 @@ import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import Order from "@/models/order";
 import Customer from "@/models/Customer";
 import Product from "@/models/Product";
+import { link } from "fs";
+import { useRouter } from "next/navigation";
 
 // Registrando componentes do Chart.js
 ChartJS.register(
@@ -86,10 +88,15 @@ export default function Relatorios() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     fetchData();
   }, [timeRange]);
+
+const openOrdersPage = (order: Order) => {
+  router.push(`/pedidos?highlight=${order.id}`);
+};
 
   const fetchData = async () => {
     try {
@@ -617,7 +624,7 @@ export default function Relatorios() {
         {/* Cliente Top */}
         <div className={styles.analysisCard}>
           <h3 className={styles.analysisTitle}>
-            <StarIcon size={20} />
+            <StarIcon size={20} fill="#abb500" weight="fill"/>
             Cliente Mais Frequente
           </h3>
           <div className={styles.analysisContent}>
@@ -684,37 +691,44 @@ export default function Relatorios() {
         </div>
 
         {/* Pedidos Recentes */}
-        <div className={`${styles.analysisCard} ${styles.fullWidth}`}>
-          <h3 className={styles.analysisTitle}>
-            <ShoppingCartIcon size={20} />
-            Pedidos Recentes
-          </h3>
-          <div className={styles.analysisContent}>
-            <div className={styles.recentOrders}>
-              {analyticsData.recentOrders.map((order) => (
-                <div key={order.id} className={styles.orderItem}>
-                  <div className={styles.orderInfo}>
-                    <div className={styles.orderId}>#{order.id}</div>
-                    <div className={styles.orderCustomer}>
-                      {order.customer?.name || "Cliente não informado"}
-                    </div>
-                    <div className={styles.orderDate}>
-                      {new Date(order.orderDate ? new Date(order.orderDate.toString()).toISOString() : "").toLocaleDateString('pt-BR')}
-                    </div>
-                  </div>
-                  <div className={styles.orderTotal}>
-                    {formatCurrency(order.total || 0)}
-                  </div>
-                  <div className={`${styles.orderStatus} ${styles[order.status.toLowerCase()]}`}>
-                    {order.status === "DELIVERED" ? "Entregue" : 
-                     order.status === "PENDING" ? "Pendente" :
-                     order.status === "CANCELLED" ? "Cancelado" : "Em Andamento"}
-                  </div>
-                </div>
-              ))}
+<div className={`${styles.analysisCard} ${styles.fullWidth}`}>
+  <h3 className={styles.analysisTitle}>
+    <ShoppingCartIcon size={20} />
+    Pedidos Recentes
+  </h3>
+  <div className={styles.analysisContent}>
+    <div className={styles.recentOrders}>
+      {analyticsData.recentOrders.map((orderId) => (
+        <div 
+          key={orderId ? orderId.id || undefined : ""} 
+          className={styles.orderItem} 
+          onClick={() => openOrdersPage(orderId)}
+          style={{ cursor: 'pointer' }}
+          role="button"
+          tabIndex={0}
+        >
+          <div className={styles.orderInfo}>
+            <div className={styles.orderId}>#{orderId.id}</div>
+            <div className={styles.orderCustomer}>
+              {orderId.customer?.name || "Cliente não informado"}
+            </div>
+            <div className={styles.orderDate}>
+              {new Date(orderId.orderDate ? new Date(orderId.orderDate.toString()).toISOString() : "").toLocaleDateString('pt-BR')}
             </div>
           </div>
+          <div className={styles.orderTotal}>
+            {formatCurrency(orderId.total || 0)}
+          </div>
+          <div className={`${styles.orderStatus} ${styles[orderId.status.toLowerCase()]}`}>
+            {orderId.status === "DELIVERED" ? "Entregue" : 
+             orderId.status === "PENDING" ? "Pendente" :
+             orderId.status === "CANCELLED" ? "Cancelado" : "Em Andamento"}
+          </div>
         </div>
+      ))}
+    </div>
+  </div>
+</div>
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import styles from "./styles.module.css";
 import { usePageActions } from "@/hooks/usePageActions"
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 import fileToBase64 from "@/utils/fileToBase64";
+import Product from "@/models/Product";
 
 export default function ProdutosModal() {
   const [modalShow, setModalShow] = useState(false);
@@ -171,9 +172,15 @@ export default function ProdutosModal() {
   }, []);
 
   return (
-    <>
-      <div className={styles.containerPrincipal}>
-        {produtos.map((produto) => (
+    <>      
+    <div className={styles.containerPrincipal}>
+        {produtos.length === 0 ? (
+          <div className={styles.emptyState}>
+            <h3>Nenhum Produto encontrado</h3>
+            <p>Cadastre seu produto cliente para começar</p>
+          </div>
+        ) : (
+        produtos.map((produto) => (
           <div
             key={produto.id}
             className={styles.divContainerCliente}
@@ -193,7 +200,8 @@ export default function ProdutosModal() {
               ]}
             />
           </div>
-        ))}
+        ))
+      )}
       </div>
 
       {/* Modal principal */}

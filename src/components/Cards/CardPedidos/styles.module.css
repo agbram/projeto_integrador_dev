@@ -14,7 +14,7 @@
 
 .card:hover {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .cardHeader {
@@ -41,6 +41,7 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   background-color: #414549;
+  color: white;
 }
 
 .cardBody {
@@ -69,13 +70,14 @@
 
 .discountLabel {
   font-weight: 600;
-  color: red;
+  color: #dc3545;
   font-size: 0.9rem;
 }
 
 .discountValue {
-  color: red;
+  color: #dc3545;
   font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .fullWidthItem {
@@ -125,6 +127,7 @@
   border-radius: 10px;
   background: #f8f9fa;
   margin-top: 12px;
+  border: 1px solid #e9ecef;
 }
 
 .totalLabel {
@@ -134,9 +137,9 @@
 }
 
 .totalValue {
-  font-weight: 650;
-  font-size: 1rem;
-  color: #6c757d;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #2c5530;
 }
 
 .itemName {
@@ -241,32 +244,30 @@
 }
 
 .actionButton.cancel:hover {
+  background-color: #c82333;
   transform: translateY(-1px);
-  background-color: #dc3545;
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
 }
 
 .actionButton.edit {
   background-color: #ffc107;
+  color: #212529;
 }
 
 .actionButton.edit:hover {
+  background-color: #e0a800;
   transform: translateY(-1px);
-  background-color: #ffc107;
+  box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
 }
 
 .actionButton.notaFiscal {
   background-color: #007bff;
 }
+
 .actionButton.notaFiscal:hover {
+  background-color: #0056b3;
   transform: translateY(-1px);
-  background-color: #007bff;
-}
-
-
-.actionButton:hover:not(:disabled) {
-  background-color: var(--color-button-hover-bg);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
 }
 
 .actionButton:disabled {
@@ -300,5 +301,34 @@
   .item {
     grid-template-columns: 30px 1fr auto;
     gap: 8px;
+    font-size: 0.85rem;
+  }
+
+  .cardBody {
+    padding: 16px 20px;
+  }
+
+  .cardFooter {
+    padding: 12px 20px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardHeader {
+    padding: 16px 20px 12px;
+  }
+
+  .cardTitle {
+    font-size: 1.1rem;
+  }
+
+  .actionsSection {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .actionButton {
+    min-width: auto;
+    width: 100%;
   }
 }

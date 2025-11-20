@@ -503,10 +503,6 @@ export default function Relatorios() {
     <div className={styles.container}>
       {/* Cabeçalho */}
       <div className={styles.header}>
-        <div>
-          <h1 className={styles.title}>Relatórios & Analytics</h1>
-          <p className={styles.subtitle}>Visão geral do desempenho do negócio</p>
-        </div>
         <div className={styles.headerActions}>
           <div className={styles.timeFilter}>
             <button

@@ -154,6 +154,7 @@
   justify-content: flex-end;
   padding: 12px 20px 16px;
   position: relative;
+  bottom: 20px;
 }
 
 .actions::before {

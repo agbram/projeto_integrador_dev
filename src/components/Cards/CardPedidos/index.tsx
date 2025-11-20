@@ -36,7 +36,6 @@ export default function CardOrder({
 }: CardOrderProps) {
   const [isUpdating, setIsUpdating] = useState(false);
 
-// ✅ FUNÇÕES CORRETAS PARA DATAS - CardOrder
 const formatDisplayDate = (dateString: string | null): string => {
   if (!dateString) return 'Não definida';
   
@@ -44,7 +43,6 @@ const formatDisplayDate = (dateString: string | null): string => {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return 'Data inválida';
     
-    // ✅ SOLUÇÃO: Adiciona 3 horas para compensar o fuso brasileiro
     const adjustedDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
     
     const day = String(adjustedDate.getUTCDate()).padStart(2, '0');
@@ -173,7 +171,7 @@ const formatDateTime = (dateString: string | null): string => {
             </span>
           </div>
 
-          {order.discount && order.discount > 0 && (
+          {order.discount !== 0 && (
             <div className={styles.infoItem}>
               <span className={styles.infoLabel}>Desconto:</span>
               <span className={styles.discountValue}>{formatCurrency(order.discount)}</span>

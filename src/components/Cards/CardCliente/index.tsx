@@ -12,7 +12,7 @@ import {
   UserIcon, 
   PhoneIcon,
   ShoppingCartIcon,
-  FireIcon // ✅ Ícone de fogo para clientes quentes
+  FireIcon 
 } from "@phosphor-icons/react"
 
 type Action = {
@@ -27,7 +27,6 @@ type CardClienteProps = {
   actions?: Action[]
 }
 
-// ✅ SISTEMA DE CORES TERMÔMETRO
 const getOrderCountColor = (ordersCount: number): string => {
   if (ordersCount === 0) return '#e3f2fd'; // Azul muito claro
   if (ordersCount <= 5) return '#bbdefb';  // Azul claro
@@ -44,7 +43,6 @@ const getOrderCountColor = (ordersCount: number): string => {
   return '#d32f2f'; // Vermelho escuro (100+)
 };
 
-// ✅ Determina se o texto deve ser claro ou escuro
 const getTextColor = (backgroundColor: string): string => {
   const hex = backgroundColor.replace('#', '');
   const r = parseInt(hex.substr(0, 2), 16);
@@ -54,7 +52,6 @@ const getTextColor = (backgroundColor: string): string => {
   return luminance > 0.5 ? '#000000' : '#ffffff';
 };
 
-// ✅ Função para determinar se é um cliente "quente" (muitos pedidos)
 const isHotCustomer = (ordersCount: number): boolean => {
   return ordersCount > 50;
 };
@@ -93,7 +90,6 @@ export default function CardCliente({ title, customer, loading = false, actions 
         <div className={styles.headerContent}>
           <div className={styles.avatar}>
             <UserIcon size={24} weight="fill" />
-            {/* ✅ Ícone de fogo para clientes quentes */}
             {isHot && (
               <div className={styles.fireBadge}>
                 <FireIcon size={12} weight="fill" />
@@ -111,7 +107,6 @@ export default function CardCliente({ title, customer, loading = false, actions 
                 <PhoneIcon size={16} />
                 {formatPhone(customer.contact)}
               </span>
-              {/* ✅ BADGE COM COR DINÂMICA */}
               <span 
                 className={`${styles.infoItem} ${styles.ordersCount}`}
                 style={{
@@ -171,7 +166,6 @@ export default function CardCliente({ title, customer, loading = false, actions 
             </div>
           </div>
 
-          {/* ✅ INDICADOR VISUAL DO TERMÔMETRO */}
           <div className={styles.detailItem}>
             <ShoppingCartIcon size={18} className={styles.detailIcon} />
             <div>

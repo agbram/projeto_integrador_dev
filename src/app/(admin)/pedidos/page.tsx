@@ -107,12 +107,11 @@ export default function PedidosModal() {
             block: 'center'
           });
 
-          // Remove o parâmetro da URL sem recarregar a página
           const url = new URL(window.location.href);
           url.searchParams.delete('highlight');
           window.history.replaceState({}, '', url.toString());
         }
-      }, 100); // Pequeno delay para garantir que o DOM foi renderizado
+      }, 100);
 
       return () => clearTimeout(timer);
     }
@@ -135,129 +134,161 @@ export default function PedidosModal() {
     }
   }, [productSearchTerm, products]);
 
-  const gerarNotaFiscal = (pedido: Order) => {
-    const doc = new jsPDF();
+const formatCurrency = (value: number): string => {
+  return `R$ ${value.toFixed(2).replace('.', ',')}`;
+};
 
-    // Configurações iniciais
-    doc.setFontSize(20);
-    doc.setTextColor(40, 40, 40);
+const gerarNotaFiscal = (pedido: Order) => {
+  const doc = new jsPDF();
 
-    // Cabeçalho
-    doc.text("NOTA FISCAL", 105, 20, { align: "center" });
+  // Cabeçalho estilizado
+  doc.setFillColor(230, 230, 250);
+  doc.rect(20, 10, 170, 15, "F");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.setTextColor(50, 50, 120);
+  doc.text("RECIBO", 105, 20, { align: "center" });
 
-    // Linha divisória
-    doc.setDrawColor(200, 200, 200);
-    doc.line(20, 25, 190, 25);
+  // Linha divisória
+  doc.setDrawColor(180, 180, 180);
+  doc.line(20, 28, 190, 28);
 
-    // Informações da Empresa
-    doc.setFontSize(12);
-    doc.text("DOCE SABOR - CONFEITARIA", 20, 35);
-    doc.setFontSize(10);
-    doc.text("CNPJ: 12.345.678/0001-90", 20, 42);
-    doc.text("Rua das Flores, 123 - Centro", 20, 48);
-    doc.text("São Paulo - SP - CEP: 01234-567", 20, 54);
-    doc.text("Telefone: (11) 9999-9999", 20, 60);
+  // Dados da Empresa
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text("DADOS DA EMPRESA", 20, 40);
+  doc.setFontSize(10);
 
-    // Informações do Cliente
-    doc.setFontSize(12);
-    doc.text("DADOS DO CLIENTE", 20, 72);
-    doc.setFontSize(10);
-    doc.text(`Nome: ${pedido.customer?.name || "Não informado"}`, 20, 79);
-    doc.text(
-      `Telefone: ${pedido.customer?.contact || "Não informado"}`,
-      20,
-      85
-    );
-    doc.text(
-      `Endereço: ${pedido.customer?.address || "Não informado"}`,
-      20,
-      91
-    );
+  const empresa = {
+    name: "SANT'SAPORE",
+    cnpj: "26.378.162/0001-51",
+    address: "Rua Riachuelo, 795 - Centro",
+    ie: "São Carlos - SP - CEP: 13.560-10",
+    contact: "(16) 99750-9099"
+  };
 
-    // Informações do Pedido
-    doc.setFontSize(12);
-    doc.text("DADOS DO PEDIDO", 120, 72);
-    doc.setFontSize(10);
-    doc.text(`Nº do Pedido: ${pedido.id}`, 120, 79);
-    doc.text(
-      `Data: ${
-        pedido.orderDate ? formatDateForDisplay(pedido.orderDate.toString())
-          : "A combinar"
-      }`,
-      120,
-      85
-    );
-    doc.text(
-      `Entrega: ${
-        pedido.deliveryDate ? formatDateForDisplay(pedido.deliveryDate.toString()) : "A combinar"
-      }`,
-      120,
-      91
-    );
-    doc.text(`Status: ${getStatusText(pedido.status)}`, 120, 97);
+  doc.text(`Empresa: ${empresa.name}`, 20, 47);
+  doc.text(`CNPJ: ${empresa.cnpj}`, 20, 53);
+  doc.text(`IE: ${empresa.ie}`, 20, 59);
+  doc.text(`Endereço: ${empresa.address}`, 20, 65);
+  doc.text(`Contato: ${empresa.contact}`, 20, 71);
 
-    // Tabela de Produtos
-    doc.setFontSize(12);
-    doc.text("ITENS DO PEDIDO", 20, 112);
+  // Dados do Cliente
+  doc.setFontSize(12);
+  doc.text("DADOS DO CLIENTE", 120, 40);
+  doc.setFontSize(10);
+  doc.text(`Nome: ${pedido.customer?.name || "Não informado"}`, 120, 47);
+  doc.text(`Telefone: ${pedido.customer?.contact || "Não informado"}`, 120, 53);
+  doc.text(`Endereço: ${pedido.customer?.address || "Não informado"}`, 120, 59);
 
-    // Cabeçalho da tabela
-    doc.setFillColor(240, 240, 240);
-    doc.rect(20, 117, 170, 8, "F");
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    doc.text("Produto", 22, 122);
-    doc.text("Qtd", 120, 122);
-    doc.text("Valor Unit.", 140, 122);
-    doc.text("Subtotal", 165, 122);
+  doc.setDrawColor(180, 180, 180);
+  doc.line(20, 28, 190, 28);
 
-    let yPosition = 132;
+  doc.text(
+    `Data: ${pedido.orderDate ? formatDateForDisplay(pedido.orderDate.toString()) : "A combinar"}`,
+    120, 71
+  );
+  doc.text(
+    `Entrega: ${pedido.deliveryDate ? formatDateForDisplay(pedido.deliveryDate.toString()) : "A combinar"}`,
+    120, 77
+  );
 
-    // Itens do pedido
-    pedido.items?.forEach((item, index) => {
-      if (yPosition > 250) {
-        doc.addPage();
-        yPosition = 20;
-      }
+  // Tabela de Produtos
+  doc.setFontSize(12);
+  doc.text("ITENS DO PEDIDO", 20, 95);
 
-      doc.text(item.product?.name || "Produto não encontrado", 22, yPosition);
-      doc.text(item.quantity.toString(), 120, yPosition);
-      doc.text(`R$ ${item.unitPrice?.toFixed(2) || "0.00"}`, 140, yPosition);
-      doc.text(`R$ ${item.subtotal?.toFixed(2) || "0.00"}`, 165, yPosition);
+  // Cabeçalho da tabela
+  doc.setFillColor(200, 200, 200);
+  doc.rect(20, 100, 170, 8, "F");
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.text("Produto", 22, 105);
+  doc.text("Qtd", 120, 105);
+  doc.text("Valor Unit.", 140, 105);
+  doc.text("Subtotal", 165, 105);
 
-      yPosition += 8;
-    });
+  let yPosition = 115;
 
-    // Total
-    doc.setFontSize(12);
-    doc.setDrawColor(200, 200, 200);
-    doc.line(120, yPosition + 10, 190, yPosition + 10);
-    doc.text("TOTAL DO PEDIDO:", 120, yPosition + 18);
-    doc.text(`R$ ${pedido.total?.toFixed(2) || "0.00"}`, 165, yPosition + 18);
+  // Cálculos dos totais
+  const subtotalItens = pedido.items?.reduce((total, item) => total + (item.subtotal || 0), 0) || 0;
+  const desconto = pedido.discount || 0;
+  const totalFinal = pedido.total || (subtotalItens - desconto);
 
-    // Observações
-    if (pedido.notes) {
-      doc.setFontSize(10);
-      doc.text("OBSERVAÇÕES:", 20, yPosition + 30);
-      doc.text(pedido.notes, 20, yPosition + 37, { maxWidth: 170 });
+  // Itens do pedido
+  pedido.items?.forEach((item, index) => {
+    // Se precisar de nova página
+    if (yPosition > 250) {
+      doc.addPage();
+      yPosition = 20;
     }
 
-    // Rodapé
-    const footerY = 280;
-    doc.setFontSize(8);
-    doc.setTextColor(100, 100, 100);
-    doc.text("Agradecemos pela preferência!", 105, footerY, {
-      align: "center",
-    });
-    doc.text(
-      "Doces Sabor Confeitaria - Qualidade e Sabor em Cada Doce",
-      105,
-      footerY + 5,
-      { align: "center" }
-    );
+    // Fundo alternado para as linhas
+    if (index % 2 === 0) {
+      doc.setFillColor(245, 245, 245);
+      doc.rect(20, yPosition - 5, 170, 8, "F");
+    }
 
-    // Salvar o PDF
-    doc.save(`nota-fiscal-pedido-${pedido.id}.pdf`);
-  };
+    const nome = item.product?.name || "Produto não encontrado";
+    const qtd = item.quantity || 0;
+    const unit = item.unitPrice || 0;
+    const sub = item.subtotal || (qtd * unit);
+
+    doc.setTextColor(0, 0, 0);
+    doc.text(nome, 22, yPosition);
+    doc.text(String(qtd), 125, yPosition, { align: "right" });
+    doc.text(formatCurrency(unit), 140, yPosition);
+    doc.text(formatCurrency(sub), 165, yPosition);
+
+    yPosition += 8;
+  });
+
+  // Totais - FORA DO LOOP
+  yPosition += 10;
+  doc.setDrawColor(180, 180, 180);
+  doc.line(120, yPosition, 190, yPosition);
+
+  // Subtotal
+  doc.setFont("helvetica", "bold");
+  doc.text("SUBTOTAL:", 120, yPosition + 8);
+  doc.text(formatCurrency(subtotalItens), 165, yPosition + 8);
+
+  // Desconto
+  if (desconto > 0) {
+    doc.setFont("helvetica", "normal");
+    doc.text("Desconto:", 120, yPosition + 16);
+    doc.text(`- ${formatCurrency(desconto)}`, 165, yPosition + 16);
+  }
+
+  // Total final
+  const totalY = desconto > 0 ? yPosition + 24 : yPosition + 16;
+  doc.setFont("helvetica", "bold");
+  doc.text("TOTAL DO PEDIDO:", 120, totalY);
+  doc.text(formatCurrency(totalFinal), 165, totalY);
+
+  // Observações
+  const obsStart = totalY + 10;
+  if (pedido.notes) {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("OBSERVAÇÕES:", 20, obsStart);
+    
+    // Quebra de linha automática para observações longas
+    const splitNotes = doc.splitTextToSize(pedido.notes, 170);
+    doc.text(splitNotes, 20, obsStart + 7);
+  }
+
+  // Rodapé
+  const footerY = 280;
+  doc.setDrawColor(200, 200, 200);
+  doc.line(20, footerY - 10, 190, footerY - 10);
+  doc.setFontSize(8);
+  doc.setTextColor(100, 100, 100);
+  doc.text("Agradecemos pela preferência!", 105, footerY - 2, { align: "center" });
+  doc.text("SANT'SAPORE - Doces Sabor Confeitaria", 105, footerY + 4, { align: "center" });
+
+  doc.save(`nota-fiscal-pedido-${pedido.id}.pdf`);
+};
+
 
   const getStatusText = (status: string) => {
     const statusMap: { [key: string]: string } = {
@@ -276,25 +307,16 @@ export default function PedidosModal() {
     try {
       setLoading(true);
       const response = await api.get("/orders");
-      setPedidos(response.data);
+      const sortedOrders = response.data.sort((a: Order, b: Order) => 
+          b.id - a.id
+      );
+      setPedidos(sortedOrders);
     } catch (error) {
       console.error("Erro ao buscar pedidos:", error);
     } finally {
       setLoading(false);
     }
   };
-
-  const formatInputDateForDisplay = (dateString: string): string => {
-  if (!dateString) return '';
-  
-  try {
-    const [year, month, day] = dateString.split('-');
-    return `${day}/${month}/${year}`;
-  } catch (error) {
-    console.error('❌ Erro ao converter data do input:', error);
-    return dateString;
-  }
-};
 
 const handleDateForBackend = (dateString: string): string => {
   if (!dateString) return '';
@@ -533,9 +555,8 @@ const handleUpdateOrderStatus = async (
       try {
         setLoading(true);
         const response = await api.get('/orders');
-        // Ordena do mais recente para o mais antigo
         const sortedOrders = response.data.sort((a: Order, b: Order) => 
-          new Date(b.orderDate ? b.orderDate.toString() : "").getTime() - new Date(a.orderDate ? a.orderDate.toString() : "").getTime()
+          b.id - a.id
         );
         setPedidos(sortedOrders);
       } catch (err) {
@@ -636,6 +657,7 @@ const handleUpdateOrderStatus = async (
         setLoading(false);
         return;
       }
+
       const formattedOrderDate = handleDateForBackend(String(data.orderDate));
       const formattedDeliveryDate = data.deliveryDate 
       ? handleDateForBackend(String(data.deliveryDate))
@@ -1035,6 +1057,7 @@ const getLocalDateString = (date: Date = new Date()): string => {
             label: "Data de Entrega",
             type: "date",
             value: "",
+            min: getLocalDateString()
           },
           {
             name: "notes",
@@ -1110,7 +1133,7 @@ const getLocalDateString = (date: Date = new Date()): string => {
           <ButtonCancelar
             variant="outline"
             onClick={handleCloseCancelModal}
-            CancelLabel="Cancelar"
+            CancelLabel="Voltar"
           />
           <Button variant="danger" onClick={handleConfirmCancel}>
             Cancelar

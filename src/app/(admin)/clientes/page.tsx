@@ -170,7 +170,6 @@ export default function ClientesModal() {
     setLoading(true);
     try {
       const response = await api.get(`/customers/check-document/${doc}`);
-      alert(response.status)
       setWarningMessage(
         `${type === CustomerType.PF_CPF ? "CPF" : "CNPJ"} já cadastrado no sistema. Verifique os dados e tente novamente.`
       );

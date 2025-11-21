@@ -16,7 +16,8 @@ type Field = {
   readOnly?: boolean 
   disabled?: boolean 
   placeholder?: string
-  max?: number
+  max?: number | string
+  min?: number | string
 }
 
 type FormProps = {
@@ -129,6 +130,7 @@ export default function Card({
                     readOnly={isReadOnly}
                     placeholder={field.placeholder}
                     max={field.max}
+                    min={field.min}
                     className={`${styles.input} ${isReadOnly ? styles.readOnlyInput : ''}`}
                   />
                 )}

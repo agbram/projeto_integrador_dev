@@ -1,173 +1,190 @@
-.root {
-  /* Paleta principal */
-  --primary-dark: #2e1c1c;
-  --primary-light: #442a27;
-  --accent: #f7a6b8;
-  --accent-dark: #d47b92;
-  --text-strong: #3a2b2b;
-  --text-soft: #6b5a5a;
-
-  /* Efeito vidro */
-  --glass-bg: rgba(46, 28, 28, 0.35);
-  --glass-border: rgba(255, 255, 255, 0.15);
-  --glass-highlight: rgba(247, 166, 184, 0.06);
-
-  --panel-radius: 22px;
-  --blur: 14px;
-  --shadow: 0 10px 25px rgba(0,0,0,0.18);
-}
-
-
-/* ==========================
-   TELA INTEIRA
-========================== */
-.WelcomeScreen {
-  width: 100%;
-  height: 100vh;
-
-  background-image: url("/welcomeWallpaper.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 32px;
-  position: relative;
-
-  /* Texto mais bem integrado ao tema */
-  color: var(--text-strong);
-}
-
-
-/* ==========================
-   PALAVRAS SUPERIORES
-========================== */
-.topWords {
+/* Wrapper geral do componente */
+.wrapper {
   position: absolute;
-  top: 26px;
-  left: 32px;
-
-  display: flex;
-  gap: 22px;
-
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text-soft);
-  letter-spacing: 0.4px;
-
-  /* Ajuste: leve efeito de sombra pra destacar em fundos claros */
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-}
-
-
-/* ==========================
-   PAINEL DECORATIVO
-========================== */
-.decorativePanel {
-  position: absolute;
-  top: 28px;
-  right: 28px;
-
-  width: 90px;
-  height: 90px;
-
-  background: var(--glass-highlight);
-  border-radius: var(--panel-radius);
-  border: 1px solid var(--glass-border);
-
-  /* Blur menor para diferenciar do painel principal */
-  backdrop-filter: blur(calc(var(--blur) - 4px));
-}
-
-
-/* ==========================
-   PAINEL PRINCIPAL (VIDRO)
-========================== */
-.mainPanel {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--panel-radius);
-  backdrop-filter: blur(var(--blur));
-
-  padding: 32px;
-  max-width: 480px;
-
-  box-shadow: var(--shadow);
+  bottom: 40px;
+  /* Distância alterável do fundo */
+  left: 40px;
+  /* Distância alterável da lateral */
 
   display: flex;
   flex-direction: column;
   gap: 16px;
 
-  /* Dica: ajustar margens no mobile */
-  margin-top: 20px;
+  width: fit-content;
+  max-width: 420px;
+  /* Proporção original mantida */
+  color: #ffffff;
+  /* Todos os textos em branco */
+  pointer-events: none;
 }
 
-
-/* ==========================
-   ÍCONES
-========================== */
-.welcomeIcon {
+/* Ícones decorativos (mantidos no topo, acima do bloco) */
+.iconGroup {
   display: flex;
-  justify-content: flex-start;
   gap: 12px;
-  margin-bottom: 1rem;
 
-  /* Ícones grandes pedem respiro visual */
+  position: absolute;
+  top: 32px;
+  left: 40px;
+
+  opacity: 0.9;
+  pointer-events: none;
 }
 
+/* Caixa de vidro para título + texto */
+.glassBox {
+  background: rgba(60, 40, 33, 0.32);
+  backdrop-filter: blur(14px);
+  border-radius: 18px;
+  padding: 18px;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 10px;
+  width: auto;
+  max-width: 90%;
 
-/* ==========================
-   TÍTULO
-========================== */
-.welcomeTitle {
-  font-size: 2.2rem;
+}
+
+/* Título */
+.title {
+  font-size: 2rem;
   font-weight: 700;
   margin: 0;
-  color: var(--text-strong);
-
-  /* Sombra leve para realçar com o vidro */
-  text-shadow: 0 2px 5px rgba(0,0,0,0.18);
+  color: #ffffff;
+  /* Branco */
 }
 
+/* Destaque */
 .highlight {
-  color: var(--accent-dark);
+  color: #D9697D;
+  /* Branco também */
 }
 
-
-/* ==========================
-   TEXTO PRINCIPAL
-========================== */
-.welcomeText {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  opacity: 0.95;
-  color: var(--text-strong);
+/* Descrição */
+.description {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #ffffff;
+  /* Branco */
 }
 
-
-/* ==========================
-   RODAPÉ
-========================== */
-.welcomeFooter {
+/* Rodapé */
+.footer {
   font-size: 0.9rem;
-  color: var(--accent-dark);
   opacity: 0.9;
-  margin-top: 10px;
+  color: #ffffff;
+  /* Branco */
+  margin-left: 2px;
+}
+
+/* Fonte */
+@import url("https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap");
+
+/* === FONTES APLICADAS === */
+.wrapper,
+.glassBox,
+.description,
+.footer,
+.miniGlass {
+  font-family: "Rubik", sans-serif; /* substituível */
+}
+
+.title {
+  font-family: "Rubik", sans-serif; /* substituível */
 }
 
 
-/* ==========================
-   RESPONSIVIDADE
-========================== */
-@media (min-width: 768px) {
-  /* Ativa o painel do lado no desktop */
-  .painelBoasVindas {
-    display: flex;
-  }
 
-  .mainPanel {
-    margin-top: 0; /* Remove margem no desktop */
-  }
+
+
+/* Wrapper geral do componente */
+.wrapper {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: fit-content;
+  max-width: 420px;
+  color: #ffffff;
+  pointer-events: none;
+}
+
+/* ======================= */
+/* PAINÉIS SUPERIORES PEQUENINOS */
+/* ======================= */
+
+.topPanels {
+  position: absolute;
+  top: 32px;
+  left: 40px;
+  right: 40px;
+
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.miniGlass {
+  background: rgba(60, 40, 33, 0.32);
+  backdrop-filter: blur(12px);
+  border-radius: 14px;
+  padding: 6px 14px;
+
+  font-family: "Inter", sans-serif;
+  font-size: 0.8rem;
+  font-style: italic;      /* ======= ITÁLICO FINO ======= */
+  font-weight: 3000;        /* ======= FINO ======= */
+
+  color: #ffffff;
+  letter-spacing: 0.5px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  pointer-events: none;
+}
+
+
+/* Caixa de vidro para título + descrição */
+.glassBox {
+  background: rgba(60, 40, 33, 0.32);
+  backdrop-filter: blur(14px);
+  border-radius: 18px;
+  padding: 18px;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 10px;
+  width: auto;
+  max-width: 90%;
+}
+
+/* Título */
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  color: #ffffff;
+}
+
+/* Destaque */
+.highlight {
+  color: #D9697D;
+}
+
+/* Descrição */
+.description {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #ffffff;
+}
+
+/* Rodapé */
+.footer {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  color: #ffffff;
+  margin-left: 2px;
 }

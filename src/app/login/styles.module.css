@@ -3,25 +3,62 @@
   flex-direction: column;
   height: 100vh;
   width: 100vw;
-  background-color: #F2EBE9;
+  background-color: #fff;
+
 }
 
+
 .painelBoasVindas {
-  display: none;
+  display: flex;
   flex-grow: 4.5;
   position: relative;
   height: 100vh;
-  background: linear-gradient(135deg, #652f17 0%, #402727 60%);
-  background-blend-mode: overlay;
+
+  /* === FUNDO NOVO === */
+  /* A imagem preenche totalmente SEM distorcer e preservando o bolo */
+  background-image: url("/imgs/welcomeWallpaper.png");
+  background-repeat: no-repeat;
+  background-size: cover; /* cobre tudo sem deformar */
+  background-position: center 67%;
+
+  background-color: #402727; /* cor de fallback */
+
+  /* ==== Layout original ==== */
   box-shadow: 10px 0 30px -10px rgb(0, 0, 0);
   transition: all 0.3s ease-in-out;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #F2EBE9;
-  text-align: left;
+  justify-content: flex-end;
+  align-items: flex-start;
   overflow: hidden;
 }
+
+/* === OVERLAY ELEGANTE === */
+/* camada que realça a imagem sem apagá-la */
+.painelBoasVindas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  /* degrade radial para dar profundidade */
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 0, 0, 0.25) 0%,  /* centro levemente escuro */
+    rgba(0, 0, 0, 0.45) 70%  /* bordas mais densas */
+  );
+
+  /* leve blur para deixar o fundo ainda mais elegante e suave */
+  backdrop-filter: blur(2px);
+
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Garante que os textos fiquem acima do overlay */
+.painelBoasVindas * {
+  position: relative;
+  z-index: 2;
+}
+
 
 .WelcomeLogin {
   display: flex;

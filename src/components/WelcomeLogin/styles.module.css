@@ -147,6 +147,46 @@
   pointer-events: none;
 }
 
+/* ======================= */
+/* CONTAINER DE ÍCONES LATERAL DIREITA */
+/* ======================= */
+.iconContainer {
+  position: absolute;
+  top: 50%;          /* centraliza verticalmente */
+  right: 40px;       /* distância ajustável da lateral direita */
+  transform: translateY(-50%); /* corrige centralização exata */
+  display: flex;
+  flex-direction: column; /* empilha verticalmente */
+  gap: 5px;              /* distância entre ícones */
+  background: transparent;
+
+}
+
+/* ======================= */
+/* CONTAINER DA LOGO */
+/* ======================= */
+.logoContainer {
+  position: absolute;
+  top: 75px;         /* distância do topo */
+  left: 47%;         /* centralizado horizontalmente */
+  transform: translateX(-50%); /* centralização exata */
+  
+  width: 400px;      /* largura máxima da logo */
+  height: auto;      /* mantém proporção automática */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.logo {
+  width: 100%;
+  height: auto;      /* mantém proporção da imagem */
+  object-fit: contain; /* não corta ou distorce a logo */
+}
+
+
+
 
 /* Caixa de vidro para título + descrição */
 .glassBox {

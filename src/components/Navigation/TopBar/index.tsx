@@ -9,12 +9,6 @@ export default function TopBar({
 }) {
   return (
     <div className={styles.topbar}>
-
-      <div className={styles.circleHeart}>
-        <HeartIcon weight="fill" />
-      </div>
-
-
       {/* Área da logo */}
       <div className={styles.logoArea}>
         <img
@@ -23,19 +17,6 @@ export default function TopBar({
           className={styles.logoImg}
         />
       </div>
-
-      {/* Botão de perfil */}
-      <button
-        className={styles.profileBtn}
-        onClick={onProfileClick}
-        aria-label="Abrir perfil"
-      >
-        <Image
-          className={styles.profileImg}
-          src="https://i.pravatar.cc/40"
-          alt="perfil"
-        />
-      </button>
     </div>
   );
 }

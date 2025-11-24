@@ -136,6 +136,7 @@
   gap: 24px;
   padding: 24px;
   background-color: #f9fafb;
+  position: relative;
 }
 
 /* ======== SELEÇÃO DE PRODUTOS ======== */
@@ -151,39 +152,44 @@
   font-weight: 600;
   margin-bottom: 8px;
   color: #333;
+  align-self: flex-start;
 }
 
-.productList {
+/* ======== PRODUTOS SELECIONADOS ======== */
+.selectedProducts {
   width: 100%;
   max-width: 480px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  margin-top: 16px;
 }
 
-.productItem {
+.selectedProducts h5 {
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.selectedProductItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 14px;
+  padding: 12px 16px;
   background: #f8f9fa;
   border-radius: 10px;
   border: 1px solid #ddd;
+  margin-bottom: 8px;
 }
 
-.productName {
-  font-weight: 500;
-}
-
-.productPrice {
-  font-size: 14px;
-  color: #555;
+.productInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .quantityControls {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin: 0 16px;
 }
 
 .btnQuantity {
@@ -196,11 +202,19 @@
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: background-color 0.2s ease;
 }
 
 .btnQuantity:hover {
   background-color: #0056b3;
+}
+
+.btnQuantity:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
 .quantityValue {
@@ -210,177 +224,17 @@
   font-weight: 500;
 }
 
-.selectedProductItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background: #f8f9fa;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-}
-
 .itemTotal {
   font-weight: 600;
   color: #333;
-}
-
-.partialTotal {
+  min-width: 80px;
   text-align: right;
-  font-size: 16px;
-  margin-top: 8px;
 }
 
-/* ======== AÇÕES ======== */
-.productsActions {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 480px;
-  margin-top: 20px;
-}
-
-/* ======== RESUMO DO PEDIDO ======== */
-.orderSummaryContainer {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.orderSummaryToggle {
-  background: none;
-  border: none;
-  color: #007bff;
-  font-weight: 500;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.orderSummaryToggle:hover {
-  color: #0056b3;
-}
-
-.orderSummaryCard {
-  background: #f8f9fa;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 12px 16px;
-}
-
-.orderItem {
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: #444;
-}
-
-/* ======== RESPONSIVIDADE ======== */
-@media (max-width: 480px) {
-  .searchInput {
-    font-size: 14px;
-    padding: 10px 12px 10px 38px;
-  }
-
-  .searchIcon {
-    left: 10px;
-  }
-
-  .searchItem {
-    padding: 10px 12px;
-  }
-
-  .productItem,
-  .selectedProductItem {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .productsActions {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .btnQuantity {
-    width: 28px;
-    height: 28px;
-  }
-
-  .quantityValue {
-    font-size: 14px;
-  }
-}
-
-/* ======== EFEITOS ADICIONAIS ======== */
-.modalWarningFooter {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  margin-top: 220px;
-  justify-content: center;
-  align-items: center;
-}
-
-.editButton {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Estilos específicos para os botões com ícones */
-.botaocancelar,
-.botaoeditar,
-.botaonotafiscal {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 600;
-  padding: 4px 0;
-}
-
-/* Mantenha os estilos existentes dos botões principais */
-.actionsSection {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-}
-
-.actionButton {
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 20px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  font-size: 0.9rem;
-  min-width: 140px;
-  border: 2px solid transparent;
-  background: #f8f9fa; /* Cor de fundo neutra para os botões */
-  
-}
-
-.actionButton:hover:not(:disabled) {
-  background: #e9ecef;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.actionButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Estilos para a seção de desconto */
+/* ======== SEÇÃO DE DESCONTO ======== */
 .discountSection {
-  margin: 15px 0;
-  padding: 15px;
+  margin: 20px 0;
+  padding: 16px;
   background-color: #f8f9fa;
   border-radius: 8px;
   border: 1px solid #e9ecef;
@@ -397,6 +251,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  max-width: 200px;
 }
 
 .currencySymbol {
@@ -415,18 +270,92 @@
 .discountInput:focus {
   outline: none;
   border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* ======== TOTAIS ======== */
+.partialTotal {
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  margin-top: 16px;
 }
 
 .totalLine {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 5px;
-  padding: 5px 0;
+  margin-bottom: 8px;
+  padding: 4px 0;
 }
 
 .discountText {
   color: #dc3545;
   font-weight: 600;
+}
+
+.finalTotal {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 2px solid #007bff;
+  font-size: 18px;
+}
+
+/* ======== AÇÕES ======== */
+.productsActions {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 480px;
+  margin-top: 20px;
+  gap: 12px;
+}
+
+.productsActions .btn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+/* ======== RESUMO DO PEDIDO ======== */
+.orderSummaryContainer {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.orderSummaryToggle {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 8px 0;
+  text-align: left;
+}
+
+.orderSummaryToggle:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.orderSummaryCard {
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.orderItem {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #444;
+  padding: 4px 0;
 }
 
 .orderDiscount {
@@ -439,15 +368,118 @@
   font-weight: 600;
 }
 
-.finalTotal {
-  display: flex;
-  margin-top: 20px;
-  padding-top: 10px;
-  border-top: 2px solid #007bff;
-  justify-content: flex-end;
-  font-size: 18px;
+/* ======== RESPONSIVIDADE ======== */
+@media (max-width: 480px) {
+  .modalPedidosBody {
+    padding: 16px;
+  }
+  
+  .searchInput {
+    font-size: 14px;
+    padding: 10px 12px 10px 38px;
+  }
+
+  .searchIcon {
+    left: 10px;
+  }
+
+  .searchItem {
+    padding: 10px 12px;
+  }
+
+  .selectedProductItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .quantityControls {
+    margin: 0;
+    align-self: center;
+  }
+
+  .itemTotal {
+    align-self: flex-end;
+  }
+
+  .productsActions {
+    flex-direction: column;
+  }
+
+  .btnQuantity {
+    width: 28px;
+    height: 28px;
+  }
+
+  .quantityValue {
+    font-size: 14px;
+  }
+
+  .discountInputWrapper {
+    max-width: 100%;
+  }
 }
 
+/* ======== ESTADOS ESPECIAIS ======== */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  margin-top: 220px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Estilos para os botões de ação */
+.actionsSection {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.actionButton {
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-size: 0.9rem;
+  min-width: 140px;
+  border: 2px solid transparent;
+  background: #f8f9fa;
+}
+
+.actionButton:hover:not(:disabled) {
+  background: #e9ecef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.actionButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Botões com ícones */
+.botaocancelar,
+.botaoeditar,
+.botaonotafiscal {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  padding: 4px 0;
+}
+
+.editButton {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Container principal adicional */
 .containerPrincipal {
   padding: 16px;
   transition: all 0.3s ease;

@@ -375,13 +375,13 @@ export default function PedidosModal() {
       // Converte para data local
       const date = new Date(dateString);
       if (isNaN(date.getTime())) {
-        console.error('❌ Data inválida:', dateString);
+        console.error(' Data inválida:', dateString);
         return '';
       }
 
       return getLocalDateString(date);
     } catch (error) {
-      console.error('❌ Erro ao processar data:', error);
+      console.error(' Erro ao processar data:', error);
       return '';
     }
   };
@@ -399,7 +399,7 @@ export default function PedidosModal() {
 
       return `${day}/${month}/${year}`;
     } catch (error) {
-      console.error('❌ Erro ao formatar data para exibição:', error);
+      console.error(' Erro ao formatar data para exibição:', error);
       return 'Data inválida';
     }
   };
@@ -413,7 +413,7 @@ export default function PedidosModal() {
       console.log(`✅ Pedido ${orderId} removido da produção:`, response.data);
       return { success: true, message: 'Pedido removido da produção' };
     } catch (error: any) {
-      console.error(`❌ Erro ao remover pedido ${orderId} da produção:`, error);
+      console.error(` Erro ao remover pedido ${orderId} da produção:`, error);
 
       if (error.response?.status === 404) {
         console.log(`Pedido ${orderId} não estava na produção`);
@@ -515,7 +515,7 @@ export default function PedidosModal() {
       setSuccessModalShow(true);
       handleCloseEditModal();
     } catch (error: any) {
-      console.error("❌ Erro ao atualizar pedido:", error);
+      console.error(" Erro ao atualizar pedido:", error);
 
       if (error.response) {
         const errorData = error.response.data;

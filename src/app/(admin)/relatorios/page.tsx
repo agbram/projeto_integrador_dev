@@ -421,7 +421,6 @@ export default function Relatorios() {
       }));
   };
 
-  // FUNÇÃO CORRIGIDA: Agora gera dados mensais em vez de diários
   const generateMonthlyOrders = (orders: Order[]) => {
     const ordersByMonth: { [key: string]: number } = {};
 
@@ -693,7 +692,7 @@ export default function Relatorios() {
               Ano
             </button>
           </div>
-          <button onClick={exportToCSV} className={styles.exportButton}>
+          <button onClick={exportToCSV} className={styles.exportButton} disabled>
             <ExportIcon size={20} />
             Exportar CSV
           </button>

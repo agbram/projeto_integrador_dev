@@ -1,6 +1,6 @@
 // ActionBar.tsx
 "use client";
-import { JSX, useState } from "react";
+import { JSX, useContext, useState } from "react";
 import { Dropdown, Button } from "react-bootstrap";
 import FAB from "@/components/FAB";
 import {
@@ -16,7 +16,7 @@ import {
 } from "@phosphor-icons/react";
 import { usePathname } from "next/navigation";
 import styles from "./styles.module.css";
-import { usePageActions } from "@/hooks/usePageActions";
+import { PageActions } from "@/contexts/PageActions";
 
 
 type Props = {
@@ -31,9 +31,7 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
   const rawPath = usePathname();
   const pathname = rawPath ?? "/";
   
-  const pageAction = usePageActions();
-
-
+  const pageAction = useContext(PageActions);
 
   function getPageTitle() {
     if (title) return title;
@@ -42,8 +40,6 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
         return "Homepage";
       case "/produtos":
         return "Produtos";
-      case "/estoque":
-        return "Estoque";
       case "/clientes":
         return "Clientes";
       case "/relatorios":
@@ -63,7 +59,6 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
   function getPageIconMobile(pathname: string): JSX.Element {
       switch (pathname) {
         case "/produtos": return <PackageIcon size={24} style={{ marginLeft: 8 }} weight="bold"/>;
-        case "/estoque": return <StackPlusIcon size={24} style={{ marginLeft: 8 }} weight="bold"/>;
         case "/clientes": return <UserPlusIcon size={24} style={{ marginLeft: 8 }} weight="bold"/>;
         case "/relatorios": return <ChartBarIcon size={24} style={{ marginLeft: 8 }} weight="bold"/>;
         case "/despesas": return <ReceiptIcon size={24} style={{ marginLeft: 8 }} weight="bold"/>;
@@ -113,13 +108,15 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
           </Dropdown.Menu>
         </Dropdown>
 
-        <Button
-          variant="light"
-          className={styles.addBtn}
-          onClick={pageAction.handleAdd}
-        >
-          <PlusIcon size={16} className="me-2" /> Adicionar
-        </Button>
+        {pageAction.showAddButton && (
+          <Button
+            variant="light"
+            className={styles.addBtn}
+            onClick={pageAction.handleAdd}
+          >
+            <PlusIcon size={16} className="me-2" /> Adicionar
+          </Button>
+        )}
 
         <FAB onClick={() => {}} text={IconComp} />
 

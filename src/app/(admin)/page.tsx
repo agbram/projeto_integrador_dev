@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Card from "@/components/Cards/Card";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
@@ -9,6 +9,7 @@ import { GearIcon, PlayIcon, CheckCircleIcon } from "@phosphor-icons/react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
+import { PageActions } from "@/contexts/PageActions";
 
 // Tipos para as tarefas de produção
 interface ProductionTask {
@@ -65,6 +66,11 @@ export default function ProductionTasksModal() {
   const [syncLoading, setSyncLoading] = useState(false);
   const [progressLoading, setProgressLoading] = useState(false);
   const [confirmFullSyncModalShow, setConfirmFullSyncModalShow] = useState(false);
+  const pageActions = useContext(PageActions);
+
+  useEffect(() => {
+    pageActions.setShowAddButton(false);
+  }, []);
 
   const fetchProductionDashboard = async () => {
     try {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Card, { FormData } from "@/components/Cards/Card";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
@@ -10,10 +10,10 @@ import { UserPlusIcon } from "@phosphor-icons/react";
 import CardProduto from "@/components/Cards/CardProduto";
 import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
-import { usePageActions } from "@/hooks/usePageActions"
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 import fileToBase64 from "@/utils/fileToBase64";
 import Product from "@/models/Product";
+import { PageActions } from "@/contexts/PageActions";
 
 export default function ProdutosModal() {
   const [modalShow, setModalShow] = useState(false);
@@ -26,7 +26,11 @@ export default function ProdutosModal() {
   const [produtos, setProdutos] = useState<Product[]>([]);
   const [selectProduto, setSelectProduto] = useState<Product>();
   const [warningDeleteModalShow, setWarningDeleteModalShow] = useState(false);
-  const pageAction = usePageActions();
+  const pageActions = useContext(PageActions);
+    
+      useEffect(() => {
+        pageActions.setShowAddButton(true);
+      }, []);
 
   const handleCloseEditModal = () => {
     setModalEditShow(false);
@@ -108,13 +112,13 @@ export default function ProdutosModal() {
 
      useEffect(() => {
       // registra o handler apenas quando o componente montar (ou quando pageAction mudar)
-      pageAction.setHandleAdd(() => {
+      pageActions.setHandleAdd(() => {
         setModalShow(true);
         
       });
       // opcional: cleanup para restaurar handler padrão (não obrigatório)
       return () => {
-        pageAction.setHandleAdd(() => () => {}); // no-op ao desmontar
+        pageActions.setHandleAdd(() => () => {}); // no-op ao desmontar
       };
     }, []);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import api from "@/services/api";
 import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
@@ -34,6 +34,7 @@ import Customer from "@/models/Customer";
 import Product from "@/models/Product";
 import { link } from "fs";
 import { useRouter } from "next/navigation";
+import { PageActions } from "@/contexts/PageActions";
 
 // Registrando componentes do Chart.js
 ChartJS.register(
@@ -93,6 +94,12 @@ export default function Relatorios() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const router = useRouter();
+  const pageActions = useContext(PageActions);
+  
+
+    useEffect(() => {
+      pageActions.setShowAddButton(false);
+    }, []);
 
   useEffect(() => {
     fetchData();

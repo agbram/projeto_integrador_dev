@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import Card, { FormData } from "@/components/Cards/Card";
 import CardOrder from "@/components/Cards/CardPedidos";
 import Button from "react-bootstrap/Button";
@@ -18,11 +18,11 @@ import {
 } from "@phosphor-icons/react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
-import { usePageActions } from "@/hooks/usePageActions";
 import Order from "@/models/order";
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 import jsPDF from "jspdf";
 import { useSearchParams } from "next/navigation";
+import { PageActions } from "@/contexts/PageActions";
 
 export default function PedidosModal() {
   const [modalShow, setModalShow] = useState(false);
@@ -85,9 +85,9 @@ export default function PedidosModal() {
 
   const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
 
-  const pageAction = usePageActions();
   const searchParams = useSearchParams();
   const highlightOrderId = searchParams.get('highlight');
+    const pageActions = useContext(PageActions);
 
   const statusOptions = [
     { value: "PENDING", label: "Pendente" },
@@ -118,8 +118,9 @@ export default function PedidosModal() {
   }, [highlightOrderId, pedidos]);
 
   useEffect(() => {
-    pageAction.setHandleAdd(() => setModalShow(true));
-    return () => pageAction.setHandleAdd(() => () => {});
+    pageActions.setShowAddButton(true);
+    pageActions.setHandleAdd(() => setModalShow(true));
+    return () => pageActions.setHandleAdd(() => () => {});
   }, []);
 
   // Filtra produtos baseado no termo de pesquisa

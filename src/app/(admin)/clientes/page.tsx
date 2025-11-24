@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Card from "@/components/Cards/Card";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
@@ -11,8 +11,8 @@ import CardCliente from "@/components/Cards/CardCliente";
 import Customer, { CustomerType } from "@/models/Customer";
 import styles from "./styles.module.css";
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
-import { usePageActions } from "@/hooks/usePageActions";
 import ActionBar from "@/components/Navigation/ActionBar";
+import { PageActions } from "@/contexts/PageActions";
 
 // ✅ Funções de validação movidas para fora do componente
 const isValidCPF = (cpf: string): boolean => {
@@ -93,31 +93,15 @@ export default function ClientesModal() {
   const [clientes, setClientes] = useState<Customer[]>([]);
   const [selectCliente, setSelectCliente] = useState<Customer>();
   const [documentValue, setDocumentValue] = useState("");
-  const pageAction = usePageActions();
+  const pageActions = useContext(PageActions);
   const [showDisabled, setShowDisabled] = useState(false);
-  const { setHandleFilter } = usePageActions();
+
 
   useEffect(() => {
-    // registra o handler que será chamado pelo header
-    setHandleFilter(() => (show: boolean) => {
-      setShowDisabled(show);
-    });
-
-    // cleanup opcional: restaura no-op quando desmontar
+    pageActions.setShowAddButton(true);
+    pageActions.setHandleAdd(() => {setModalShow(true);});
     return () => {
-      setHandleFilter(() => () => { });
-    };
-  }, [setHandleFilter]);
-
-  useEffect(() => {
-    // registra o handler apenas quando o componente montar (ou quando pageAction mudar)
-    pageAction.setHandleAdd(() => {
-      setModalShow(true);
-
-    });
-    // opcional: cleanup para restaurar handler padrão (não obrigatório)
-    return () => {
-      pageAction.setHandleAdd(() => () => { }); // no-op ao desmontar
+      pageActions.setHandleAdd(() => () => { });
     };
   }, []);
 

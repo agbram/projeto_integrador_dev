@@ -1,3 +1,5 @@
+/* ===== CONTAINER PRINCIPAL E CARDS ===== */
+
 .container {
   padding: 20px;
   max-width: 1200px;
@@ -36,17 +38,61 @@
 
 .syncContainer {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
   margin-bottom: 24px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
 }
 
-.syncButton {
+.syncButtons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.smartSyncButton {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  color: (--color-button-text)
+  background-color: #007bff;
+  color: white;
+  border: none;
+  font-weight: 600;
+}
+
+.smartSyncButton:hover:not(:disabled) {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.fullSyncButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  border: 1px solid #6c757d;
+  color: #6c757d;
+}
+
+.fullSyncButton:hover:not(:disabled) {
+  background: #6c757d;
+  color: white;
+}
+
+.syncStatus {
+  text-align: center;
+}
+
+.syncStatus small {
+  color: #6c757d;
+  font-style: italic;
 }
 
 .containerPrincipal {
@@ -106,7 +152,6 @@
   letter-spacing: 0.5px;
 }
 
-/* Descrição do Produto */
 .productDescription {
   color: #666;
   font-size: 14px;
@@ -165,7 +210,6 @@
   display: block;
 }
 
-/* Ações da Tarefa */
 .taskActions {
   display: flex;
   gap: 8px;
@@ -179,7 +223,502 @@
   font-size: 12px;
 }
 
-/* Modal */
+/* ===== MODALS PROFISSIONAIS PARA PRODUCTION TASKS ===== */
+
+/* Base comum para todos os modals */
+.productionModal,
+.productionSuccessModal,
+.productionWarningModal,
+.productionSyncWarningModal {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Overlay do modal */
+.productionModal :global(.modal-backdrop),
+.productionSuccessModal :global(.modal-backdrop),
+.productionWarningModal :global(.modal-backdrop),
+.productionSyncWarningModal :global(.modal-backdrop) {
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.productionModal :global(.modal-content),
+.productionSuccessModal :global(.modal-content),
+.productionWarningModal :global(.modal-content),
+.productionSyncWarningModal :global(.modal-content) {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+/* Header do modal com degradê azul e título centralizado */
+.productionModalHeader,
+.productionSyncWarningHeader {
+  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+}
+
+.productionModal :global(.modal-header),
+.productionSuccessModal :global(.modal-header),
+.productionWarningModal :global(.modal-header),
+.productionSyncWarningModal :global(.modal-header) {
+  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+}
+
+.productionModalTitle {
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin: 0;
+  text-align: center;
+  flex: 1;
+}
+
+.productionModal :global(.modal-header .btn-close),
+.productionSuccessModal :global(.modal-header .btn-close),
+.productionWarningModal :global(.modal-header .btn-close),
+.productionSyncWarningModal :global(.modal-header .btn-close) {
+  filter: invert(1);
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+  position: absolute;
+  right: 1.5rem;
+  margin: 0;
+}
+
+.productionModal :global(.modal-header .btn-close:hover),
+.productionSuccessModal :global(.modal-header .btn-close:hover),
+.productionWarningModal :global(.modal-header .btn-close:hover),
+.productionSyncWarningModal :global(.modal-header .btn-close:hover) {
+  opacity: 1;
+}
+
+/* Body do modal */
+.productionModalBody,
+.productionSuccessModalBody,
+.productionWarningModalBody,
+.productionSyncWarningBody {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 0 0 12px 12px;
+}
+
+/* ===== MODAL DE SUCESSO ===== */
+.productionSuccessModal :global(.modal-content) {
+  border: 1px solid #d1e7dd;
+  max-width: 400px;
+}
+
+.productionSuccessIconContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.productionSuccessIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background-color: #10b981;
+  color: white;
+  border-radius: 50%;
+  font-size: 1.8rem;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.productionSuccessTitle {
+  color: #065f46;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.productionSuccessBody {
+  padding: 1.5rem;
+}
+
+.productionSuccessFooter {
+  border-top: 1px solid #d1e7dd;
+  background-color: #f8f9fa;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== MODAL DE AVISO/ALERTA ===== */
+.productionWarningModal :global(.modal-content) {
+  border: 1px solid #fecaca;
+  max-width: 400px;
+}
+
+.productionWarningIconContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.productionWarningIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background-color: #dc2626;
+  color: white;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.productionWarningTitle {
+  color: #991b1b;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.productionWarningMessage {
+  color: #dc2626;
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+
+.productionWarningBody {
+  padding: 1.5rem;
+}
+
+.productionWarningFooter {
+  border-top: 1px solid #fecaca;
+  background-color: #fefefe;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== MODAL DE SYNC WARNING ===== */
+.productionSyncWarningModal :global(.modal-content) {
+  border: 1px solid #fecaca;
+  max-width: 500px;
+}
+
+.warningIconContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.warningIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background-color: #dc2626;
+  color: white;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.warningHeading {
+  color: #991b1b;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.warningContent {
+  color: #dc2626;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.warningDetails {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: #fef2f2;
+  border-radius: 6px;
+  border-left: 4px solid #dc2626;
+}
+
+.warningDetails ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.warningDetails li {
+  margin-bottom: 0.25rem;
+}
+
+.recommendation {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: #f0f9ff;
+  border-radius: 6px;
+  border-left: 4px solid #0ea5e9;
+}
+
+.recommendation small {
+  color: #0369a1;
+}
+
+.productionSyncWarningFooter {
+  border-top: 1px solid #fecaca;
+  background-color: #fefefe;
+  padding: 1.25rem 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+/* ===== BOTÕES ===== */
+.productionSuccessButton,
+.productionWarningButton,
+.confirmButton {
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 0.9rem;
+  min-width: 100px;
+}
+
+/* Botão de sucesso */
+.productionSuccessButton {
+  background-color: #10b981;
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.productionSuccessButton:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+/* Botão de warning */
+.productionWarningButton {
+  background-color: #dc2626;
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.productionWarningButton:hover {
+  background-color: #b91c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+}
+
+/* Botão de confirmação perigoso */
+.confirmButton {
+  background-color: #dc2626;
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.confirmButton:hover:not(:disabled) {
+  background-color: #b91c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+}
+
+/* ===== BOTÕES DO BOOTSTRAP ===== */
+.productionModal :global(.btn),
+.productionSuccessModal :global(.btn),
+.productionWarningModal :global(.btn),
+.productionSyncWarningModal :global(.btn) {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.productionModal :global(.btn-primary) {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  color: white;
+  font-weight: 600;
+}
+
+.productionModal :global(.btn-primary:hover) {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+}
+
+.productionModal :global(.btn-danger) {
+  background-color: #dc2626;
+  border-color: #dc2626;
+  font-weight: 600;
+}
+
+.productionModal :global(.btn-danger:hover) {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2);
+}
+
+.productionModal :global(.btn-outline) {
+  border: 1px solid #d1d5db;
+  color: #374151;
+  background-color: transparent;
+  font-weight: 500;
+}
+
+.productionModal :global(.btn-outline:hover) {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+  color: #111827;
+}
+
+/* ===== ANIMAÇÕES ===== */
+.productionModal :global(.modal),
+.productionSuccessModal :global(.modal),
+.productionWarningModal :global(.modal),
+.productionSyncWarningModal :global(.modal) {
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .summaryContainer {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .containerPrincipal {
+    grid-template-columns: 1fr;
+  }
+  
+  .taskHeader {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .statusBadges {
+    flex-direction: row;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .taskActions {
+    justify-content: center;
+  }
+  
+  .syncButtons {
+    flex-direction: column;
+  }
+  
+  .smartSyncButton,
+  .fullSyncButton {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .productionModalBody,
+  .productionSuccessModalBody,
+  .productionWarningModalBody,
+  .productionSyncWarningBody {
+    padding: 1.5rem;
+  }
+  
+  .productionSuccessIcon,
+  .productionWarningIcon,
+  .warningIcon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+  
+  .productionModal :global(.modal-header),
+  .productionSuccessModal :global(.modal-header),
+  .productionWarningModal :global(.modal-header),
+  .productionSyncWarningModal :global(.modal-header) {
+    padding: 1rem 1.25rem;
+  }
+  
+  .productionSuccessModal :global(.modal-content),
+  .productionWarningModal :global(.modal-content),
+  .productionSyncWarningModal :global(.modal-content) {
+    max-width: 90%;
+    margin: 0 auto;
+  }
+  
+  .productionModalTitle {
+    font-size: 1.1rem;
+  }
+  
+  .productionSyncWarningFooter {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .productionSuccessButton,
+  .productionWarningButton,
+  .confirmButton {
+    min-width: 100%;
+    margin-bottom: 8px;
+  }
+}
+
+/* ===== ESTADOS DE CARREGAMENTO ===== */
+.productionModal :global(.btn:disabled),
+.productionSuccessModal :global(.btn:disabled),
+.productionWarningModal :global(.btn:disabled),
+.productionSyncWarningModal :global(.btn:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ===== ESTILOS EXISTENTES MANTIDOS ===== */
 .modalBody {
   padding: 0;
 }
@@ -214,7 +753,6 @@
   border-bottom: none;
 }
 
-/* Estados de Loading e Vazio */
 .loadingContainer {
   display: flex;
   flex-direction: column;
@@ -258,124 +796,3 @@
   margin: 16px 0 8px 0;
   color: #333;
 }
-
-/* Responsividade */
-@media (max-width: 768px) {
-  .container {
-    padding: 16px;
-  }
-  
-  .summaryContainer {
-    grid-template-columns: 1fr 1fr;
-  }
-  
-  .containerPrincipal {
-    grid-template-columns: 1fr;
-  }
-  
-  .taskHeader {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .statusBadges {
-    flex-direction: row;
-    width: 100%;
-    justify-content: flex-start;
-  }
-  
-  .infoGrid {
-    grid-template-columns: 1fr;
-  }
-  
-  .taskActions {
-    justify-content: center;
-  }
-}
-
-/* Container de Sincronização Melhorado */
-.syncContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 24px;
-  padding: 16px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
-}
-
-.syncButtons {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-/* Botão de Sync Inteligente (PRINCIPAL) */
-.smartSyncButton {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background-color:#007bff;
-  color: white;
-  border: none;
-  font-weight: 600;
-}
-
-.smartSyncButton:hover:not(:disabled) {
-  background-color:#0056b3;
-  transform: translateY(-1px);
-}
-
-/* Botão de Sync Completo (SECUNDÁRIO) */
-.fullSyncButton {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  font-size: 14px;
-  border: 1px solid #6c757d;
-  color: #6c757d;
-}
-
-.fullSyncButton:hover:not(:disabled) {
-  background: #6c757d;
-  color: white;
-}
-
-/* Status de Sincronização */
-.syncStatus {
-  text-align: center;
-}
-
-.syncStatus small {
-  color: #6c757d;
-  font-style: italic;
-}
-
-/* Spinning animation */
-.spinning {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-  .syncButtons {
-    flex-direction: column;
-  }
-  
-  .smartSyncButton,
-  .fullSyncButton {
-    width: 100%;
-    justify-content: center;
-  }
-}
-

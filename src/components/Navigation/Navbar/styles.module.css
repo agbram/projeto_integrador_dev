@@ -135,48 +135,60 @@
   to { transform: translateX(0); opacity: 1; }
 }
 
-/* ============================
-   Navbar Pills - Novo Estilo com espaçamento
-============================ */
+
+/* NAVBAR PILLS — ELEGANTE, ESCURA E PREMIUM */
+.Nav {
+  display: flex;
+  gap: var(--pill-gap, 10px); /* valor padrão, mas ajustável */
+}
+
+
+
 .Nav :global(.nav-link) {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
+
+  /* mantém a distância entre ícone e texto intacta */
+  gap: var(--pill-inner-gap, 12px);
+
+  /* mantém exatamente o mesmo tamanho que você já tinha */
+  padding: var(--pill-padding-y, 8px) var(--pill-padding-x, 14px);
+
   border-radius: 999px !important;
   text-decoration: none;
   font-weight: 600;
-  color: var(--color-bg);
+
+  /* cor original */
+  color: #EDE8E6;
   background: transparent;
-  transition: background 160ms ease, color 160ms ease, transform 120ms ease, box-shadow 160ms ease;
-  line-height: 1;
+
+  /* mantém a animação suave sem alterar tamanho */
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 120ms ease,
+    box-shadow 160ms ease;
+
+  /* ESSENCIAL — evita deformações verticais */
+  line-height: 1; 
+
   white-space: nowrap;
 }
 
-/* remove margin da última pill */
-.Nav :global(.nav-link:last-child) {
-  margin-right: 0;
-}
 
-/* Hover: apenas para a pill sob o mouse */
+/* HOVER */
 .Nav :global(.nav-link):hover {
-  background: var(--color-primary-light); /* marrom mais claro para destacar */
-  color: var(--color-bg);
+  background: #2C201D; /* Marrom escuro neutro */
+  color: #FFFFFF;
   transform: translateY(-1px);
 }
 
-/* Focus */
-.Nav :global(.nav-link):focus {
-  outline: 3px solid rgba(125, 95, 74, 0.18); /* leve destaque */
-  outline-offset: 3px;
-}
-
-/* Estado ativo / selecionado */
+/* ACTIVE */
 .activeLink,
 .Nav :global(.nav-link).active {
-  background: var(--color-green-light) !important; /* cor de destaque */
-  color: var(--color-bg) !important;
-  box-shadow: var(--shadow-medium);
+  background: #3B2925 !important; /* Marrom destaque */
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.28);
 }
 
 /* ============================

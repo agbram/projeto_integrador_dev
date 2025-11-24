@@ -32,32 +32,32 @@ export default function CardOrder({
     }
   };
 
-const getStatusClass = (status: string) => {
-  const classMap: { [key: string]: string } = {
-    'PENDING': styles.statusPending,
-    'IN_PROGRESS': styles.statusInProgress,
-    'IN_PRODUCTION': styles.statusInProduction,
-    'READY_FOR_DELIVERY': styles.statusReadyForDelivery,
-    'PRODUCTION_COMPLETE': styles.statusProductionComplete,
-    'DELIVERED': styles.statusDelivered,
-    'CANCELLED': styles.statusCancelled
+  const getStatusClass = (status: string) => {
+    const classMap: { [key: string]: string } = {
+      'PENDING': styles.statusPending,
+      'IN_PROGRESS': styles.statusInProgress,
+      'IN_PRODUCTION': styles.statusInProduction,
+      'READY_FOR_DELIVERY': styles.statusReadyForDelivery,
+      'PRODUCTION_COMPLETE': styles.statusProductionComplete,
+      'DELIVERED': styles.statusDelivered,
+      'CANCELLED': styles.statusCancelled
+    };
+    return classMap[status] || styles.statusPending;
   };
-  return classMap[status] || styles.statusPending;
-};
 
   // Função para formatar status
-const formatStatus = (status: string) => {
-  const statusMap: { [key: string]: string } = {
-    'PENDING': 'Pendente',
-    'IN_PROGRESS': 'Em Andamento',
-    'IN_PRODUCTION': 'Em Produção',
-    'READY_FOR_DELIVERY': 'Pronto para Entrega',  
-    'PRODUCTION_COMPLETE': 'Produção Concluída',
-    'DELIVERED': 'Entregue',
-    'CANCELLED': 'Cancelada'
+  const formatStatus = (status: string) => {
+    const statusMap: { [key: string]: string } = {
+      'PENDING': 'Pendente',
+      'IN_PROGRESS': 'Em Andamento',
+      'IN_PRODUCTION': 'Em Produção',
+      'READY_FOR_DELIVERY': 'Pronto para Entrega',  
+      'PRODUCTION_COMPLETE': 'Produção Concluída',
+      'DELIVERED': 'Entregue',
+      'CANCELLED': 'Cancelada'
+    };
+    return statusMap[status] || status;
   };
-  return statusMap[status] || status;
-};
 
   // Função para formatar o total com segurança
   const formatTotal = (total: number | string | undefined) => {
@@ -73,45 +73,60 @@ const formatStatus = (status: string) => {
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.title}>
-        Pedido #{String(order.id).padStart(4, "0")}
-      </h3>
+      <div className={styles.header}>
+        <h3 className={styles.title}>
+          Pedido #{String(order.id).padStart(4, "0")}
+        </h3>
+        <span className={styles.date}>
+          {formatDate(order.createdAt)}
+        </span>
+      </div>
 
       <div className={styles.info}>
-        <p>
-          <strong>Cliente:</strong>{" "}
-          {order.customer?.name || `ID: ${order.customerId}`}
-        </p>
+        <div className={styles.infoRow}>
+          <div className={styles.infoItem}>
+            <strong>Cliente</strong>
+            <span>{order.customer?.name || `ID: ${order.customerId}`}</span>
+          </div>
+          
+          <div className={styles.infoItem}>
+            <strong>Total</strong>
+            <span className={styles.total}>{formatTotal(order.total)}</span>
+          </div>
+        </div>
+
+        <div className={styles.infoRow}>
+          <div className={styles.infoItem}>
+            <strong>Status</strong>
+            <span className={`${styles.status} ${getStatusClass(order.status)}`}>
+              {formatStatus(order.status)}
+            </span>
+          </div>
+          
+          <div className={styles.infoItem}>
+            <strong>Entrega</strong>
+            <span>{formatDate(order.deliveryDate)}</span>
+          </div>
+        </div>
 
         {order.notes && (
-          <p>
-            <strong>Observações:</strong> {order.notes}
-          </p>
+          <div className={styles.notes}>
+            <strong>Observações</strong>
+            <p>{order.notes}</p>
+          </div>
         )}
-
-        <p>
-          <strong>Status:</strong>
-          <span className={`${styles.status} ${getStatusClass(order.status)}`}>
-             {formatStatus(order.status)}
-          </span>
-        </p>
-        <p>
-          <strong>Total:</strong> {formatTotal(order.total)}
-        </p>
-        <p>
-          <strong>Data de entrega:</strong> {formatDate(order.deliveryDate)}
-        </p>
 
         {order.items && order.items.length > 0 && (
           <div className={styles.items}>
-            <strong>Itens:</strong>
-            <ul>
+            <strong>Itens do Pedido</strong>
+            <ul className={styles.itemsList}>
               {order.items.map((item, index) => (
-                <li key={index}>
-                  {item.quantity}x {item.product?.name} - R${" "}
-                  {typeof item.subtotal === "number"
-                    ? item.subtotal.toFixed(2)
-                    : "0.00"}
+                <li key={index} className={styles.item}>
+                  <span className={styles.itemQuantity}>{item.quantity}x</span>
+                  <span className={styles.itemName}>{item.product?.name}</span>
+                  <span className={styles.itemSubtotal}>
+                    R$ {typeof item.subtotal === "number" ? item.subtotal.toFixed(2) : "0.00"}
+                  </span>
                 </li>
               ))}
             </ul>

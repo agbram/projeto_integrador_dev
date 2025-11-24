@@ -62,7 +62,9 @@ export default function ProdutosModal() {
       setLoading(false);
     }
   };
-
+  const handleFilter = () => {
+    
+  }
   const handleCloseWarningModal = () => {
     setModalEditShow(true);
     setWarningDeleteModalShow(false);
@@ -111,6 +113,12 @@ export default function ProdutosModal() {
         setModalShow(true);
         
       });
+
+      pageAction.setHandleFilter(
+        function() {
+          alert('PESQUIISA')
+        }
+      );
       // opcional: cleanup para restaurar handler padrão (não obrigatório)
       return () => {
         pageAction.setHandleAdd(() => () => {}); // no-op ao desmontar

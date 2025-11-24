@@ -154,12 +154,6 @@ export default function ProdutosModal() {
         setModalShow(true);
         
       });
-
-      pageAction.setHandleFilter(
-        function() {
-          alert('PESQUIISA')
-        }
-      );
       // opcional: cleanup para restaurar handler padrão (não obrigatório)
       return () => {
         pageActions.setHandleAdd(() => () => {}); // no-op ao desmontar

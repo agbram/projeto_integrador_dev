@@ -1,31 +1,27 @@
 /* Wrapper geral do componente */
 .wrapper {
   position: absolute;
-  bottom: 40px;
-  /* Distância alterável do fundo */
-  left: 40px;
-  /* Distância alterável da lateral */
+  bottom: 2.2vh; /* proporcional à altura da tela */
+  left: 2.2vw;   /* proporcional à largura da tela */
 
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1vh;
 
   width: fit-content;
-  max-width: 420px;
-  /* Proporção original mantida */
+  max-width: 25vw; /* máximo proporcional à largura da tela */
   color: #ffffff;
-  /* Todos os textos em branco */
   pointer-events: none;
 }
 
-/* Ícones decorativos (mantidos no topo, acima do bloco) */
+/* Ícones decorativos (mantidos no topo) */
 .iconGroup {
   display: flex;
-  gap: 12px;
+  gap: 0.7vw;
 
   position: absolute;
-  top: 32px;
-  left: 40px;
+  top: 2vh;
+  left: 2.2vw;
 
   opacity: 0.9;
   pointer-events: none;
@@ -34,111 +30,79 @@
 /* Caixa de vidro para título + texto */
 .glassBox {
   background: rgba(60, 40, 33, 0.32);
-  backdrop-filter: blur(14px);
-  border-radius: 18px;
-  padding: 18px;
+  backdrop-filter: blur(1.4vh);
+  border-radius: 1.1vw;
+  padding: 1.1vh 1vw;
   display: inline-flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0.7vh;
   width: auto;
   max-width: 90%;
-
 }
 
 /* Título */
 .title {
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 2.5vw, 2.5rem); /* escala proporcional */
   font-weight: 700;
   margin: 0;
   color: #ffffff;
-  /* Branco */
+  font-family: "Inter", sans-serif;
 }
 
 /* Destaque */
 .highlight {
   color: #D9697D;
-  /* Branco também */
 }
 
 /* Descrição */
 .description {
-  font-size: 1rem;
+  font-size: clamp(0.8rem, 1.5vw, 1.2rem); /* escala proporcional */
   line-height: 1.55;
   color: #ffffff;
-  /* Branco */
 }
 
 /* Rodapé */
 .footer {
-  font-size: 0.9rem;
+  font-size: clamp(0.7rem, 1vw, 1rem);
   opacity: 0.9;
   color: #ffffff;
-  /* Branco */
-  margin-left: 2px;
+  margin-left: 0.1vw;
 }
 
-/* Fonte */
-@import url("https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap");
-
-/* === FONTES APLICADAS === */
+/* Fontes */
 .wrapper,
 .glassBox,
 .description,
 .footer,
 .miniGlass {
-  font-family: "Rubik", sans-serif; /* substituível */
+  font-family: "Inter", sans-serif;
 }
 
-.title {
-  font-family: "Rubik", sans-serif; /* substituível */
-}
-
-
-
-
-
-/* Wrapper geral do componente */
-.wrapper {
-  position: absolute;
-  bottom: 40px;
-  left: 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  width: fit-content;
-  max-width: 420px;
-  color: #ffffff;
-  pointer-events: none;
-}
-
-/* ======================= */
 /* PAINÉIS SUPERIORES PEQUENINOS */
-/* ======================= */
-
 .topPanels {
   position: absolute;
-  top: 32px;
-  left: 40px;
-  right: 40px;
+  top: 2vh;
+  left: 2.2vw;
+  right: 2.2vw;
 
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: 0.7vw;
 }
 
 .miniGlass {
   background: rgba(60, 40, 33, 0.32);
-  backdrop-filter: blur(12px);
-  border-radius: 14px;
-  padding: 6px 14px;
+  backdrop-filter: blur(1.2vh);
+  border-radius: 0.8vw;
+  padding: 0.4vh 1vw;
 
   font-family: "Inter", sans-serif;
-  font-size: 0.8rem;
-  font-style: italic;      /* ======= ITÁLICO FINO ======= */
-  font-weight: 3000;        /* ======= FINO ======= */
+  font-size: clamp(0.6rem, 1vw, 0.9rem);
+  font-style: italic;
+  font-weight: 300;
 
   color: #ffffff;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.1vw;
 
   display: flex;
   align-items: center;
@@ -147,32 +111,27 @@
   pointer-events: none;
 }
 
-/* ======================= */
 /* CONTAINER DE ÍCONES LATERAL DIREITA */
-/* ======================= */
 .iconContainer {
   position: absolute;
-  top: 50%;          /* centraliza verticalmente */
-  right: 40px;       /* distância ajustável da lateral direita */
-  transform: translateY(-50%); /* corrige centralização exata */
+  top: 50%;
+  right: 2.2vw;
+  transform: translateY(-50%);
   display: flex;
-  flex-direction: column; /* empilha verticalmente */
-  gap: 5px;              /* distância entre ícones */
+  flex-direction: column;
+  gap: 0.3vh;
   background: transparent;
-
 }
 
-/* ======================= */
 /* CONTAINER DA LOGO */
-/* ======================= */
 .logoContainer {
   position: absolute;
-  top: 75px;         /* distância do topo */
-  left: 47%;         /* centralizado horizontalmente */
-  transform: translateX(-50%); /* centralização exata */
-  
-  width: 400px;      /* largura máxima da logo */
-  height: auto;      /* mantém proporção automática */
+  top: 19vh;
+  left: 49%;
+  transform: translateX(-50%);
+
+  width: 27vw;  /* proporcional */
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -181,50 +140,6 @@
 
 .logo {
   width: 100%;
-  height: auto;      /* mantém proporção da imagem */
-  object-fit: contain; /* não corta ou distorce a logo */
-}
-
-
-
-
-/* Caixa de vidro para título + descrição */
-.glassBox {
-  background: rgba(60, 40, 33, 0.32);
-  backdrop-filter: blur(14px);
-  border-radius: 18px;
-  padding: 18px;
-  display: inline-flex;
-  flex-direction: column;
-  gap: 10px;
-  width: auto;
-  max-width: 90%;
-}
-
-/* Título */
-.title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 0;
-  color: #ffffff;
-}
-
-/* Destaque */
-.highlight {
-  color: #D9697D;
-}
-
-/* Descrição */
-.description {
-  font-size: 1rem;
-  line-height: 1.55;
-  color: #ffffff;
-}
-
-/* Rodapé */
-.footer {
-  font-size: 0.9rem;
-  opacity: 0.9;
-  color: #ffffff;
-  margin-left: 2px;
+  height: auto;
+  object-fit: contain;
 }

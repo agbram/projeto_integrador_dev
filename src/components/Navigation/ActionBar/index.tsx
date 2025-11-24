@@ -80,19 +80,22 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
         <form className={styles.searchBox} onSubmit={submitSearch}>
           <input
             className={styles.searchInput}
-            placeholder="Procurar"
+            placeholder="Procurar!"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             aria-label="Procurar"
           />
+          
           <button
-            type="submit"
+            type="button"
             aria-label="Pesquisar"
             className={styles.iconBtn}
             onClick={pageAction.handleFilter}
+            
           >
             <MagnifyingGlassIcon size={16} />
           </button>
+         
         </form>
 
         <Dropdown className={styles.filterDropdown}>

@@ -30,7 +30,7 @@ export default function WelcomeLogin() {
       <div className={styles.wrapper}>
         <div className={styles.glassBox}>
           <h1 className={styles.title}>
-            Olá <span className={styles.highlight}>Confeiteira!</span>
+            Seja <span className={styles.highlight}> Bem Vinda!</span>
           </h1>
         </div>
 

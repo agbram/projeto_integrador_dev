@@ -103,7 +103,9 @@ export default function ProdutosModal() {
       setLoading(false);
     }
   };
-
+  const handleFilter = () => {
+    
+  }
   const handleCloseWarningModal = () => {
     setModalEditShow(true);
     setWarningDeleteModalShow(false);

@@ -15,6 +15,42 @@ import {
   ExportIcon,
 } from "@phosphor-icons/react";
 
+// OPERAÇÕES PRINCIPAIS:
+
+// BUSCAR DADOS:
+// 1. Faz chamadas paralelas para orders, customers e products
+// 2. Processa dados para analytics
+// 3. Atualiza estados com informações coletadas
+
+// PROCESSAR ANALYTICS:
+// 1. Filtra orders por período (semana/mês/ano)
+// 2. Calcula métricas: receita total, pedidos, clientes, produtos
+// 3. Identifica cliente mais frequente e valores gastos
+// 4. Encontra produtos mais e menos vendidos
+// 5. Agrupa pedidos por status
+// 6. Gera dados para gráficos (receita mensal, pedidos mensais)
+
+// FILTRAR POR PERÍODO:
+// - Semana: últimos 7 dias
+// - Mês: último mês
+// - Ano: último ano
+// Aplica filtro às orders e recalcula todas as métricas
+
+// GERAR GRÁFICOS:
+// 1. Receita Mensal: Linha temporal da receita
+// 2. Pedidos Mensais: Barras com quantidade de pedidos
+// 3. Status: Pizza/Doughnut com distribuição
+// 4. Produtos: Top 10 produtos mais vendidos
+
+// EXPORTAR DADOS:
+// 1. Coleta métricas principais
+// 2. Formata em CSV
+// 3. Gera arquivo para download
+
+// NAVEGAÇÃO:
+// - Redireciona para página de pedidos com highlight
+// - Permissão de clique em pedidos recentes
+
 // Importações do Chart.js
 import {
   Chart as ChartJS,

@@ -15,7 +15,7 @@
   height: 100vh;
 
   /* === FUNDO NOVO === */
-  /* A imagem preenche totalmente SEM distorcer e preservando o bolo */
+
   background-image: url("/imgs/welcomeWallpaper.png");
   background-repeat: no-repeat;
   background-size: cover; /* cobre tudo sem deformar */

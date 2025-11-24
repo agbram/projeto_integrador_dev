@@ -11,6 +11,37 @@ import styles from "./styles.module.css";
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 import { PageActions } from "@/contexts/PageActions";
 
+// OPERAÇÕES PRINCIPAIS:
+
+// SINCRONIZAÇÃO DE PEDIDOS:
+// 1. Sincronização Inteligente: Adiciona apenas novos pedidos sem perder progresso atual
+// 2. Sincronização Completa: Reseta toda a produção e reprocessa todos os pedidos
+// 3. Verificação de Status: Identifica pedidos não sincronizados antes da ação
+
+// CONTROLE DE PRODUÇÃO:
+// 1. Busca dashboard com resumo de tarefas e estatísticas
+// 2. Inicia produção: Muda status de PENDING para IN_PRODUCTION
+// 3. Atualiza progresso: Registra quantidades produzidas
+// 4. Conclui tarefas: Marca como COMPLETED quando toda quantidade é produzida
+
+// GESTÃO DE TAREFAS:
+// 1. Organiza por prioridade (Urgente, Alta, Média, Baixa)
+// 2. Controla status (Pendente, Em Produção, Concluída, Cancelada)
+// 3. Calcula progresso automaticamente baseado em quantidades
+// 4. Exibe prazos e informações dos produtos
+
+// ATUALIZAÇÃO DE PROGRESSO:
+// 1. Valida quantidade informada (não pode ser negativa ou exceder pendente)
+// 2. Atualiza quantidades pendentes e concluídas
+// 3. Recalcula porcentagem de progresso automaticamente
+// 4. Fecha modal e atualiza lista após sucesso
+
+// CONTROLE DE ESTADOS:
+// 1. Loading durante operações assíncronas
+// 2. Modais de confirmação para ações críticas
+// 3. Feedback visual de sucesso/erro
+// 4. Indicadores visuais por prioridade e status
+
 // Tipos para as tarefas de produção
 interface ProductionTask {
   id: number;
@@ -508,85 +539,83 @@ const cancelFullSync = () => {
         )}
       </div>
 
-      {/*  Modal de Confirmação para Sync Completo */}
-<Modal
-  show={confirmFullSyncModalShow}
-  onHide={cancelFullSync}
-  size="lg"
-  centered
->
-  <Modal.Header closeButton className={styles.syncWarningHeader}>
-    <Modal.Title>
-      <div className={styles.warningTitle}>
-        <span style={{ fontSize: "24px", marginRight: "8px" }}>⚠️</span>
-        Confirmação de Sincronização Completa
-      </div>
-    </Modal.Title>
-  </Modal.Header>
-  
-  <Modal.Body className={styles.syncWarningBody}>
-    <div className={styles.warningIconContainer}>
-      <div className={styles.warningIcon}>⚠️</div>
-    </div>
-    
-    <h5 className={styles.warningHeading}>Atenção!</h5>
-    
-    <div className={styles.warningContent}>
-      <p>
-        <strong>Esta ação irá resetar TODA a produção atual.</strong>
-      </p>
-      
-      <div className={styles.warningDetails}>
-        <p>📋 <strong>O que será afetado:</strong></p>
-        <ul>
-          <li>✅ Todos os pedidos serão reprocessados</li>
-          <li>🔄 Progresso atual de produção será perdido</li>
-          <li>📊 Tarefas existentes serão recriadas</li>
-          <li>⏰ Histórico de produção será reiniciado</li>
-        </ul>
+      {/* ✅ MODAL DE CONFIRMAÇÃO PARA SYNC COMPLETO - ATUALIZADO */}
+      <Modal
+        show={confirmFullSyncModalShow}
+        onHide={cancelFullSync}
+        size="lg"
+        centered
+        className={styles.productionSyncWarningModal}
+      >
+        <Modal.Header closeButton className={styles.productionSyncWarningHeader}>
+          <Modal.Title className={styles.productionModalTitle}>
+            Confirmação de Sincronização Completa
+          </Modal.Title>
+        </Modal.Header>
         
-        <p>🚨 <strong>Recomendado apenas se:</strong></p>
-        <ul>
-          <li>Houve problemas de sincronização</li>
-          <li>Pedidos não estão aparecendo corretamente</li>
-          <li>Foi orientado pelo suporte técnico</li>
-        </ul>
-      </div>
-      
-      <div className={styles.recommendation}>
-        <small>
-          💡 <strong>Dica:</strong> Para adicionar novos pedidos sem perder o progresso, 
-          use <strong>"Sincronizar Novos Pedidos"</strong>.
-        </small>
-      </div>
-    </div>
-  </Modal.Body>
-  
-  <Modal.Footer className={styles.syncWarningFooter}>
-    <ButtonCancelar 
-      variant="outline" 
-      onClick={cancelFullSync} 
-      CancelLabel="Cancelar"
-    />
-    <Button 
-      variant="danger" 
-      onClick={confirmFullSync}
-      disabled={syncLoading}
-      className={styles.confirmButton}
-    >
-      {syncLoading ? (
-        <>
-          <div className={styles.spinner}></div>
-          Processando...
-        </>
-      ) : (
-        "Sim, Resetar Toda a Produção"
-      )}
-    </Button>
-  </Modal.Footer>
-</Modal>
+        <Modal.Body className={styles.productionSyncWarningBody}>
+          <div className={styles.warningIconContainer}>
+            <span className={styles.warningIcon}>⚠</span>
+          </div>
+          
+          <h5 className={styles.warningHeading}>Atenção!</h5>
+          
+          <div className={styles.warningContent}>
+            <p>
+              <strong>Esta ação irá resetar TODA a produção atual.</strong>
+            </p>
+            
+            <div className={styles.warningDetails}>
+              <p><strong>O que será afetado:</strong></p>
+              <ul>
+                <li>Todos os pedidos serão reprocessados</li>
+                <li>Progresso atual de produção será perdido</li>
+                <li>Tarefas existentes serão recriadas</li>
+                <li>Histórico de produção será reiniciado</li>
+              </ul>
+              
+              <p><strong>Recomendado apenas se:</strong></p>
+              <ul>
+                <li>Houve problemas de sincronização</li>
+                <li>Pedidos não estão aparecendo corretamente</li>
+                <li>Foi orientado pelo suporte técnico</li>
+              </ul>
+            </div>
+            
+            <div className={styles.recommendation}>
+              <small>
+                <strong>Dica:</strong> Para adicionar novos pedidos sem perder o progresso, 
+                use <strong>"Sincronizar Novos Pedidos"</strong>.
+              </small>
+            </div>
+          </div>
+        </Modal.Body>
+        
+        <Modal.Footer className={styles.productionSyncWarningFooter}>
+          <ButtonCancelar 
+            variant="outline" 
+            onClick={cancelFullSync} 
+            CancelLabel="Cancelar"
+          />
+          <Button 
+            variant="danger" 
+            onClick={confirmFullSync}
+            disabled={syncLoading}
+            className={styles.confirmButton}
+          >
+            {syncLoading ? (
+              <>
+                <div className={styles.spinner}></div>
+                Processando...
+              </>
+            ) : (
+              "Sim, Resetar Toda a Produção"
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
-      {/* 📝 Modal de Detalhes da Tarefa */}
+      {/* ✅ MODAL DE DETALHES DA TAREFA - ATUALIZADO */}
       <Modal
         show={modalDetailShow}
         onHide={() => {
@@ -595,20 +624,21 @@ const cancelFullSync = () => {
         }}
         size="lg"
         centered
+        className={styles.productionModal}
       >
-        <Modal.Header closeButton>
-          <Modal.Title>
+        <Modal.Header closeButton className={styles.productionModalHeader}>
+          <Modal.Title className={styles.productionModalTitle}>
             {selectedTask ? `Produção - ${selectedTask.product.name}` : 'Detalhes da Tarefa'}
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body className={styles.modalBody}>
+        <Modal.Body className={styles.productionModalBody}>
           {selectedTask && (
             <Card
-              title={`Atualizar Progresso - ${selectedTask.product.name}`}
+              title=""
               fields={[
                 {
                   name: "completedQuantity",
-                  label: "Quantidade Concluidas",
+                  label: "Quantidade Concluída",
                   type: "text",
                   placeholder: `Digite a quantidade (máx: ${selectedTask.pendingQuantity})`,
                 },
@@ -687,43 +717,53 @@ const cancelFullSync = () => {
         </Modal.Body>
       </Modal>
 
-      {/* ✅ Modal de Sucesso */}
+      {/* ✅ MODAL DE SUCESSO - ATUALIZADO */}
       <Modal
         show={successModalShow}
         onHide={() => setSuccessModalShow(false)}
         size="sm"
         centered
+        className={styles.productionSuccessModal}
       >
-        <Modal.Body className="text-center">
-          <div style={{ fontSize: "48px", color: "#28a745" }}>
-            <CheckCircleIcon size={48} weight="fill" />
+        <Modal.Body className={styles.productionSuccessModalBody}>
+          <div className={styles.productionSuccessIconContainer} aria-hidden>
+            <span className={styles.productionSuccessIcon}>✓</span>
           </div>
-          <h5>Sucesso!</h5>
-          <p>{successMessage}</p>
+          <h5 className={styles.productionSuccessTitle}>Sucesso!</h5>
+          <p className={styles.productionSuccessMessage}>{successMessage}</p>
         </Modal.Body>
-        <Modal.Footer className="justify-content-center">
-          <Button variant="success" onClick={() => setSuccessModalShow(false)}>
+        <Modal.Footer className={styles.productionSuccessFooter}>
+          <button
+            className={styles.productionSuccessButton}
+            onClick={() => setSuccessModalShow(false)}
+          >
             OK
-          </Button>
+          </button>
         </Modal.Footer>
       </Modal>
 
-      {/* ⚠️ Modal de Aviso */}
+      {/* ✅ MODAL DE AVISO - ATUALIZADO */}
       <Modal
         show={warningModalShow}
         onHide={() => setWarningModalShow(false)}
         size="sm"
         centered
+        className={styles.productionWarningModal}
       >
-        <Modal.Body className="text-center">
-          <div style={{ fontSize: "48px", color: "#ffc107" }}>⚠️</div>
-          <h5>Atenção</h5>
-          <p>{warningMessage}</p>
+        <Modal.Body className={styles.productionWarningModalBody}>
+          <div className={styles.productionWarningIconContainer} aria-hidden>
+            <span className={styles.productionWarningIcon}>⚠</span>
+          </div>
+          <h5 className={styles.productionWarningTitle}>Atenção</h5>
+          <p className={styles.productionWarningMessage}>{warningMessage}</p>
         </Modal.Body>
-        <Modal.Footer className="justify-content-center">
-          <Button variant="warning" onClick={() => setWarningModalShow(false)}>
+        <Modal.Footer className={styles.productionWarningFooter}>
+          <button
+            className={styles.productionWarningButton}
+            onClick={() => setWarningModalShow(false)}
+          >
             Entendi
-          </Button>
+          </button>
         </Modal.Footer>
       </Modal>
     </div>

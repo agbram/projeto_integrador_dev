@@ -1,81 +1,85 @@
-/* TopBar atualizado: brand ocupa o espaço disponível; profile empurra para a direita */
+/* ============================
+   TopBar — versão elegante com logo real
+============================ */
 .topbar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  /* não usamos space-between aqui porque vamos empurrar o profile com margin-left:auto */
   width: 100%;
   box-sizing: border-box;
+  gap: 12px;
+  padding: 4px 0;
 }
 
-/* o bloco da marca (logo + texto) pode crescer até ocupar o espaço disponível,
-   mas tem um min-width para não encolher demais no mobile */
-.brand {
+/* Área da logo (não cresce, não encolhe demais) */
+.logoArea {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex: 1 1 auto;      /* pode crescer e encolher */
-  min-width: 160px;    /* evita que encolha muito e deixe a foto grudada */
-  min-height: 40px;
-  overflow: hidden;    /* protege contra overflow por filhos largos */
+  height: 70px;        /* altura ajustável */
+  max-width: 250px;    /* largura máxima ajustável */
 }
 
-/* garante que o círculo não encolha */
-.logoCircle {
-  flex: 0 0 auto;
-  width: 50px;
-  height: 50px;
+/* Logo com proporção preservada */
+.logoImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* nunca estica */
+  object-position: left;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Botão de perfil sempre à direita */
+.profileBtn {
+  margin-left: auto;
+  background: transparent;
+  border: 0;
+  padding: 4px;
+  cursor: pointer;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-primary-light);
-  color: var(--color-bg);
-  font-weight: 700;
 }
 
-/* nome da marca: usa ellipsis quando faltar espaço */
-.brandText {
-  color: var(--color-bg);
-  font-weight: 700;
-  font-size: 1.10rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0; /* importante para permitir o truncamento em flex children */
-}
-
-/* botão do profile fica sempre no extremo direito */
-.profileBtn {
-  background: transparent;
-  border: 0;
-  padding: 4px;
-  border-radius: 50%;
-  cursor: pointer;
-  margin-left: auto; /* empurra até a borda direita */
-  flex: 0 0 auto;
-}
-
-/* imagem do profile */
+/* Imagem do perfil */
 .profileImg {
   width: 36px;
   height: 36px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(var(--color-primary-dark-rgb), 0.3); /* usando primary-dark */
+  border: 2px solid rgba(var(--color-primary-dark-rgb), 0.3);
 }
 
-/* --- Responsividade: reduz min-width da brand no mobile para caber melhor --- */
+.circleHeart {
+  width: 40px;             /* ajuste livre */
+  height: 40px;            /* ajuste livre */
+  background: #F7F2EF;
+  border-radius: 50%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.circleHeart svg {
+  width: 25px;    /* ajuste do tamanho do ícone */
+  height: 25px;   /* ajuste do tamanho do ícone */
+  color: #C84555;
+}
+
+
+/* Responsividade */
 @media (max-width: 767px) {
-  .brand {
-    min-width: 120px; /* menos para caber, mas ainda evita que fique colado */
-    gap: 10px;
+  .logoArea {
+    max-width: 130px;
+    height: 40px;
   }
 
-  .brandText {
-    font-size: 1rem;
+  .profileImg {
+    width: 32px;
+    height: 32px;
   }
-
-  .logoCircle { width: 36px; height: 36px; }
-  .profileImg { width: 34px; height: 34px; }
 }

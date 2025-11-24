@@ -1,52 +1,230 @@
-.WelcomeLogin {
+/* Wrapper geral do componente */
+.wrapper {
+  position: absolute;
+  bottom: 40px;
+  /* Distância alterável do fundo */
+  left: 40px;
+  /* Distância alterável da lateral */
+
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  flex-grow: 1;
-  max-width: 520px; /* Aumentei levemente a largura máxima */
-  position: relative;
-  color: #F2EBE9;
-  z-index: 1;
+  gap: 16px;
+
+  width: fit-content;
+  max-width: 420px;
+  /* Proporção original mantida */
+  color: #ffffff;
+  /* Todos os textos em branco */
+  pointer-events: none;
 }
 
-.welcomeContent {
+/* Ícones decorativos (mantidos no topo, acima do bloco) */
+.iconGroup {
   display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  justify-content: center;
-}
+  gap: 12px;
 
-.welcomeIcon {
-  display: flex;
-  justify-content: flex-start;
-  gap: 10px; /* Espaço entre os ícones */
-  margin-bottom: 2rem; 
-}
+  position: absolute;
+  top: 32px;
+  left: 40px;
 
-.welcomeTitle {
-  font-size: 2.8rem; /* Aumentei de 2.4 para 2.8rem */
-  font-weight: 700;
-  margin-bottom: 1.5rem; 
-  line-height: 1.2;
-  color: #F2EBE9;
-}
-
-.highlight {
-  color: #FFA0C2;
-}
-
-.welcomeText {
-  font-size: 1.10rem; /* Aumentei de 1 para 1.15rem */
   opacity: 0.9;
-  line-height: 1.6; /* Aumentei o line-height para melhor legibilidade */
-  color: #F2EBE9;
-  margin-bottom: 2rem;
+  pointer-events: none;
 }
 
-.welcomeFooter {
-  font-size: 0.9rem; /* Aumentei de 0.8 para 0.9rem */
-  opacity: 0.8; /* Aumentei levemente a opacidade */
-  color: #C8829A;
-  margin-top: auto;
-  padding-top: 2rem;
+/* Caixa de vidro para título + texto */
+.glassBox {
+  background: rgba(60, 40, 33, 0.32);
+  backdrop-filter: blur(14px);
+  border-radius: 18px;
+  padding: 18px;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 10px;
+  width: auto;
+  max-width: 90%;
+
+}
+
+/* Título */
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  color: #ffffff;
+  /* Branco */
+}
+
+/* Destaque */
+.highlight {
+  color: #D9697D;
+  /* Branco também */
+}
+
+/* Descrição */
+.description {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #ffffff;
+  /* Branco */
+}
+
+/* Rodapé */
+.footer {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  color: #ffffff;
+  /* Branco */
+  margin-left: 2px;
+}
+
+/* Fonte */
+@import url("https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap");
+
+/* === FONTES APLICADAS === */
+.wrapper,
+.glassBox,
+.description,
+.footer,
+.miniGlass {
+  font-family: "Rubik", sans-serif; /* substituível */
+}
+
+.title {
+  font-family: "Rubik", sans-serif; /* substituível */
+}
+
+
+
+
+
+/* Wrapper geral do componente */
+.wrapper {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: fit-content;
+  max-width: 420px;
+  color: #ffffff;
+  pointer-events: none;
+}
+
+/* ======================= */
+/* PAINÉIS SUPERIORES PEQUENINOS */
+/* ======================= */
+
+.topPanels {
+  position: absolute;
+  top: 32px;
+  left: 40px;
+  right: 40px;
+
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.miniGlass {
+  background: rgba(60, 40, 33, 0.32);
+  backdrop-filter: blur(12px);
+  border-radius: 14px;
+  padding: 6px 14px;
+
+  font-family: "Inter", sans-serif;
+  font-size: 0.8rem;
+  font-style: italic;      /* ======= ITÁLICO FINO ======= */
+  font-weight: 3000;        /* ======= FINO ======= */
+
+  color: #ffffff;
+  letter-spacing: 0.5px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  pointer-events: none;
+}
+
+/* ======================= */
+/* CONTAINER DE ÍCONES LATERAL DIREITA */
+/* ======================= */
+.iconContainer {
+  position: absolute;
+  top: 50%;          /* centraliza verticalmente */
+  right: 40px;       /* distância ajustável da lateral direita */
+  transform: translateY(-50%); /* corrige centralização exata */
+  display: flex;
+  flex-direction: column; /* empilha verticalmente */
+  gap: 5px;              /* distância entre ícones */
+  background: transparent;
+
+}
+
+/* ======================= */
+/* CONTAINER DA LOGO */
+/* ======================= */
+.logoContainer {
+  position: absolute;
+  top: 75px;         /* distância do topo */
+  left: 47%;         /* centralizado horizontalmente */
+  transform: translateX(-50%); /* centralização exata */
+  
+  width: 400px;      /* largura máxima da logo */
+  height: auto;      /* mantém proporção automática */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.logo {
+  width: 100%;
+  height: auto;      /* mantém proporção da imagem */
+  object-fit: contain; /* não corta ou distorce a logo */
+}
+
+
+
+
+/* Caixa de vidro para título + descrição */
+.glassBox {
+  background: rgba(60, 40, 33, 0.32);
+  backdrop-filter: blur(14px);
+  border-radius: 18px;
+  padding: 18px;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 10px;
+  width: auto;
+  max-width: 90%;
+}
+
+/* Título */
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  color: #ffffff;
+}
+
+/* Destaque */
+.highlight {
+  color: #D9697D;
+}
+
+/* Descrição */
+.description {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #ffffff;
+}
+
+/* Rodapé */
+.footer {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  color: #ffffff;
+  margin-left: 2px;
 }

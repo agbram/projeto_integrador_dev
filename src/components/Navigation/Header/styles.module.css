@@ -1,14 +1,17 @@
-/* container do header */
 .headerWrapper {
   width: 100%;
   background: linear-gradient(
     180deg,
-    var(--color-primary-light) 0%,
-    var(--color-primary) 100%
+    #0F0C0B 0%,
+    #1A1412 100%
   );
   padding: 14px 0;
-  box-shadow: var(--shadow-soft);
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.50);
 }
+
 
 .headerInner {
   margin: 0 auto;
@@ -22,8 +25,6 @@
   box-sizing: border-box;
 }
 
-/* Cada área ocupa 100% do espaço disponível, mas seu conteúdo interno fica limitado ao max-width do headerInner.
-   Use essas classes para os blocos que você já tem no JSX: topBarArea, NavBarArea, actionBarArea. */
 .topBarArea,
 .NavBarArea,
 .actionBarArea {

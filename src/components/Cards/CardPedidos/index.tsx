@@ -5,9 +5,16 @@ import Order from "@/models/order";
 import { CheckCircleIcon } from "@phosphor-icons/react";
 import { ReactNode, useState } from "react";
 
+enum Variant { 
+  NotaFiscal = "notaFiscal", 
+  Cancel = "cancel", 
+  Edit = "edit"
+};
+
 type Action = {
   label: ReactNode;
   onClick(): void;
+  variant?: Variant | string;
 };
 
 type CardOrderProps = {
@@ -25,18 +32,61 @@ export default function CardOrder({
   loading = false,
   actions,
   onStatusUpdate,
-  onDeliveredClick, 
+  onDeliveredClick,
 }: CardOrderProps) {
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const formatDate = (dateString: string | Date | undefined) => {
-    if (!dateString) return "—";
-    try {
-      const date = new Date(dateString);
-      return isNaN(date.getTime()) ? "—" : date.toLocaleDateString("pt-BR");
-    } catch {
-      return "—";
-    }
+const formatDisplayDate = (dateString: string | null): string => {
+  if (!dateString) return 'Não definida';
+  
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Data inválida';
+    
+    const adjustedDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
+    
+    const day = String(adjustedDate.getUTCDate()).padStart(2, '0');
+    const month = String(adjustedDate.getUTCMonth() + 1).padStart(2, '0');
+    const year = adjustedDate.getUTCFullYear();
+    
+    return `${day}/${month}/${year}`;
+  } catch (error) {
+    console.error('Erro ao formatar data:', error);
+    return 'Data inválida';
+  }
+};
+
+const formatDateTime = (dateString: string | null): string => {
+  if (!dateString) return 'Não definida';
+  
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Data inválida';
+    
+    const adjustedDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
+    
+    const day = String(adjustedDate.getUTCDate()).padStart(2, '0');
+    const month = String(adjustedDate.getUTCMonth() + 1).padStart(2, '0');
+    const year = adjustedDate.getUTCFullYear();
+    
+    return `${day}/${month}/${year}`;
+  } catch (error) {
+    console.error('Erro ao formatar data/hora:', error);
+    return 'Data inválida';
+  }
+};
+
+  const formatCurrency = (value: number | string | undefined | null): string => {
+    if (value === undefined || value === null) return "R$ 0,00";
+    
+    const num = typeof value === 'string' ? parseFloat(value) : value;
+    
+    if (isNaN(num)) return "R$ 0,00";
+    
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(num);
   };
 
   const handleMarkAsDelivered = async () => {
@@ -75,122 +125,139 @@ export default function CardOrder({
       'READY_FOR_DELIVERY': 'Pronto para Entrega',
       'PRODUCTION_COMPLETE': 'Produção Concluída',
       'DELIVERED': 'Entregue',
-      'CANCELLED': 'Cancelada'
+      'CANCELLED': 'Cancelado'
     };
     return statusMap[status] || status;
   };
 
-  const formatTotal = (total: number | string | undefined) => {
-    if (typeof total === "number") {
-      return `R$ ${total.toFixed(2)}`;
-    }
-    if (typeof total === "string") {
-      const num = parseFloat(total);
-      return `R$ ${isNaN(num) ? "0.00" : num.toFixed(2)}`;
-    }
-    return "R$ 0.00";
-  };
-
   return (
-    <div className={styles.container}>
-      <h3 className={styles.title}>
-        Pedido #{String(order.id).padStart(4, "0")}
-      </h3>
+    <div className={styles.card}>
+      <div className={styles.cardHeader}>
+        <h3 className={styles.cardTitle}>
+          Pedido #{String(order.id).padStart(4, "0")}
+        </h3>
+        <div 
+          className={styles.statusBadge}
+          style={{ 
+            backgroundColor: `${getStatusColor(order.status)}15`,
+            border: `1px solid ${getStatusColor(order.status)}`,
+            color: getStatusColor(order.status),
+          }}
+        >
+          {formatStatus(order.status)}
+        </div>
+      </div>
 
-      <div className={styles.info}>
-        <p>
-          <strong>Cliente:</strong>{" "}
-          {order.customer?.name || `ID: ${order.customerId}`}
-        </p>
+      <div className={styles.cardBody}>
+        <div className={styles.infoGrid}>
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Cliente:</span>
+            <span className={styles.infoValue}>
+              {order.customer?.name || `ID: ${order.customerId}`}
+            </span>
+          </div>
 
-        {order.notes && (
-          <p>
-            <strong>Observações:</strong> {order.notes}
-          </p>
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Data do pedido:</span>
+            <span className={styles.infoValue}>
+              {formatDisplayDate(order.orderDate?.toString() || null)}
+            </span>
+          </div>
+
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Data de entrega:</span>
+            <span className={styles.infoValue}><strong>{formatDisplayDate(order.deliveryDate?.toString() || null)}</strong>
+              
+            </span>
+          </div>
+
+          {order.discount !== 0 && (
+            <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>Desconto:</span>
+              <span className={styles.discountValue}>{formatCurrency(order.discount)}</span>
+            </div>
+          )}
+
+          {order.notes && (
+            <div className={styles.fullWidthItem}>
+              <span className={styles.infoLabel}>Observações:</span>
+              <span className={styles.infoValue}>{order.notes}</span>
+            </div>
+          )}
+
+          {order.items && order.items.length > 0 && (
+            <div className={styles.fullWidthItem}>
+              <span className={styles.infoLabel}>Itens:</span>
+              <div className={styles.itemsList}>
+                {order.items.map((item, index) => {                  
+                  return (
+                    <div key={index} className={styles.item}>
+                      <span className={styles.itemQuantity}>{item.quantity}x</span>
+                      <span className={styles.itemName}>
+                        {item.product?.name}
+                      </span>
+                      <span className={styles.itemPrice}>
+                        {formatCurrency(item.unitPrice)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className={styles.totalItem}>
+            <span className={styles.totalLabel}>Total:</span>
+            <span className={styles.totalValue}>
+              {formatCurrency(order.total)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.cardFooter}>
+        {order.status === "READY_FOR_DELIVERY" && (onStatusUpdate || onDeliveredClick) && (
+          <div className={styles.deliverySection}>
+            <button
+              onClick={handleMarkAsDelivered}
+              className={styles.deliveredButton}
+              disabled={(isUpdating && !onDeliveredClick) || loading} 
+            >
+              {isUpdating && !onDeliveredClick ? "Confirmando..." : "Marcar como Entregue"}
+            </button>
+            <small className={styles.deliveryHelpText}>
+              Clique para confirmar que o pedido foi entregue ao cliente
+            </small>
+          </div>
         )}
 
-        <p>
-          <strong>Status: </strong>
-          <span 
-            className={styles.status} 
-            style={{ 
-              border: `2px solid ${getStatusColor(order.status)}`, 
-              color: getStatusColor(order.status),
-            }}
-          >
-            {formatStatus(order.status)}
-          </span>
-        </p>
-        <p>
-          <strong>Total:</strong> {formatTotal(order.total)}
-        </p>
-        <p>
-          <strong>Data de criação pedido:</strong> {formatDate(order.orderDate)}
-        </p>
+        {order.status === "DELIVERED" && (
+          <div className={styles.deliveredSection}>
+            <div className={styles.deliveredBadge}>
+              <CheckCircleIcon size={20} color="green" weight="fill" />
+              <span>Pedido Entregue</span>
+            </div>
+            <small className={styles.deliveredDate}>
+              Entregue em: {formatDateTime(order.updatedAt?.toString() || null)}
+            </small>
+          </div>
+        )}
 
-        <p>
-          <strong>Data de entrega:</strong> {formatDate(order.deliveryDate)}
-        </p>
-
-
-        {order.items && order.items.length > 0 && (
-          <div className={styles.items}>
-            <strong>Itens:</strong>
-            <ul>
-              {order.items.map((item, index) => (
-                <li key={index}>
-                  {item.quantity}x {item.product?.name} - R${" "}
-                  {typeof item.unitPrice === "number"
-                    ? item.unitPrice.toFixed(2)
-                    : "0.00"}
-                </li>
-              ))}
-            </ul>
+        {actions && actions.length > 0 && (
+          <div className={styles.actionsSection}>
+            {actions.map((action, idx) => (
+              <button
+                key={idx}
+                onClick={action.onClick}
+                className={`${styles.actionButton} ${styles[action.variant ?? ""]}`}
+                disabled={loading}
+              >
+                {action.label}
+              </button>
+            ))}
           </div>
         )}
       </div>
-
-      {order.status === "READY_FOR_DELIVERY" && (onStatusUpdate || onDeliveredClick) && (
-        <div className={styles.deliveryAction}>
-          <button
-            onClick={handleMarkAsDelivered}
-            className={styles.deliveredButton}
-            disabled={(isUpdating && !onDeliveredClick) || loading} 
-          >
-            {isUpdating && !onDeliveredClick ? "Confirmando..." : "Entregue"}
-          </button>
-          <small className={styles.deliveryHelpText}>
-            Clique para confirmar que o pedido foi entregue ao cliente
-          </small>
-        </div>
-      )}
-
-      {order.status === "DELIVERED" && (
-        <div className={styles.deliveredContainer}>
-          <div className={styles.deliveredBadge}>
-            <CheckCircleIcon size={20} color="green" weight="fill" />
-            <span>Pedido Entregue</span>
-          </div>
-          <small className={styles.deliveredDate}>
-            <strong>Entregue em: {formatDate(order.updatedAt)}</strong>
-          </small>
-        </div>
-      )}
-
-      {actions && actions.length > 0 && (
-        <div className={styles.actions}>
-          {actions.map((action, idx) => (
-            <button
-              key={idx}
-              onClick={action.onClick}
-              className={styles.button}
-              disabled={loading}
-            >
-              {action.label}
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

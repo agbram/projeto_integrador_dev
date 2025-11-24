@@ -4,7 +4,7 @@ import { useState } from "react"
 import styles from "./styles.module.css"
 import ButtonCancelar from "@/components/Buttons/ButtonCancel"
 
-export type FormData = Record<string, string | File | Date | Number>;
+export type FormData = Record<string, string | File | Date | Number >;
 
 type Field = {
   name: string
@@ -16,7 +16,8 @@ type Field = {
   readOnly?: boolean 
   disabled?: boolean 
   placeholder?: string
-  max?: number
+  max?: number | string
+  min?: number | string
 }
 
 type FormProps = {
@@ -90,46 +91,53 @@ export default function Card({
       {title && <h2 className={styles.title}>{title}</h2>}
 
       <form className={styles.form} onSubmit={handleSubmit}>
-        {fields.map(field => {
-          const value = formData[field.name] !== undefined ? formData[field.name] : field.value || "";
-          const isReadOnly = field.readOnly; 
-          const isDisabled = loading || disabled || field.disabled; 
-          const isPlaceholder = field.placeholder;
-          const isMax = field.max;
-          
-          return (
-            <label key={field.name}>
-              {field.label}:
-              {field.type === 'select' && field.options ? (
-                <select
-                  name={field.name}
-                  value={value.toString()}
-                  onChange={handleChange}
-                  required
-                  disabled={isDisabled || isReadOnly} 
-                >
-                  <option value="">Selecione uma opção</option>
-                  {field.options.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  type={field.type || "text"}
-                  name={field.name}
-                  value={field.type === 'file' ? undefined : value.toString()}
-                  onChange={handleChange}
-                  disabled={isDisabled}
-                  readOnly={isReadOnly}
-                  className={isReadOnly ? styles.readOnlyInput : ''} 
-                />
-              )}
-              <br />
-            </label>
-          )
-        })}
+        <div className={styles.fieldsGrid}>
+          {fields.map(field => {
+            const value = formData[field.name] !== undefined ? formData[field.name] : field.value || "";
+            const isReadOnly = field.readOnly; 
+            const isDisabled = loading || disabled || field.disabled; 
+            
+            return (
+              <div key={field.name} className={styles.fieldGroup}>
+                {field.label && (
+                  <label className={styles.label}>
+                    {field.label}
+                  </label>
+                )}
+                {field.type === 'select' && field.options ? (
+                  <select
+                    name={field.name}
+                    value={value.toString()}
+                    onChange={handleChange}
+                    required
+                    disabled={isDisabled || isReadOnly}
+                    className={styles.select}
+                  >
+                    <option value="">Selecione uma opção</option>
+                    {field.options.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type={field.type || "text"}
+                    name={field.name}
+                    value={field.type === 'file' ? undefined : value.toString()}
+                    onChange={handleChange}
+                    disabled={isDisabled}
+                    readOnly={isReadOnly}
+                    placeholder={field.placeholder}
+                    max={field.max}
+                    min={field.min}
+                    className={`${styles.input} ${isReadOnly ? styles.readOnlyInput : ''}`}
+                  />
+                )}
+              </div>
+            )
+          })}
+        </div>
 
         {additionalInfo && (
           <div className={styles.additionalInfo}>
@@ -147,7 +155,7 @@ export default function Card({
           )}
           {showCancel && onCancel && (
             <ButtonCancelar
-              CancelLabel="Voltar"
+              CancelLabel="Cancelar"
               onClick={onCancel}
               variant="cancelLight"
             />
@@ -155,7 +163,7 @@ export default function Card({
           
           <button 
             type="submit" 
-            className={styles.button}
+            className={styles.submitButton}
             disabled={loading || disabled}
           >
             {loading ? "Verificando..." : submitLabel}  

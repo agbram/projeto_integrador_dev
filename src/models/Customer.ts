@@ -8,6 +8,7 @@ type Customer = {
   email: string
   address: string
   modality: string
+  ordersCount?: number;
 }
 
 export enum CustomerType{

@@ -8,37 +8,32 @@ import PagesWallpaper from "@/components/PagesWallpaper";
 import Header from "@/components/Navigation/Header";
 import { PageActionProvider } from "@/contexts/PageActions";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Sant'Sapore • Central",
   description: "Sistema Central de Gestão da confeitaria Sant'Sapore",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-br">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
           <PrivateRouter>
             <PageActionProvider>
+
+              {/* HeaderSizer é client e atualiza --header-height */}
               <Header />
+
               <PagesWallpaper />
-              {children}
+
+              <div className="pageWrapper">
+                {children}
+              </div>
+
+
             </PageActionProvider>
           </PrivateRouter>
         </AuthProvider>

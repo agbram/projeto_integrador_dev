@@ -101,5 +101,11 @@
   --color-text-gray: #cfcfcf;
   --color-green-primary: #0e8f69;
   --color-green-medium: #17a87c;
-  --color-green-light: #73d0b1;
+    
 }
+
+.pageWrapper {
+  padding-top: var(--header-height, 80px);
+}
+
+

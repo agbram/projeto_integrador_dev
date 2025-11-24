@@ -1,31 +1,6 @@
-.modalProdutos,
-.successProdutosModal,
-.warningProdutosModal {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+/* ===== CONTAINER PRINCIPAL E CARDS ===== */
 
-.modalProdutosBody,
-.successProdutosBody,
-.warningProdutosBody {
-  background-color: var(--color-bg);
-  padding: 2rem;
-}
-
-.divContainerCliente{
-  display: flex;
-  flex-direction: row;
-  margin-top: 20px;
-}
-
-.modalWarningFooter{
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    justify-items: center;
-}
-
-
-.containerPrincipal{
+.containerPrincipal {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -37,105 +12,390 @@
   margin: 10px auto;
 }
 
-.modalProdutosFooter {
-  background-color: #D9C6A3;
-  border-top: 1px solid #c2b292;
-  padding: 1rem 2rem;
-}
-
-.modalProdutosButton,
-.successProdutosButton,
-.warningProdutosButton {
-  background-color: var(--color-btn-bg);
-  border: var(--color-btn-border);
-  color: var(--color-btn-text);
-  padding: 0.5rem 1.5rem;
-  font-weight: 600;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.modalProdutosButton:hover,
-.successProdutosButton:hover,
-.warningProdutosButton:hover {
-  background-color: var(--color-btn-hover-bg);
-  color: var(--color-btn-hover-text);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-medium);
-}
-
-.successProdutosIconContainer,
-.warningProdutosIconContainer {
+.divContainerCliente {
   display: flex;
-  justify-content: center;
+  flex-direction: row;
+  margin-top: 20px;
 }
 
-.successProdutosIcon {
-  font-size: 48px;
-  color: var(--color-success);
-  font-weight: bold;
+/* ===== MODALS PROFISSIONAIS PARA PRODUTOS ===== */
+
+/* Base comum para todos os modals */
+.modalProdutos,
+.successProdutosModal,
+.warningProdutosModal {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.successProdutosTitle,
-.warningProdutosTitle {
-  color: var(--color-primary);
-  font-weight: 600;
-  margin-bottom: 0;
+/* Overlay do modal */
+.modalProdutos :global(.modal-backdrop),
+.successProdutosModal :global(.modal-backdrop),
+.warningProdutosModal :global(.modal-backdrop) {
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
 }
 
-.warningProdutosMessage {
-  color: var(--color-muted);
-  margin-bottom: 0;
-  line-height: 1.5;
-}
-
-.modalProdutosCard {
-  background: var(--color-bg);
+.modalProdutos :global(.modal-content),
+.successProdutosModal :global(.modal-content),
+.warningProdutosModal :global(.modal-content) {
   border: none;
-  border-radius: 10px;
-  box-shadow: var(--shadow-soft);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
 
-.modalProdutosCardTitle {
-  color: var(--color-primary);
-  font-weight: 700;
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
+/* Header do modal com degradê azul e título centralizado */
+.modalProdutosHeader {
+  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+  padding: 1.25rem 1.5rem;
+  text-align: center;
 }
 
-:global(.modalProdutos) .modal-content {
-  border: none;
-  border-radius: 10px;
-  box-shadow: var(--shadow-strong);
+.modalProdutos :global(.modal-header),
+.successProdutosModal :global(.modal-header),
+.warningProdutosModal :global(.modal-header) {
+  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
 }
 
-:global(.modalProdutos) .modal-header {
-  border-bottom: 1px solid var(--color-border);
-  background: linear-gradient(90deg, var(--color-header-grad-start), var(--color-header-grad-end));
-  color: var(--color-on-header);
-  border-radius: 10px 10px 0 0;
-  padding: 1rem 1.25rem;
+.modalProdutosTitle {
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin: 0;
+  text-align: center;
+  flex: 1;
 }
 
-:global(.modalProdutos) .modal-header .btn-close {
+.modalProdutos :global(.modal-header .btn-close),
+.successProdutosModal :global(.modal-header .btn-close),
+.warningProdutosModal :global(.modal-header .btn-close) {
   filter: invert(1);
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+  position: absolute;
+  right: 1.5rem;
+  margin: 0;
 }
 
-.modalProdutos .icon-center,
-.successProdutosIconContainer,
+.modalProdutos :global(.modal-header .btn-close:hover),
+.successProdutosModal :global(.modal-header .btn-close:hover),
+.warningProdutosModal :global(.modal-header .btn-close:hover) {
+  opacity: 1;
+}
+
+/* Body do modal */
+.modalProdutosBody,
+.successProdutosBody,
+.warningProdutosBody {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 0 0 12px 12px;
+}
+
+.modalBodyEdit {
+  background-color: #f8f9fa;
+  padding: 2rem;
+  border-radius: 0 0 12px 12px;
+}
+
+/* ===== MODAL DE SUCESSO ===== */
+.successProdutosModal :global(.modal-content) {
+  border: 1px solid #d1e7dd;
+  max-width: 400px;
+}
+
+.successProdutosIconContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.successProdutosIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background-color: #10b981;
+  color: white;
+  border-radius: 50%;
+  font-size: 1.8rem;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.successProdutosTitle {
+  color: #065f46;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.successProdutosBody {
+  padding: 1.5rem;
+}
+
+.successProdutosFooter {
+  border-top: 1px solid #d1e7dd;
+  background-color: #f8f9fa;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== MODAL DE AVISO/ALERTA ===== */
+.warningProdutosModal :global(.modal-content) {
+  border: 1px solid #fecaca;
+  max-width: 400px;
+}
+
 .warningProdutosIconContainer {
   display: flex;
   justify-content: center;
-  align-items: center;
+  margin-bottom: 1rem;
 }
 
-.modalProdutosFooter .actions,
-.successProdutosFooter .actions,
-.warningProdutosFooter .actions {
+.warningProdutosIcon {
   display: flex;
-  gap: 0.75rem;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background-color: #dc2626;
+  color: white;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.warningProdutosTitle {
+  color: #991b1b;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.warningProdutosMessage {
+  color: #dc2626;
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+
+.warningProdutosBody {
+  padding: 1.5rem;
+}
+
+.warningProdutosFooter {
+  border-top: 1px solid #fecaca;
+  background-color: #fefefe;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== MODAL DE DELETE ===== */
+.modalWarningFooter {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  align-items: center;
+  border-top: 1px solid #f8d7da;
+  background-color: #fefefe;
+  padding: 1.25rem 2rem;
+}
+
+/* ===== BOTÕES ===== */
+.successProdutosButton,
+.warningProdutosButton {
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 0.9rem;
+  min-width: 100px;
+}
+
+/* Botão de sucesso */
+.successProdutosButton {
+  background-color: #10b981;
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.successProdutosButton:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+/* Botão de warning */
+.warningProdutosButton {
+  background-color: #dc2626;
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.warningProdutosButton:hover {
+  background-color: #b91c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+}
+
+/* ===== BOTÕES DO BOOTSTRAP ===== */
+.modalProdutos :global(.btn),
+.successProdutosModal :global(.btn),
+.warningProdutosModal :global(.btn) {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.modalProdutos :global(.btn-primary) {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  color: white;
+  font-weight: 600;
+}
+
+.modalProdutos :global(.btn-primary:hover) {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+}
+
+.modalProdutos :global(.btn-danger) {
+  background-color: #dc2626;
+  border-color: #dc2626;
+  font-weight: 600;
+}
+
+.modalProdutos :global(.btn-danger:hover) {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2);
+}
+
+.modalProdutos :global(.btn-outline) {
+  border: 1px solid #d1d5db;
+  color: #374151;
+  background-color: transparent;
+  font-weight: 500;
+}
+
+.modalProdutos :global(.btn-outline:hover) {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+  color: #111827;
+}
+
+/* ===== ANIMAÇÕES ===== */
+.modalProdutos :global(.modal),
+.successProdutosModal :global(.modal),
+.warningProdutosModal :global(.modal) {
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .modalProdutosBody,
+  .successProdutosBody,
+  .warningProdutosBody,
+  .modalBodyEdit {
+    padding: 1.5rem;
+  }
+  
+  .containerPrincipal {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .divContainerCliente {
+    flex-direction: column;
+  }
+  
+  .modalWarningFooter {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .successProdutosButton,
+  .warningProdutosButton {
+    min-width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .successProdutosIcon,
+  .warningProdutosIcon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+  
+  .modalProdutos :global(.modal-header),
+  .successProdutosModal :global(.modal-header),
+  .warningProdutosModal :global(.modal-header) {
+    padding: 1rem 1.25rem;
+  }
+  
+  .successProdutosModal :global(.modal-content),
+  .warningProdutosModal :global(.modal-content) {
+    max-width: 90%;
+    margin: 0 auto;
+  }
+  
+  .modalProdutosTitle {
+    font-size: 1.1rem;
+  }
+}
+
+/* ===== ESTADOS DE CARREGAMENTO ===== */
+.modalProdutos :global(.btn:disabled),
+.successProdutosModal :global(.btn:disabled),
+.warningProdutosModal :global(.btn:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ===== ESTILOS EXISTENTES MANTIDOS ===== */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  margin-top: 220px;
+  justify-content: center;
   align-items: center;
 }

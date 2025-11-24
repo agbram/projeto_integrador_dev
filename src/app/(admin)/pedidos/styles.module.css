@@ -28,18 +28,18 @@
   left: 14px;
   transform: translateY(-50%);
   color: #777;
-  pointer-events: none; /* Ícone apenas decorativo */
+  pointer-events: none;
+  transition: color 0.2s ease;
 }
 
 .searchInput {
   width: 100%;
-  max-width: 420px;
   padding: 12px 16px 12px 42px; /* espaço pro ícone */
   border-radius: 10px;
   border: 2px solid #ddd;
   font-size: 16px;
   outline: none;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   background-color: #fff;
 }
@@ -53,6 +53,10 @@
   box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
 }
 
+.searchInput:focus ~ .searchIcon {
+  color: #007bff;
+}
+
 /* ======== RESULTADOS DA BUSCA ======== */
 .containerResults {
   width: 100%;
@@ -60,23 +64,18 @@
   border: 1px solid #ddd;
   border-top: none;
   border-radius: 0 0 10px 10px;
-  overflow: hidden;
   background: #fff;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   position: relative;
   margin-top: 4px;
-  height: 40px;
-  min-height: calc(5 * 40px); /* 40px = altura de cada item (ajuste se necessário) */
 
-  /* 👇 NOVO — ativa barra de rolagem */
-  max-height: calc(7 * 40px); /* opcional: exibe 7 itens antes de rolar */
+  /* Ajuste de altura dinâmica */
+  max-height: calc(7 * 40px); /* exibe até 7 itens antes de rolar */
   overflow-y: auto;
-
 }
 
 .searchResults {
-  width: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -85,6 +84,9 @@
   padding: 12px 16px;
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .searchItem:not(:last-child) {
@@ -94,6 +96,29 @@
 .searchItem:hover {
   background-color: #007bff;
   color: #fff;
+}
+
+.searchItemContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.searchItemAdd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.addIcon {
+  color: #007bff;
+  transition: transform 0.2s ease;
+}
+
+.searchItem:hover .addIcon {
+  color: #fff;
+  transform: scale(1.1);
 }
 
 /* ======== RESULTADO VAZIO ======== */
@@ -108,7 +133,7 @@
 .modalPedidosBody {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 24px;
   padding: 24px;
   background-color: #f9fafb;
 }
@@ -150,6 +175,11 @@
   font-weight: 500;
 }
 
+.productPrice {
+  font-size: 14px;
+  color: #555;
+}
+
 .quantityControls {
   display: flex;
   align-items: center;
@@ -166,7 +196,7 @@
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease;
 }
 
 .btnQuantity:hover {
@@ -180,12 +210,68 @@
   font-weight: 500;
 }
 
+.selectedProductItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.itemTotal {
+  font-weight: 600;
+  color: #333;
+}
+
+.partialTotal {
+  text-align: right;
+  font-size: 16px;
+  margin-top: 8px;
+}
+
+/* ======== AÇÕES ======== */
 .productsActions {
   display: flex;
   justify-content: space-between;
   width: 100%;
   max-width: 480px;
   margin-top: 20px;
+}
+
+/* ======== RESUMO DO PEDIDO ======== */
+.orderSummaryContainer {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.orderSummaryToggle {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.orderSummaryToggle:hover {
+  color: #0056b3;
+}
+
+.orderSummaryCard {
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 12px 16px;
+}
+
+.orderItem {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #444;
 }
 
 /* ======== RESPONSIVIDADE ======== */
@@ -203,7 +289,8 @@
     padding: 10px 12px;
   }
 
-  .productItem {
+  .productItem,
+  .selectedProductItem {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
@@ -225,15 +312,10 @@
 }
 
 /* ======== EFEITOS ADICIONAIS ======== */
-.searchInput:focus + .searchIcon {
-  color: #007bff;
-}
-
-.modalWarningFooter{
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    justify-items: center;
+.modalWarningFooter {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
 }
 
 .emptyState {
@@ -242,4 +324,140 @@
   margin-top: 220px;
   justify-content: center;
   align-items: center;
+}
+
+.editButton {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Estilos específicos para os botões com ícones */
+.botaocancelar,
+.botaoeditar,
+.botaonotafiscal {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  padding: 4px 0;
+}
+
+/* Mantenha os estilos existentes dos botões principais */
+.actionsSection {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.actionButton {
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-size: 0.9rem;
+  min-width: 140px;
+  border: 2px solid transparent;
+  background: #f8f9fa; /* Cor de fundo neutra para os botões */
+  
+}
+
+.actionButton:hover:not(:disabled) {
+  background: #e9ecef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.actionButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Estilos para a seção de desconto */
+.discountSection {
+  margin: 15px 0;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.discountLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.discountInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.currencySymbol {
+  font-weight: 600;
+  color: #495057;
+}
+
+.discountInput {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.discountInput:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.totalLine {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  padding: 5px 0;
+}
+
+.discountText {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.orderDiscount {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #dee2e6;
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.finalTotal {
+  display: flex;
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 2px solid #007bff;
+  justify-content: flex-end;
+  font-size: 18px;
+}
+
+.containerPrincipal {
+  padding: 16px;
+  transition: all 0.3s ease;
+}
+
+.divContainerCliente {
+  transition: all 0.3s ease;
+  margin-bottom: 16px;
+}
+
+.divContainerCliente:hover {
+  transform: translateY(-2px);
 }

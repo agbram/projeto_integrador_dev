@@ -3,21 +3,28 @@ import styles from "./styles.module.css";
 import { Image } from "react-bootstrap";
 import { HeartIcon } from "@phosphor-icons/react";
 
-
 export default function TopBar({
-  brand = "Sant'Sapore",
-  onProfileClick = () => {},
+  logoSrc = "/logo.png",      // ajuste como quiser
+  onProfileClick = () => { },
 }) {
   return (
     <div className={styles.topbar}>
-      <div className={styles.brand}>
-        <div className={styles.logoCircle} aria-hidden="true">
-         <HeartIcon size={30} color="#FF6B6B" weight="fill" />
-       
-        </div>
-        <span className={styles.brandText}>{brand}</span>
+
+      <div className={styles.circleHeart}>
+        <HeartIcon weight="fill" />
       </div>
 
+
+      {/* Área da logo */}
+      <div className={styles.logoArea}>
+        <img
+          src="/imgs/logoTopbar.png"
+          alt="Logo"
+          className={styles.logoImg}
+        />
+      </div>
+
+      {/* Botão de perfil */}
       <button
         className={styles.profileBtn}
         onClick={onProfileClick}
@@ -28,7 +35,6 @@ export default function TopBar({
           src="https://i.pravatar.cc/40"
           alt="perfil"
         />
-        
       </button>
     </div>
   );

@@ -1,22 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { XIcon, Info } from "@phosphor-icons/react";
+import { XIcon, InfoIcon } from "@phosphor-icons/react";
 import styles from "./styles.module.css";
+import Product from "@/models/Product";
 
 type Action = {
   label: string;
   onClick(): void;
-};
-
-type Product = {
-  name: string;
-  fotoUrl?: string;
-  description?: string;
-  costPrice?: number;
-  markupPercent?: number;
-  category?: string;
-  salePrice?: number;
 };
 
 type CardProductProps = {
@@ -32,17 +23,54 @@ export default function CardProduto({
   loading = false,
   actions,
 }: CardProductProps) {
-  const urlBase = "http://localhost:4000";
-  const imageSrc = products.fotoUrl ? `${urlBase}${products.fotoUrl}` : "/placeholder.png";
+  const API_URL = "http://localhost:4000"; // URL do backend
   const [isMobile, setIsMobile] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+const getImageUrl = (fotoUrl: string | undefined | null): string => {
+  if (!fotoUrl) {
+    return "/placeholder.png";
+  }
+
+  console.log("📸 Foto URL do banco:", fotoUrl);
+
+  // Se já tem http (de algum teste)
+  if (fotoUrl.includes('http://') || fotoUrl.includes('https://')) {
+    // Corrige porta 3000 para 4000
+    return fotoUrl.replace('localhost:3000', 'localhost:4000').replace(':3000', ':4000');
+  }
+
+  // Remove qualquer prefixo /imagens/ se existir
+  const nomeArquivo = fotoUrl.replace(/^\/?imagens\//, '');
+  
+  // Retorna URL completa
+  return `http://localhost:4000/imagens/${nomeArquivo}`;
+};
+
+  const imageSrc = getImageUrl(products.fotoUrl);
+
+  // DEBUG: Log para verificar
+  useEffect(() => {
+    console.log("=== DEBUG IMAGEM ===");
+    console.log("Produto:", products.name);
+    console.log("Foto URL do banco:", products.fotoUrl);
+    console.log("URL construída:", imageSrc);
+    
+    // Testa se a imagem carrega
+    if (products.fotoUrl) {
+      const img = new Image();
+      img.onload = () => console.log("✅ Teste: Imagem carrega OK");
+      img.onerror = () => console.log("❌ Teste: Imagem NÃO carrega");
+      img.src = imageSrc;
+    }
+  }, [products, imageSrc]);
 
   // Detecta se é mobile
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -67,13 +95,29 @@ export default function CardProduto({
         {/* Imagem do produto */}
         <div className={styles.imageContainer}>
           <img
-            src={imageSrc}
+            src={imageError ? "/placeholder.png" : imageSrc}
             alt={products.name}
             className={styles.cardImage}
+            onError={(e) => {
+              console.error("❌ Erro ao carregar imagem:", imageSrc);
+              setImageError(true);
+              e.currentTarget.src = "/placeholder.png";
+              
+              // Tenta alternativa
+              if (products.fotoUrl && !products.fotoUrl.startsWith('/imagens/')) {
+                const altUrl = `${API_URL}/imagens/${products.fotoUrl}`;
+                console.log("🔄 Tentando URL alternativa:", altUrl);
+                e.currentTarget.src = altUrl;
+              }
+            }}
+            onLoad={() => {
+              console.log("✅ Imagem carregada com sucesso:", imageSrc);
+              setImageError(false);
+            }}
           />
           {isMobile && (
             <div className={styles.mobileOverlay}>
-              <Info size={20} className={styles.infoIcon} />
+              <InfoIcon size={20} className={styles.infoIcon} />
               <span>Toque para detalhes</span>
             </div>
           )}
@@ -178,9 +222,10 @@ export default function CardProduto({
             <div className={styles.sidebarContent}>
               <div className={styles.sidebarImage}>
                 <img
-                  src={imageSrc}
+                  src={imageError ? "/placeholder.png" : imageSrc}
                   alt={products.name}
                   className={styles.sidebarImg}
+                  onError={() => setImageError(true)}
                 />
               </div>
 

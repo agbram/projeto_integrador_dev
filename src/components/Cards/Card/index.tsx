@@ -1,16 +1,17 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import styles from "./styles.module.css"
 import ButtonCancelar from "@/components/Buttons/ButtonCancel"
 
-export type FormData = Record<string, string | File | Date | Number >;
+// Atualize o tipo FormData para aceitar number (primitivo)
+export type FormData = Record<string, string | File | Date | number | null | undefined>;
 
 type Field = {
   name: string
   label?: string
   type?: string
-  value?: string
+  value?: string | number | null
   options?: { value: string; label: string }[]
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
   readOnly?: boolean 
@@ -18,6 +19,8 @@ type Field = {
   placeholder?: string
   max?: number | string
   min?: number | string
+  condition?: (data: any) => boolean;
+  step?: string
 }
 
 type FormProps = {
@@ -33,6 +36,7 @@ type FormProps = {
   onDelete?: () => void
   onChange?: (name: string, value: string) => void
   additionalInfo?: React.ReactNode
+  defaultValues?: FormData
 }
 
 export default function Card({ 
@@ -47,44 +51,78 @@ export default function Card({
   onCancel,
   onDelete,
   onChange,
-  additionalInfo
+  additionalInfo,
+  defaultValues = {}
 }: FormProps) {
-  const [formData, setFormData] = useState<FormData>({})
+  const [formData, setFormData] = useState<FormData>(() => {
+    const initialData: FormData = {};
+    fields.forEach(field => {
+      if (field.value !== undefined && field.value !== null) {
+        initialData[field.name] = field.value;
+      }
+    });
+    return { ...initialData, ...defaultValues };
+  });
+
+  useEffect(() => {
+    if (Object.keys(defaultValues).length > 0) {
+      setFormData(prev => ({ ...prev, ...defaultValues }));
+    }
+  }, [defaultValues]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
+    const { name, value, type } = e.target;
     
     const fieldConfig = fields.find(field => field.name === name);
     if (fieldConfig?.readOnly) {
       return;
     }
     
+    let newValue: string | File | number | null | undefined;
+    
     if (e.target instanceof HTMLInputElement && e.target.files) {
       const files = e.target.files;
       const file = files[0];
-      setFormData(prev => ({ ...prev, [name]: file }))
+      newValue = file;
+    } else if (type === 'number') {
+      // Para campos numéricos, converte para número ou null se vazio
+      newValue = value === '' ? null : parseFloat(value);
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }))
+      newValue = value;
     }
+    
+    setFormData(prev => ({ ...prev, [name]: newValue }));
 
     if (onChange) {
-      onChange(name, value)
+      onChange(name, value);
     }
   }
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     
-    const submittedData = { ...formData }
-    fields.forEach(field => {
-      const fieldNaoFoiAlterado = submittedData[field.name] === undefined;
-      if (fieldNaoFoiAlterado && field.value !== undefined) {
-        submittedData[field.name] = field.value 
+    const filteredData: FormData = {};
+    Object.keys(formData).forEach(key => {
+      const field = fields.find(f => f.name === key);
+      if (!field || !field.condition || field.condition(formData)) {
+        filteredData[key] = formData[key];
       }
-    })
-    console.log(submittedData)
-    onSubmit(submittedData)
+    });
+    
+    fields.forEach(field => {
+      if (filteredData[field.name] === undefined && field.value !== undefined) {
+        filteredData[field.name] = field.value;
+      }
+    });
+    
+    console.log('Dados submetidos:', filteredData);
+    onSubmit(filteredData);
   }
+
+  const visibleFields = fields.filter(field => {
+    if (!field.condition) return true;
+    return field.condition(formData);
+  });
 
   return (
     <div className={styles.container}>
@@ -92,24 +130,41 @@ export default function Card({
 
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.fieldsGrid}>
-          {fields.map(field => {
-            const value = formData[field.name] !== undefined ? formData[field.name] : field.value || "";
+          {visibleFields.map(field => {
+            const value = formData[field.name] !== undefined 
+              ? formData[field.name] 
+              : field.value !== undefined 
+                ? field.value 
+                : "";
+            
             const isReadOnly = field.readOnly; 
             const isDisabled = loading || disabled || field.disabled; 
+            
+            // Para inputs que não são file, precisamos converter para string
+            const stringValue = value === null || value === undefined 
+              ? "" 
+              : typeof value === 'number' 
+                ? value.toString() 
+                : value instanceof Date 
+                  ? value.toISOString().split('T')[0] // Para date inputs
+                  : typeof value === 'string'
+                    ? value
+                    : "";
             
             return (
               <div key={field.name} className={styles.fieldGroup}>
                 {field.label && (
-                  <label className={styles.label}>
+                  <label className={styles.label} htmlFor={field.name}>
                     {field.label}
                   </label>
                 )}
                 {field.type === 'select' && field.options ? (
                   <select
+                    id={field.name}
                     name={field.name}
-                    value={value.toString()}
+                    value={stringValue}
                     onChange={handleChange}
-                    required
+                    required={false}
                     disabled={isDisabled || isReadOnly}
                     className={styles.select}
                   >
@@ -120,22 +175,34 @@ export default function Card({
                       </option>
                     ))}
                   </select>
+                ) : field.type === 'file' ? (
+                  <input
+                    id={field.name}
+                    type="file"
+                    name={field.name}
+                    onChange={handleChange}
+                    disabled={isDisabled}
+                    className={styles.input}
+                    accept="image/*"
+                  />
                 ) : (
                   <input
+                    id={field.name}
                     type={field.type || "text"}
                     name={field.name}
-                    value={field.type === 'file' ? undefined : value.toString()}
+                    value={stringValue}
                     onChange={handleChange}
                     disabled={isDisabled}
                     readOnly={isReadOnly}
                     placeholder={field.placeholder}
                     max={field.max}
                     min={field.min}
+                    step={field.step || (field.type === 'number' ? '0.01' : undefined)}
                     className={`${styles.input} ${isReadOnly ? styles.readOnlyInput : ''}`}
                   />
                 )}
               </div>
-            )
+            );
           })}
         </div>
 
@@ -151,6 +218,7 @@ export default function Card({
               CancelLabel="Desativar"
               onClick={onDelete}
               variant="outline"
+              disabled={loading || disabled}
             />
           )}
           {showCancel && onCancel && (
@@ -158,6 +226,7 @@ export default function Card({
               CancelLabel="Cancelar"
               onClick={onCancel}
               variant="cancelLight"
+              disabled={loading}
             />
           )}
           
@@ -171,5 +240,5 @@ export default function Card({
         </div>
       </form>
     </div>
-  )
+  );
 }

@@ -101,8 +101,30 @@
   --color-text-gray: #cfcfcf;
   --color-green-primary: #0e8f69;
   --color-green-medium: #17a87c;
-    
+
+  --precificacao-primary-gradient: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+  --precificacao-secondary-gradient: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+  --precificacao-success-gradient: linear-gradient(135deg, var(--color-success) 0%, var(--color-green-primary) 100%);
+  --precificacao-warning-gradient: linear-gradient(135deg, var(--color-accent-dark) 0%, var(--color-accent) 100%);
+  --precificacao-danger-gradient: linear-gradient(135deg, var(--color-danger) 0%, var(--color-danger-dark) 100%);
+  --precificacao-dark-gradient: linear-gradient(135deg, var(--color-brown-dark-2) 0%, var(--color-brown-dark-1) 100%);
+  
+  --precificacao-bg-hover: rgba(247, 166, 184, 0.08);
+  
+  --precificacao-border-radius: 12px;
+  --precificacao-border-radius-sm: 8px;
+  --precificacao-border-radius-lg: 16px;
+  
+  --precificacao-shadow-sm: var(--shadow-soft);
+  --precificacao-shadow-md: var(--shadow-medium);
+  --precificacao-shadow-lg: var(--shadow-strong);
+  --precificacao-shadow-xl: 0 20px 40px rgba(64, 39, 39, 0.15);
+  
+  --precificacao-transition-fast: 0.2s ease;
+  --precificacao-transition-normal: 0.3s ease;
+  --precificacao-transition-slow: 0.5s ease;
 }
+    
 
 .pageWrapper {
   padding-top: var(--header-height, 80px);

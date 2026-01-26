@@ -20,7 +20,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
 import Order from "@/models/order";
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
-import jsPDF from "jspdf";
 import { useSearchParams } from "next/navigation";
 import { PageActions } from "@/contexts/PageActions";
 
@@ -130,8 +129,8 @@ export default function PedidosModal() {
   const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
 
   const searchParams = useSearchParams();
-  const highlightOrderId = searchParams.get('highlight');
-    const pageActions = useContext(PageActions);
+  const highlightOrderId = searchParams.get("highlight");
+  const pageActions = useContext(PageActions);
 
   const statusOptions = [
     { value: "PENDING", label: "Pendente" },
@@ -140,6 +139,7 @@ export default function PedidosModal() {
     { value: "CANCELLED", label: "Cancelado" },
   ];
 
+  
   useEffect(() => {
     if (highlightOrderId) {
       const timer = setTimeout(() => {
@@ -147,13 +147,13 @@ export default function PedidosModal() {
         if (element) {
           // Scroll suave até o elemento
           element.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
+            behavior: "smooth",
+            block: "center",
           });
 
           const url = new URL(window.location.href);
-          url.searchParams.delete('highlight');
-          window.history.replaceState({}, '', url.toString());
+          url.searchParams.delete("highlight");
+          window.history.replaceState({}, "", url.toString());
         }
       }, 100);
 
@@ -180,11 +180,13 @@ export default function PedidosModal() {
   }, [productSearchTerm, products]);
 
   const formatCurrency = (value: number): string => {
-    return `R$ ${value.toFixed(2).replace('.', ',')}`;
+    return `R$ ${value.toFixed(2).replace(".", ",")}`;
   };
 
-  const gerarNotaFiscal = (pedido: Order) => {
-    const doc = new jsPDF();
+const gerarNotaFiscal = async (pedido: Order) => {
+  const { default: jsPDF } = await import("jspdf");
+  const doc = new jsPDF();
+  
 
     // Cabeçalho estilizado
     doc.setFillColor(230, 230, 250);
@@ -209,7 +211,7 @@ export default function PedidosModal() {
       cnpj: "26.378.162/0001-51",
       address: "Rua Riachuelo, 795 - Centro",
       ie: "São Carlos - SP - CEP: 13.560-10",
-      contact: "(16) 99750-9099"
+      contact: "(16) 99750-9099",
     };
 
     doc.text(`Empresa: ${empresa.name}`, 20, 47);
@@ -223,19 +225,37 @@ export default function PedidosModal() {
     doc.text("DADOS DO CLIENTE", 120, 40);
     doc.setFontSize(10);
     doc.text(`Nome: ${pedido.customer?.name || "Não informado"}`, 120, 47);
-    doc.text(`Telefone: ${pedido.customer?.contact || "Não informado"}`, 120, 53);
-    doc.text(`Endereço: ${pedido.customer?.address || "Não informado"}`, 120, 59);
+    doc.text(
+      `Telefone: ${pedido.customer?.contact || "Não informado"}`,
+      120,
+      53
+    );
+    doc.text(
+      `Endereço: ${pedido.customer?.address || "Não informado"}`,
+      120,
+      59
+    );
 
     doc.setDrawColor(180, 180, 180);
     doc.line(20, 28, 190, 28);
 
     doc.text(
-      `Data: ${pedido.orderDate ? formatDateForDisplay(pedido.orderDate.toString()) : "A combinar"}`,
-      120, 71
+      `Data: ${
+        pedido.orderDate
+          ? formatDateForDisplay(pedido.orderDate.toString())
+          : "A combinar"
+      }`,
+      120,
+      71
     );
     doc.text(
-      `Entrega: ${pedido.deliveryDate ? formatDateForDisplay(pedido.deliveryDate.toString()) : "A combinar"}`,
-      120, 77
+      `Entrega: ${
+        pedido.deliveryDate
+          ? formatDateForDisplay(pedido.deliveryDate.toString())
+          : "A combinar"
+      }`,
+      120,
+      77
     );
 
     // Tabela de Produtos
@@ -255,9 +275,11 @@ export default function PedidosModal() {
     let yPosition = 115;
 
     // Cálculos dos totais
-    const subtotalItens = pedido.items?.reduce((total, item) => total + (item.subtotal || 0), 0) || 0;
+    const subtotalItens =
+      pedido.items?.reduce((total, item) => total + (item.subtotal || 0), 0) ||
+      0;
     const desconto = pedido.discount || 0;
-    const totalFinal = pedido.total || (subtotalItens - desconto);
+    const totalFinal = pedido.total || subtotalItens - desconto;
 
     // Itens do pedido
     pedido.items?.forEach((item, index) => {
@@ -276,12 +298,12 @@ export default function PedidosModal() {
       const nome = item.product?.name || "Produto não encontrado";
       const qtd = item.quantity || 0;
       const unit = item.unitPrice || 0;
-      const sub = item.subtotal || (qtd * unit);
+      const sub = item.subtotal || qtd * unit;
 
       doc.setTextColor(0, 0, 0);
       doc.text(nome, 22, yPosition);
       doc.text(String(qtd), 125, yPosition, { align: "right" });
-      doc.text(formatCurrency(unit), 140, yPosition);
+      doc.text(formatCurrency(unit || 0), 140, yPosition);
       doc.text(formatCurrency(sub), 165, yPosition);
 
       yPosition += 8;
@@ -328,12 +350,15 @@ export default function PedidosModal() {
     doc.line(20, footerY - 10, 190, footerY - 10);
     doc.setFontSize(8);
     doc.setTextColor(100, 100, 100);
-    doc.text("Agradecemos pela preferência!", 105, footerY - 2, { align: "center" });
-    doc.text("SANT'SAPORE - Doces Sabor Confeitaria", 105, footerY + 4, { align: "center" });
+    doc.text("Agradecemos pela preferência!", 105, footerY - 2, {
+      align: "center",
+    });
+    doc.text("SANT'SAPORE - Doces Sabor Confeitaria", 105, footerY + 4, {
+      align: "center",
+    });
 
     doc.save(`nota-fiscal-pedido-${pedido.id}.pdf`);
   };
-
 
   const getStatusText = (status: string) => {
     const statusMap: { [key: string]: string } = {
@@ -352,8 +377,8 @@ export default function PedidosModal() {
     try {
       setLoading(true);
       const response = await api.get("/orders");
-      const sortedOrders = response.data.sort((a: Order, b: Order) =>
-        b.id - a.id
+      const sortedOrders = response.data.sort(
+        (a: Order, b: Order) => b.id - a.id
       );
       setPedidos(sortedOrders);
     } catch (error) {
@@ -364,7 +389,7 @@ export default function PedidosModal() {
   };
 
   const handleDateForBackend = (dateString: string): string => {
-    if (!dateString) return '';
+    if (!dateString) return "";
 
     try {
       // Se já está no formato YYYY-MM-DD, retorna direto
@@ -375,32 +400,32 @@ export default function PedidosModal() {
       // Converte para data local
       const date = new Date(dateString);
       if (isNaN(date.getTime())) {
-        console.error(' Data inválida:', dateString);
-        return '';
+        console.error(" Data inválida:", dateString);
+        return "";
       }
 
       return getLocalDateString(date);
     } catch (error) {
-      console.error(' Erro ao processar data:', error);
-      return '';
+      console.error(" Erro ao processar data:", error);
+      return "";
     }
   };
 
   const formatDateForDisplay = (dateString: string | null): string => {
-    if (!dateString) return 'Não definida';
+    if (!dateString) return "Não definida";
 
     try {
       const date = new Date(dateString);
-      if (isNaN(date.getTime())) return 'Data inválida';
+      if (isNaN(date.getTime())) return "Data inválida";
 
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
       const year = date.getFullYear();
 
       return `${day}/${month}/${year}`;
     } catch (error) {
-      console.error(' Erro ao formatar data para exibição:', error);
-      return 'Data inválida';
+      console.error(" Erro ao formatar data para exibição:", error);
+      return "Data inválida";
     }
   };
 
@@ -411,16 +436,18 @@ export default function PedidosModal() {
       const response = await api.post(`/${orderId}/remove-from-production`);
 
       console.log(`✅ Pedido ${orderId} removido da produção:`, response.data);
-      return { success: true, message: 'Pedido removido da produção' };
+      return { success: true, message: "Pedido removido da produção" };
     } catch (error: any) {
       console.error(` Erro ao remover pedido ${orderId} da produção:`, error);
 
       if (error.response?.status === 404) {
         console.log(`Pedido ${orderId} não estava na produção`);
-        return { success: true, message: 'Pedido não estava na produção' };
+        return { success: true, message: "Pedido não estava na produção" };
       }
 
-      throw new Error(error.response?.data?.message || 'Erro ao remover da produção');
+      throw new Error(
+        error.response?.data?.message || "Erro ao remover da produção"
+      );
     }
   };
   const handleUpdateOrderStatus = async (
@@ -437,10 +464,10 @@ export default function PedidosModal() {
         prevOrders.map((order) =>
           order.id === orderId
             ? {
-              ...order,
-              status: newStatus as any,
-              updatedAt: new Date().toISOString(),
-            }
+                ...order,
+                status: newStatus as any,
+                updatedAt: new Date().toISOString(),
+              }
             : order
         )
       );
@@ -448,14 +475,18 @@ export default function PedidosModal() {
       console.log(`✅ Pedido ${orderId} marcado como ${newStatus}`);
 
       if (newStatus === "CANCELLED") {
-
         try {
           setTimeout(async () => {
             await handleRemoveFromProduction(orderId);
-            console.log(`🗑️ Pedido ${orderId} removido da produção após cancelamento`);
+            console.log(
+              `🗑️ Pedido ${orderId} removido da produção após cancelamento`
+            );
           }, 1000);
         } catch (productionError) {
-          console.error(`Aviso: Não foi possível remover pedido ${orderId} da produção:`, productionError);
+          console.error(
+            `Aviso: Não foi possível remover pedido ${orderId} da produção:`,
+            productionError
+          );
         }
       }
 
@@ -477,18 +508,17 @@ export default function PedidosModal() {
 
     setLoading(true);
     try {
-
       const formattedOrderDate = data.orderDate
         ? handleDateForBackend(String(data.orderDate))
         : selectPedido.orderDate
-          ? handleDateForBackend(String(selectPedido.orderDate))
-          : '';
+        ? handleDateForBackend(String(selectPedido.orderDate))
+        : "";
 
       const formattedDeliveryDate = data.deliveryDate
         ? handleDateForBackend(String(data.deliveryDate))
         : selectPedido.deliveryDate
-          ? handleDateForBackend(String(selectPedido.deliveryDate))
-          : null;
+        ? handleDateForBackend(String(selectPedido.deliveryDate))
+        : null;
 
       const formattedData = {
         status: data.status,
@@ -586,26 +616,32 @@ export default function PedidosModal() {
     }
   };
 
-  const fetchProducts = async () => {
-    try {
-      const response = await api.get("/products");
-      setProducts(response.data);
-    } catch (error) {
-      console.error("Erro ao carregar produtos:", error);
-    }
-  };
+const fetchProducts = async () => {
+  try {
+    const response = await api.get("/products");
+    
+    const normalizedProducts = response.data.map((product: any) => ({
+      ...product,
+      salePrice: product.salePrice || 0, // Valor padrão se for null/undefined
+    }));
+    
+    setProducts(normalizedProducts);
+  } catch (error) {
+    console.error("Erro ao carregar produtos:", error);
+  }
+};
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const response = await api.get('/orders');
-        const sortedOrders = response.data.sort((a: Order, b: Order) =>
-          b.id - a.id
+        const response = await api.get("/orders");
+        const sortedOrders = response.data.sort(
+          (a: Order, b: Order) => b.id - a.id
         );
         setPedidos(sortedOrders);
       } catch (err) {
-        console.log('Erro ao carregar pedidos');
+        console.log("Erro ao carregar pedidos");
         console.error(err);
       } finally {
         setLoading(false);
@@ -649,7 +685,7 @@ export default function PedidosModal() {
           productId: product.id,
           quantity: 1,
           productName: product.name,
-          unitPrice: product.salePrice,
+          unitPrice: product.salePrice || 0,
         },
       ];
     });
@@ -734,7 +770,7 @@ export default function PedidosModal() {
         status: "PENDING",
         notes: data.notes || "",
         items: items,
-        discount: (parseFloat(discount.toFixed(2))) || 0
+        discount: parseFloat(discount.toFixed(2)) || 0,
       };
 
       console.log("Enviando pedido:", formattedData);
@@ -758,11 +794,12 @@ export default function PedidosModal() {
         if (error.response.status === 400) {
           setWarningMessage(
             errorData.error ||
-            "Dados inválidos. Verifique as informações do pedido."
+              "Dados inválidos. Verifique as informações do pedido."
           );
         } else {
           setWarningMessage(
-            `Erro ${error.response.status}: ${errorData.message || "Erro ao cadastrar pedido"
+            `Erro ${error.response.status}: ${
+              errorData.message || "Erro ao cadastrar pedido"
             }`
           );
         }
@@ -779,9 +816,12 @@ export default function PedidosModal() {
       setLoading(false);
     }
   };
-  const calculateSubtotal = () => {
-    return orderItems.reduce((total, item) => total + (item.unitPrice * item.quantity), 0);
-  };
+const calculateSubtotal = () => {
+  return orderItems.reduce(
+    (total, item) => total + ((item.unitPrice || 0) * item.quantity), 
+    0
+  );
+};
 
   const calculateTotal = () => {
     const subtotal = calculateSubtotal();
@@ -802,8 +842,8 @@ export default function PedidosModal() {
     const adjustedDate = new Date(now.getTime() + totalOffset);
 
     const year = adjustedDate.getUTCFullYear();
-    const month = String(adjustedDate.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(adjustedDate.getUTCDate()).padStart(2, '0');
+    const month = String(adjustedDate.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(adjustedDate.getUTCDate()).padStart(2, "0");
 
     return `${year}-${month}-${day}`;
   };
@@ -832,17 +872,17 @@ export default function PedidosModal() {
                 actions={[
                   ...(p.status === "IN_PRODUCTION" || p.status === "PENDING"
                     ? [
-                      {
-                        label: (
-                          <div className={styles.botaoeditar}>
-                            <PencilIcon size={18} />
-                            <span>Editar</span>
-                          </div>
-                        ),
-                        onClick: () => handleEditOrder(p),
-                        variant: "edit"
-                      },
-                    ]
+                        {
+                          label: (
+                            <div className={styles.botaoeditar}>
+                              <PencilIcon size={18} />
+                              <span>Editar</span>
+                            </div>
+                          ),
+                          onClick: () => handleEditOrder(p),
+                          variant: "edit",
+                        },
+                      ]
                     : []),
                   {
                     label: (
@@ -852,21 +892,21 @@ export default function PedidosModal() {
                       </div>
                     ),
                     onClick: () => gerarNotaFiscal(p),
-                    variant: "notaFiscal"
+                    variant: "notaFiscal",
                   },
                   ...(p.status !== "CANCELLED" && p.status !== "DELIVERED"
                     ? [
-                      {
-                        label: (
-                          <div className={styles.botaocancelar}>
-                            <ReceiptXIcon size={18} />
-                            <span>Cancelar</span>
-                          </div>
-                        ),
-                        onClick: () => handleOpenCancelModal(p),
-                        variant: "cancel"
-                      },
-                    ]
+                        {
+                          label: (
+                            <div className={styles.botaocancelar}>
+                              <ReceiptXIcon size={18} />
+                              <span>Cancelar</span>
+                            </div>
+                          ),
+                          onClick: () => handleOpenCancelModal(p),
+                          variant: "cancel",
+                        },
+                      ]
                     : []),
                 ]}
               />
@@ -966,7 +1006,10 @@ export default function PedidosModal() {
                             </div>
                             <div className={styles.searchItemAdd}>
                               <div className={styles.productPrice}>
-                                R$ {product.salePrice.toFixed(2)}
+                                R${" "}
+                                {product.salePrice
+                                  ? product.salePrice.toFixed(2)
+                                  : "0.00"}
                               </div>
                               <PlusIcon size={20} className={styles.addIcon} />
                             </div>
@@ -996,7 +1039,7 @@ export default function PedidosModal() {
                           {item.productName}
                         </span>
                         <span className={styles.productPrice}>
-                          R$ {item.unitPrice.toFixed(2)}
+                          R$ {item.unitPrice ? item.unitPrice.toFixed(2) : '0.00'}
                         </span>
                       </div>
                       <div className={styles.quantityControls}>
@@ -1017,7 +1060,7 @@ export default function PedidosModal() {
                         </button>
                       </div>
                       <div className={styles.itemTotal}>
-                        R$ {(item.unitPrice * item.quantity).toFixed(2)}
+                        R$ {((item.unitPrice || 0) * item.quantity).toFixed(2)}
                       </div>
                     </div>
                   ))}
@@ -1034,7 +1077,9 @@ export default function PedidosModal() {
                         min="0"
                         max={calculateSubtotal()}
                         value={discount}
-                        onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
+                        onChange={(e) =>
+                          setDiscount(parseFloat(e.target.value) || 0)
+                        }
                         className={styles.discountInput}
                         placeholder="0,00"
                       />
@@ -1101,7 +1146,7 @@ export default function PedidosModal() {
                   label: "Data de Entrega",
                   type: "date",
                   value: "",
-                  min: getLocalDateString()
+                  min: getLocalDateString(),
                 },
                 {
                   name: "notes",
@@ -1135,7 +1180,7 @@ export default function PedidosModal() {
                           <span>{item.productName}</span> —
                           <span> Qtd: {item.quantity}</span>
                           <br />
-                          <span>R$ {item.unitPrice.toFixed(2)}</span>
+                            <span>R$ {(item.unitPrice || 0).toFixed(2)}</span>
                         </div>
                       ))}
                       {discount > 0 && (
@@ -1249,13 +1294,16 @@ export default function PedidosModal() {
                 },
                 {
                   name: "orderDate",
-                  value: selectPedido.orderDate ? getLocalDateString(new Date(selectPedido.orderDate)) : getLocalDateString(),
+                  value: selectPedido.orderDate
+                    ? getLocalDateString(new Date(selectPedido.orderDate))
+                    : getLocalDateString(),
                   label: "Data do Pedido",
                   type: "date",
                 },
                 {
                   name: "deliveryDate",
-                  value: selectPedido.deliveryDate ? getLocalDateString(new Date(selectPedido.deliveryDate))
+                  value: selectPedido.deliveryDate
+                    ? getLocalDateString(new Date(selectPedido.deliveryDate))
                     : "",
                   label: "Data de Entrega",
                   type: "date",

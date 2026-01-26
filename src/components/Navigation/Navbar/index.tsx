@@ -11,6 +11,7 @@ import {
   ChartBarIcon,
   ShoppingCartIcon,
   InvoiceIcon,
+  TagIcon,
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -77,6 +78,26 @@ export default function Navbar() {
                     />
                   </span>
                   <span className={styles.linkText}>Homepage</span>
+                </Nav.Link>
+              </Nav.Item>
+
+              <Nav.Item>
+                <Nav.Link
+                  as={Link}
+                  href="/precificacao"
+                  eventKey="/precificacao"
+                  className={isActive("/precificacao") ? styles.activeLink : ""}
+                >
+                  <span className={styles.Icon} aria-hidden>
+                    <TagIcon
+                      size={20}
+                      weight={isActive("/precificacao") ? "fill" : "regular"}
+                      className={`${
+                        isActive("/precificacao") ? styles.fufilledIcon : ""
+                      }`}
+                    />
+                  </span>
+                  <span className={styles.linkText}>Precificação</span>
                 </Nav.Link>
               </Nav.Item>
 

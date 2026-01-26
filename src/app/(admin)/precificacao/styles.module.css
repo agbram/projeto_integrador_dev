@@ -1,0 +1,2346 @@
+/* MODULE CSS PERFORMANCE-OPTIMIZED - PRECIFICAÇÃO */
+
+.containerPrincipal {
+  padding: 1.5rem;
+  background: var(--color-bg-soft);
+  min-height: calc(100vh - var(--header-height, 80px));
+  overflow-x: hidden;
+}
+
+/* Tabs simplificadas */
+.tabsContainer {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  background: var(--color-bg);
+  border-radius: 8px;
+  padding: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid var(--color-border);
+}
+
+.tabButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-light);
+  cursor: pointer;
+  border-radius: 6px;
+  text-align: center;
+  flex-direction: column;
+}
+
+.tabButton:hover {
+  background: rgba(247, 166, 184, 0.05);
+}
+
+.tabActive {
+  background: var(--color-bg);
+  color: var(--color-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--color-accent-light);
+}
+
+/* Estilo específico para a aba de insumos */
+.tabActive[data-tab="insumos"] {
+  background: rgba(247, 166, 184, 0.1);
+  border-color: var(--color-accent-light);
+  color: var(--color-accent-dark);
+}
+
+/* Grid de Produtos otimizado */
+.productsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.productCard {
+  background: var(--color-bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  max-width: 100%;
+  width: 400px;
+}
+
+.productCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.productCardHeader {
+  padding: 1.25rem 1.25rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.productImage {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+  border: 3px solid var(--color-bg);
+}
+
+.productCardHeader h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* Badges simplificados */
+.badgeNotCalculated,
+.badgeCalculated,
+.badgeCalculatedInline {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.badgeNotCalculated {
+  background: rgba(247, 166, 184, 0.1);
+  color: var(--color-accent-dark);
+  border: 1px solid rgba(247, 166, 184, 0.2);
+}
+
+.badgeCalculated {
+  background: rgba(14, 143, 105, 0.1);
+  color: var(--color-green-primary);
+  border: 1px solid rgba(14, 143, 105, 0.2);
+}
+
+.badgeCalculatedInline {
+  background: rgba(14, 143, 105, 0.1);
+  border: 1px solid rgba(14, 143, 105, 0.2);
+  color: var(--color-green-primary);
+  font-size: 0.75rem;
+}
+
+.productCardBody {
+  padding: 1rem 1.25rem;
+}
+
+.productCategory {
+  color: var(--color-text-light);
+  font-size: 0.8rem;
+  margin: 0 0 0.5rem 0;
+  text-align: center;
+  font-weight: 500;
+}
+
+.productDescription {
+  color: var(--color-text-light);
+  font-size: 0.85rem;
+  margin: 0 0 1rem 0;
+  text-align: center;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.productInfo {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: var(--color-text-gray);
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.priceInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(247, 166, 184, 0.02);
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+}
+
+.priceItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.priceItem span {
+  color: var(--color-text-light);
+  font-weight: 500;
+}
+
+.priceItem strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.salePrice {
+  color: var(--color-green-primary) !important;
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+}
+
+.lastUpdated {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+  font-size: 0.8rem;
+  color: #666;
+  text-align: center;
+}
+
+/* Botões otimizados */
+.productCardFooter {
+  padding: 1rem 1.25rem;
+  background: rgba(247, 166, 184, 0.02);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btnPrecificar,
+.btnEditar {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+}
+
+.btnPrecificar {
+  background: var(--color-primary);
+  color: var(--color-text-white);
+}
+
+.btnPrecificar:hover {
+  background: var(--color-primary-dark);
+}
+
+.btnEditar {
+  background: rgba(247, 166, 184, 0.1);
+  color: var(--color-accent-dark);
+  border: 1px solid var(--color-accent-light);
+}
+
+.btnEditar:hover {
+  background: rgba(247, 166, 184, 0.2);
+}
+
+/* ============================================ */
+/* NOVA ABA: INSUMOS - LAYOUT CENTRALIZADO */
+/* ============================================ */
+
+/* Container da lista de insumos - TOTALMENTE CENTRALIZADO */
+.ingredientsListContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+/* Cabeçalho centralizado */
+.ingredientsListHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+  width: 100%;
+  max-width: 1200px;
+  text-align: center;
+}
+
+.ingredientsListHeader h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+/* Botão abaixo do título */
+.ingredientsListHeader .btnAddIngredient {
+  margin-top: 0.5rem;
+  margin-left: 0;
+  position: relative;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--color-primary);
+  color: var(--color-text-white);
+  border: none;
+}
+
+.ingredientsListHeader .btnAddIngredient:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(247, 166, 184, 0.3);
+}
+
+/* Grid de insumos - CENTRALIZADO */
+.ingredientsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 1rem;
+}
+
+/* Card de insumo individual - largura fixa para melhor alinhamento */
+.ingredientItemCard {
+  background: var(--color-bg);
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  width: 350px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.ingredientItemCard:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  border-color: var(--color-accent-light);
+  transform: translateY(-4px);
+}
+
+/* Header do card centralizado */
+.ingredientItemHeader {
+  padding: 1.25rem;
+  background: rgba(247, 166, 184, 0.05);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+}
+
+.ingredientItemHeader h5 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--color-text);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ingredientCategoryBadge {
+  background: rgba(247, 166, 184, 0.1);
+  color: var(--color-accent-dark);
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  border: 1px solid rgba(247, 166, 184, 0.2);
+}
+
+/* Body do card - conteúdo centralizado */
+.ingredientItemBody {
+  padding: 1.25rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ingredientInfoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed var(--color-border);
+  font-size: 0.9rem;
+}
+
+.ingredientInfoRow:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.ingredientInfoRow span {
+  color: var(--color-text-light);
+  font-weight: 500;
+}
+
+.ingredientInfoRow strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* Footer do card - botões lado a lado e centralizados */
+.ingredientItemFooter {
+  padding: 1rem 1.25rem;
+  background: rgba(247, 166, 184, 0.02);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+/* Botões específicos para insumos - tamanhos iguais */
+.ingredientItemFooter .btnEditar,
+.ingredientItemFooter .btnExcluir {
+  flex: 1;
+  max-width: 140px;
+  padding: 0.625rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.ingredientItemFooter .btnEditar {
+  background: rgba(247, 166, 184, 0.1);
+  color: var(--color-accent-dark);
+  border: 1px solid var(--color-accent-light);
+}
+
+.ingredientItemFooter .btnEditar:hover {
+  background: rgba(247, 166, 184, 0.2);
+  transform: translateY(-1px);
+}
+
+.ingredientItemFooter .btnExcluir {
+  background: rgba(221, 3, 3, 0.1);
+  color: var(--color-danger);
+  border: 1px solid rgba(221, 3, 3, 0.2);
+}
+
+.ingredientItemFooter .btnExcluir:hover {
+  background: var(--color-danger);
+  color: var(--color-text-white);
+  border-color: transparent;
+  transform: translateY(-1px);
+}
+
+/* ============================================ */
+/* Modal de Precificação otimizado */
+/* ============================================ */
+
+.modalPrecificacao .modal-content {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.modalPrecificacaoHeader {
+  background: var(--color-primary);
+  color: var(--color-text-white);
+  border-bottom: none;
+  padding: 1.25rem;
+}
+
+.modalPrecificacaoTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.modalPrecificacaoBody {
+  padding: 0;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Container do carrossel */
+.carouselContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Trilha do carrossel */
+.carouselTrack {
+  display: flex;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100%;
+}
+
+/* Slides do carrossel */
+.carouselSlide {
+  min-width: 100%;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Slide 1: Produto + Cálculo */
+.pricingColumns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.ingredientsColumn {
+  border-right: 1px solid var(--color-border);
+  padding-right: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.calculationColumn {
+  padding-left: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sectionHeader h5 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.btnAddIngredient {
+  margin-left: auto;
+  background: var(--color-green-primary);
+  color: var(--color-text-white);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+}
+
+.btnAddIngredient:hover {
+  background: var(--color-green-medium);
+}
+
+/* Tabela simplificada */
+.ingredientsTable {
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg);
+  flex: 1;
+}
+
+.ingredientsTable table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ingredientsTable th {
+  background: rgba(247, 166, 184, 0.05);
+  padding: 0.75rem;
+  text-align: left;
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+}
+
+.ingredientsTable td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+  font-size: 0.85rem;
+}
+
+.ingredientsTable tr:last-child td {
+  border-bottom: none;
+}
+
+.ingredientsTable tr:hover {
+  background: rgba(247, 166, 184, 0.03);
+}
+
+.ingredientName {
+  display: flex;
+  flex-direction: column;
+}
+
+.ingredientName small {
+  font-size: 0.7rem;
+  color: var(--color-text-light);
+  margin-top: 0.125rem;
+}
+
+.unitConversion {
+  margin-top: 2px;
+  color: var(--color-text-light);
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.costTotal {
+  color: var(--color-green-primary);
+  font-weight: 700;
+}
+
+.costBreakdown {
+  margin-top: 2px;
+  color: var(--color-text-light);
+  font-size: 0.75rem;
+  opacity: 0.7;
+  background: rgba(247, 166, 184, 0.05);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+/* Botões de ação na tabela */
+.ingredientActions {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+}
+
+.btnEdit {
+  background: rgba(247, 166, 184, 0.1);
+  color: var(--color-accent-dark);
+  border: 1px solid var(--color-accent-light);
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnEdit:hover {
+  background: rgba(247, 166, 184, 0.2);
+  transform: scale(1.05);
+}
+
+.btnEdit:active {
+  transform: scale(0.95);
+}
+
+.btnRemove {
+  background: rgba(221, 3, 3, 0.1);
+  color: var(--color-danger);
+  border: 1px solid rgba(221, 3, 3, 0.2);
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnRemove:hover {
+  background: var(--color-danger);
+  color: var(--color-text-white);
+  border-color: transparent;
+  transform: scale(1.05);
+}
+
+.btnRemove:active {
+  transform: scale(0.95);
+}
+
+/* Resumo de custos */
+.costSummary {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(247, 166, 184, 0.03);
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+}
+
+.costItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.costItem:last-child {
+  border-bottom: none;
+}
+
+.costItem span {
+  color: var(--color-text-light);
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.costItem strong {
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.costPerUnit {
+  color: var(--color-green-primary) !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+}
+
+/* Ações para produtos calculados */
+.calculatedActions {
+  margin-top: auto;
+  padding: 1rem;
+  background: rgba(247, 166, 184, 0.03);
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+}
+
+.btnReset {
+  background: var(--color-brown-dark-2);
+  color: var(--color-text-white);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.btnReset:hover {
+  background: var(--color-brown-dark-1);
+}
+
+/* ============================================ */
+/* SLIDE 2: RESULTADO DA SIMULAÇÃO */
+/* ============================================ */
+
+.resultColumn {
+  background: var(--color-bg);
+  border-radius: 8px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-green-primary);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  animation: slideInRight 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Header da coluna de resultado */
+.resultHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.resultHeader h5 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--color-green-primary);
+  font-weight: 700;
+}
+
+/* Badge de simulação ativa */
+.simulationBadge {
+  background: rgba(14, 143, 105, 0.1);
+  color: var(--color-green-primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: auto;
+  border: 1px solid rgba(14, 143, 105, 0.2);
+}
+
+/* Grid de resultados melhorado */
+.resultGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  flex: 1;
+}
+
+.resultItem {
+  background: rgba(247, 166, 184, 0.03);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 0.75rem;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.resultItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  border-color: var(--color-accent-light);
+}
+
+.resultItem:nth-child(3) {
+  background: rgba(14, 143, 105, 0.05);
+  border: 1px solid rgba(14, 143, 105, 0.1);
+  border-left: 4px solid var(--color-green-primary);
+  grid-column: span 2;
+}
+
+.resultItem span {
+  font-size: 0.8rem;
+  color: var(--color-text-light);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.resultItem strong {
+  font-size: 1rem;
+  color: var(--color-text);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.salePriceResult {
+  color: var(--color-green-primary) !important;
+  font-size: 1.2rem !important;
+  font-weight: 700 !important;
+}
+
+/* Breakdown de custos detalhado */
+.costBreakdownSection {
+  background: var(--color-bg-soft);
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 1px solid var(--color-border);
+}
+
+.costBreakdownSection h6 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.costBreakdownSection h6::before {
+  content: "";
+  display: block;
+  width: 4px;
+  height: 14px;
+  background: var(--color-green-primary);
+  border-radius: 2px;
+}
+
+.breakdownItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed var(--color-border);
+  font-size: 0.85rem;
+}
+
+.breakdownItem:last-child {
+  border-bottom: none;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+.breakdownItem span:first-child {
+  color: var(--color-text-light);
+}
+
+.breakdownItem span:last-child {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.profitValue {
+  color: var(--color-green-primary) !important;
+  font-weight: 700 !important;
+}
+
+/* Ações do resultado */
+.resultActions {
+  margin-top: auto;
+  padding-top: 1.25rem;
+  border-top: 2px dashed var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.btnSaveCalculation {
+  background: linear-gradient(135deg, var(--color-green-primary), var(--color-green-medium));
+  color: var(--color-text-white);
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(14, 143, 105, 0.2);
+}
+
+.btnSaveCalculation:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(14, 143, 105, 0.3);
+  background: linear-gradient(135deg, var(--color-green-medium), var(--color-green-primary));
+}
+
+.btnSaveCalculation:active {
+  transform: translateY(0);
+}
+
+.btnSaveCalculation:disabled {
+  background: var(--color-border);
+  transform: none;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.btnNewSimulation {
+  background: transparent;
+  color: var(--color-text-light);
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnNewSimulation:hover {
+  background: rgba(247, 166, 184, 0.05);
+  color: var(--color-text);
+  border-color: var(--color-accent-light);
+}
+
+.note {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--color-text-light);
+  line-height: 1.4;
+}
+
+/* Controles do carrossel */
+.carouselControls {
+  position: absolute;
+  bottom: 1rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  z-index: 10;
+}
+
+/* Setas de navegação */
+.carouselArrow {
+  background: var(--color-primary);
+  color: var(--color-text-white);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.carouselArrow:hover {
+  background: var(--color-primary-dark);
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.carouselArrow:disabled {
+  background: var(--color-border);
+  color: var(--color-text-light);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.carouselArrowLeft {
+  position: absolute;
+  left: 1rem;
+  bottom: 0;
+}
+
+.carouselArrowRight {
+  position: absolute;
+  right: 1rem;
+  bottom: 0;
+}
+
+/* Indicadores (bolinhas) */
+.carouselIndicators {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--color-border);
+}
+
+.carouselIndicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-border);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.carouselIndicator:hover {
+  background: var(--color-accent-light);
+  transform: scale(1.2);
+}
+
+.carouselIndicator.active {
+  background: var(--color-primary);
+  transform: scale(1.2);
+}
+
+/* Contador de slides */
+.slideCounter {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(247, 166, 184, 0.1);
+  color: var(--color-accent);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(247, 166, 184, 0.2);
+}
+
+/* ============================================ */
+/* MODAL DE INGREDIENTES (ADICIONAR) */
+/* ============================================ */
+
+.modalIngredient .modal-content {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.modalIngredientHeader {
+  background: rgba(247, 166, 184, 0.1);
+  color: var(--color-text);
+  border-bottom: none;
+  padding: 1.25rem;
+}
+
+.modalIngredientTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.modalIngredientBody {
+  padding: 1.25rem;
+}
+
+.modalIngredientFooter {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-bg);
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.searchResults {
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg);
+  margin-top: 0.5rem;
+}
+
+.ingredientOption {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ingredientOption:hover {
+  background: rgba(247, 166, 184, 0.05);
+}
+
+.ingredientOption.selected {
+  background: rgba(247, 166, 184, 0.1);
+  border-left: 3px solid var(--color-accent);
+}
+
+.noResults {
+  text-align: center;
+  padding: 1rem;
+  color: var(--color-text-light);
+  font-size: 0.85rem;
+}
+
+.selectedIngredient {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(247, 166, 184, 0.05);
+  border-radius: 6px;
+  border: 1px solid var(--color-accent-light);
+}
+
+.ingredientInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ingredientInfo strong {
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.ingredientInfo span {
+  font-size: 0.85rem;
+  color: var(--color-green-primary);
+  font-weight: 600;
+}
+
+.ingredientForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.formGroup label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.formGroup input,
+.formGroup select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 0.85rem;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.orSeparator {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+  color: var(--color-text-light);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.orSeparator::before,
+.orSeparator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.orSeparator span {
+  padding: 0 0.75rem;
+}
+
+.newIngredientSection {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(247, 166, 184, 0.02);
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+}
+
+.newIngredientSection h6 {
+  margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.newIngredientForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.btnAddIngredientSubmit {
+  background: var(--color-primary);
+  color: var(--color-text-white);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btnAddIngredientSubmit:hover {
+  background: var(--color-primary-dark);
+}
+
+/* ============================================ */
+/* MODAL DE EDIÇÃO DE INSUMO DA MATRIZ */
+/* ============================================ */
+
+.modalEditIngredient .modal-content {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.modalEditIngredientHeader {
+  background: rgba(247, 166, 184, 0.1);
+  color: var(--color-text);
+  border-bottom: none;
+  padding: 1.25rem;
+}
+
+.modalEditIngredientTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.modalEditIngredientBody {
+  padding: 1.25rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.modalEditIngredientFooter {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* Formulário de edição */
+.editIngredientForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.editIngredientForm .formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.editIngredientForm label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.editIngredientForm input,
+.editIngredientForm select {
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.editIngredientForm input:focus,
+.editIngredientForm select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(247, 166, 184, 0.1);
+}
+
+.editIngredientForm .formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Datas do ingrediente */
+.ingredientDates {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--color-border);
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+}
+
+/* Botão salvar específico */
+.btnSaveIngredient {
+  background: var(--color-green-primary);
+  color: var(--color-text-white);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.btnSaveIngredient:hover {
+  background: var(--color-green-medium);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(14, 143, 105, 0.2);
+}
+
+.btnSaveIngredient:active {
+  transform: translateY(0);
+}
+
+.btnSaveIngredient:disabled {
+  background: var(--color-border);
+  color: var(--color-text-light);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ============================================ */
+/* MODAL DE EDIÇÃO DE INGREDIENTE DO PRODUTO */
+/* ============================================ */
+
+.modalEditProductIngredient .modal-content {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.modalEditProductIngredientHeader {
+  background: rgba(247, 166, 184, 0.1);
+  color: var(--color-text);
+  border-bottom: none;
+  padding: 1.25rem;
+}
+
+.modalEditProductIngredientTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.modalEditProductIngredientBody {
+  padding: 1.25rem;
+}
+
+.modalEditProductIngredientFooter {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* Formulário de edição de ingrediente do produto */
+.editProductIngredientForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.ingredientInfo {
+  padding: 1rem;
+  background: rgba(247, 166, 184, 0.05);
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+}
+
+.ingredientInfo h6 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.ingredientDetails {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+}
+
+.editProductIngredientForm .formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.editProductIngredientForm label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.inputWithUnit {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.inputWithUnit input {
+  flex: 1;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.inputWithUnit select {
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  min-width: 80px;
+}
+
+.editProductIngredientForm input[type="text"] {
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+.editProductIngredientForm input:focus,
+.editProductIngredientForm select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(247, 166, 184, 0.1);
+}
+
+/* Preview do custo */
+.costPreview {
+  padding: 1rem;
+  background: rgba(14, 143, 105, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(14, 143, 105, 0.1);
+}
+
+.costPreview h6 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.9rem;
+  color: var(--color-green-primary);
+  font-weight: 600;
+}
+
+.costDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+.conversionNote {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+  font-style: italic;
+}
+
+/* Botão salvar específico para ingrediente do produto */
+.btnSaveProductIngredient {
+  background: var(--color-green-primary);
+  color: var(--color-text-white);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.btnSaveProductIngredient:hover {
+  background: var(--color-green-medium);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(14, 143, 105, 0.2);
+}
+
+.btnSaveProductIngredient:active {
+  transform: translateY(0);
+}
+
+.btnSaveProductIngredient:disabled {
+  background: var(--color-border);
+  color: var(--color-text-light);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ============================================ */
+/* ESTADOS VAZIOS */
+/* ============================================ */
+
+.emptyState,
+.emptyIngredients {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: var(--color-bg);
+  border-radius: 6px;
+  border: 2px dashed var(--color-border);
+}
+
+.emptyState h3,
+.emptyIngredients h3 {
+  margin-bottom: 0.75rem;
+  color: var(--color-text);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.emptyState p,
+.emptyIngredients p {
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+}
+
+.btnAddIngredientSmall {
+  margin-top: 0.75rem;
+  background: var(--color-green-primary);
+  color: var(--color-text-white);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+}
+
+.btnAddIngredientSmall:hover {
+  background: var(--color-green-medium);
+}
+
+/* Estado vazio para lista de insumos */
+.emptyIngredientsList {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--color-bg);
+  border-radius: 12px;
+  border: 2px dashed var(--color-border);
+  max-width: 600px;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyIngredientsList h3 {
+  margin-bottom: 1rem;
+  color: var(--color-text);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.emptyIngredientsList p {
+  font-size: 1rem;
+  color: var(--color-text-light);
+  margin-bottom: 2rem;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+/* ============================================ */
+/* MODAIS DE FEEDBACK */
+/* ============================================ */
+
+.successModal .modal-content,
+.warningModal .modal-content {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.successBody,
+.warningBody {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.successIcon,
+.warningIcon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0 auto 1rem;
+}
+
+.successIcon {
+  background: var(--color-green-primary);
+  color: var(--color-text-white);
+}
+
+.warningIcon {
+  background: var(--color-accent);
+  color: var(--color-text);
+}
+
+.successBody h5,
+.warningBody h5 {
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.successBody p,
+.warningBody p {
+  color: var(--color-text-light);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.successFooter,
+.warningFooter {
+  padding: 1rem;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: center;
+}
+
+.successButton,
+.warningButton {
+  background: var(--color-primary);
+  color: var(--color-text-white);
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.successButton:hover,
+.warningButton:hover {
+  background: var(--color-primary-dark);
+}
+
+.warningButton {
+  background: var(--color-accent);
+  color: var(--color-text);
+}
+
+.warningButton:hover {
+  background: var(--color-accent-dark);
+}
+
+/* ============================================ */
+/* ANIMAÇÕES */
+/* ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Delay para cada card de insumo */
+.ingredientItemCard:nth-child(1) { animation-delay: 0.1s; }
+.ingredientItemCard:nth-child(2) { animation-delay: 0.2s; }
+.ingredientItemCard:nth-child(3) { animation-delay: 0.3s; }
+.ingredientItemCard:nth-child(4) { animation-delay: 0.4s; }
+.ingredientItemCard:nth-child(5) { animation-delay: 0.5s; }
+.ingredientItemCard:nth-child(6) { animation-delay: 0.6s; }
+
+/* ============================================ */
+/* RESPONSIVIDADE */
+/* ============================================ */
+
+@media (max-width: 1200px) {
+  .pricingColumns {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  
+  .ingredientsColumn {
+    border-right: none;
+    padding-right: 0;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 1.25rem;
+  }
+  
+  .calculationColumn {
+    padding-left: 0;
+  }
+  
+  .ingredientsGrid {
+    max-width: 1000px;
+  }
+  
+  .ingredientItemCard {
+    width: 320px;
+  }
+}
+
+@media (max-width: 992px) {
+  .ingredientsGrid {
+    max-width: 800px;
+  }
+  
+  .ingredientItemCard {
+    width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .containerPrincipal {
+    padding: 1rem;
+  }
+  
+  .productsGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .tabsContainer {
+    flex-direction: column;
+    max-width: 100%;
+  }
+  
+  .carouselSlide {
+    padding: 1rem;
+  }
+  
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .resultGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .resultItem:nth-child(3) {
+    grid-column: 1;
+  }
+  
+  .btnSaveCalculation,
+  .btnNewSimulation {
+    font-size: 0.85rem;
+    padding: 0.625rem;
+  }
+  
+  .carouselArrow {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .carouselArrowLeft {
+    left: 0.5rem;
+  }
+  
+  .carouselArrowRight {
+    right: 0.5rem;
+  }
+  
+  .ingredientsListContainer {
+    padding: 1rem;
+  }
+  
+  .ingredientsGrid {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    max-width: 500px;
+  }
+  
+  .ingredientsListHeader {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .ingredientsListHeader h4 {
+    font-size: 1.3rem;
+  }
+  
+  .ingredientItemCard {
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .ingredientItemFooter {
+    flex-direction: row;
+    justify-content: center;
+  }
+  
+  .ingredientItemFooter .btnEditar,
+  .ingredientItemFooter .btnExcluir {
+    max-width: 130px;
+  }
+  
+  .emptyIngredientsList {
+    padding: 3rem 1.5rem;
+    margin: 1rem auto;
+  }
+  
+  .emptyIngredientsList h3 {
+    font-size: 1.3rem;
+  }
+  
+  .ingredientActions {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .btnEdit,
+  .btnRemove {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .inputWithUnit {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .inputWithUnit select {
+    width: 100%;
+    min-width: unset;
+  }
+  
+  .editIngredientForm .formRow {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .modalEditIngredientBody {
+    padding: 1rem;
+    max-height: 50vh;
+  }
+  
+  .ingredientItemHeader {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .ingredientCategoryBadge {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 576px) {
+  .resultGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .resultItem:nth-child(3) {
+    grid-column: 1;
+  }
+  
+  .ingredientsTable {
+    font-size: 0.75rem;
+  }
+  
+  .ingredientsTable th,
+  .ingredientsTable td {
+    padding: 0.5rem;
+  }
+  
+  .carouselIndicators {
+    padding: 0.5rem;
+  }
+  
+  .carouselIndicator {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .ingredientsGrid {
+    max-width: 100%;
+    padding: 0 0.5rem;
+  }
+  
+  .ingredientItemCard {
+    width: 100%;
+    min-width: 0;
+  }
+  
+  .ingredientItemHeader {
+    padding: 1rem;
+  }
+  
+  .ingredientItemBody {
+    padding: 1rem;
+  }
+  
+  .ingredientItemFooter {
+    padding: 0.75rem 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .ingredientItemFooter .btnEditar,
+  .ingredientItemFooter .btnExcluir {
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  .emptyIngredientsList {
+    padding: 2rem 1rem;
+  }
+  
+  .emptyIngredientsList h3 {
+    font-size: 1.2rem;
+  }
+  
+  .emptyIngredientsList p {
+    font-size: 0.9rem;
+  }
+  
+  .modalEditIngredient .modal-dialog {
+    margin: 0.5rem;
+  }
+  
+  .modalEditIngredientHeader,
+  .modalEditIngredientBody,
+  .modalEditIngredientFooter {
+    padding: 1rem;
+  }
+}
+
+/* ============================================ */
+/* UTILITÁRIOS */
+/* ============================================ */
+
+.textMuted {
+  color: var(--color-text-light) !important;
+  font-size: 0.85rem;
+}
+
+.textSuccess {
+  color: var(--color-green-primary) !important;
+  font-weight: 600;
+}
+
+.textDanger {
+  color: var(--color-danger) !important;
+  font-weight: 600;
+}
+
+.flexGrow {
+  flex-grow: 1;
+}
+
+.flexShrink {
+  flex-shrink: 0;
+}
+
+/* ============================================ */
+/* SCROLLBAR PERSONALIZADA */
+/* ============================================ */
+
+.ingredientsListContainer::-webkit-scrollbar,
+.modalEditIngredientBody::-webkit-scrollbar,
+.ingredientsTable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ingredientsListContainer::-webkit-scrollbar-track,
+.modalEditIngredientBody::-webkit-scrollbar-track,
+.ingredientsTable::-webkit-scrollbar-track {
+  background: rgba(247, 166, 184, 0.05);
+  border-radius: 3px;
+}
+
+.ingredientsListContainer::-webkit-scrollbar-thumb,
+.modalEditIngredientBody::-webkit-scrollbar-thumb,
+.ingredientsTable::-webkit-scrollbar-thumb {
+  background: rgba(247, 166, 184, 0.2);
+  border-radius: 3px;
+}
+
+.ingredientsListContainer::-webkit-scrollbar-thumb:hover,
+.modalEditIngredientBody::-webkit-scrollbar-thumb:hover,
+.ingredientsTable::-webkit-scrollbar-thumb:hover {
+  background: rgba(247, 166, 184, 0.3);
+}
+
+/* ============================================ */
+/* MENSAGENS DE FEEDBACK ESPECÍFICAS */
+/* ============================================ */
+
+.ingredientSuccess {
+  background: rgba(14, 143, 105, 0.1);
+  border: 1px solid rgba(14, 143, 105, 0.2);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: slideIn 0.3s ease;
+}
+
+.ingredientSuccess::before {
+  content: "✓";
+  color: var(--color-green-primary);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.ingredientWarning {
+  background: rgba(247, 166, 184, 0.1);
+  border: 1px solid rgba(247, 166, 184, 0.2);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: slideIn 0.3s ease;
+}
+
+.ingredientWarning::before {
+  content: "⚠";
+  color: var(--color-accent);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ============================================ */
+/* ESTADOS DE HOVER E FOCUS MELHORADOS */
+/* ============================================ */
+
+.ingredientItemCard:focus-within {
+  box-shadow: 0 0 0 3px rgba(247, 166, 184, 0.3);
+  outline: none;
+}
+
+.modalEditIngredient input:focus,
+.modalEditIngredient select:focus,
+.modalEditProductIngredient input:focus,
+.modalEditProductIngredient select:focus {
+  box-shadow: 0 0 0 3px rgba(247, 166, 184, 0.2);
+}
+
+/* ============================================ */
+/* ESTILOS PARA QUANDO HÁ POUCOS INSUMOS */
+/* ============================================ */
+
+/* Se houver apenas 1-2 insumos, centraliza verticalmente também */
+.ingredientsGrid:has(.ingredientItemCard:nth-child(1):nth-last-child(1)),
+.ingredientsGrid:has(.ingredientItemCard:nth-child(1):nth-last-child(2)) {
+  min-height: 300px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Container principal quando não há insumos */
+.productsGrid:has(.emptyIngredientsList) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+}
+
+/* ============================================ */
+/* ANIMAÇÃO DE DESTAQUE PARA NOVOS INSUMOS */
+/* ============================================ */
+
+@keyframes highlightNew {
+  0% {
+    box-shadow: 0 0 0 0 rgba(14, 143, 105, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(14, 143, 105, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(14, 143, 105, 0);
+  }
+}
+
+.ingredientItemCard.new {
+  animation: highlightNew 2s ease, fadeInUp 0.5s ease;
+}
+
+/* ============================================ */
+/* LOADING STATES */
+/* ============================================ */
+
+.loadingResult {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--color-text-light);
+  text-align: center;
+}
+
+.loadingResult .spinner {
+  border: 3px solid var(--color-border);
+  border-top: 3px solid var(--color-green-primary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ============================================ */
+/* STATUS INDICATORS */
+/* ============================================ */
+
+.statusIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+}
+
+.statusSuccess {
+  background: rgba(14, 143, 105, 0.1);
+  color: var(--color-green-primary);
+}
+
+.statusWarning {
+  background: rgba(247, 166, 184, 0.1);
+  color: var(--color-accent);
+}
+
+/* ============================================ */
+/* EFEITO DE HIGHLIGHT PARA NOVA SIMULAÇÃO */
+/* ============================================ */
+
+@keyframes highlightPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(14, 143, 105, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(14, 143, 105, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(14, 143, 105, 0);
+  }
+}
+
+.resultColumn.highlight {
+  animation: highlightPulse 1.5s ease;
+}
+
+/* ============================================ */
+/* CLASSES PARA SIMULAÇÃO SALVA COM SUCESSO */
+/* ============================================ */
+
+.savedSuccess {
+  background: linear-gradient(135deg, rgba(14, 143, 105, 0.1), rgba(14, 143, 105, 0.05));
+  border-color: var(--color-green-primary);
+}
+
+.savedSuccess .resultHeader h5 {
+  color: var(--color-green-primary);
+}

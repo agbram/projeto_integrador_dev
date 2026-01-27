@@ -129,7 +129,7 @@ export default function PrecificacaoModal() {
 
   const pageActions = useContext(PageActions);
 
-  const API_URL = "http://localhost:4000";
+  const API_URL = api;
 
   const getImageUrl = (fotoUrl: string | undefined | null): string => {
     if (!fotoUrl) {
@@ -137,10 +137,6 @@ export default function PrecificacaoModal() {
     }
 
     console.log("📸 Foto URL do banco (ProdutosModal):", fotoUrl);
-
-    if (fotoUrl.startsWith('http://') || fotoUrl.startsWith('https://')) {
-      return fotoUrl.replace('localhost:3000', 'localhost:4000').replace(':3000', ':4000');
-    }
 
     const nomeArquivo = fotoUrl.replace(/^\/?imagens\//, '');
     

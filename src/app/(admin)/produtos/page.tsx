@@ -52,7 +52,7 @@ export default function ProdutosModal() {
   const [warningDeleteModalShow, setWarningDeleteModalShow] = useState(false);
   const pageActions = useContext(PageActions);
   
-  const API_URL = "http://localhost:4000"; // URL do backend
+  const API_URL = api; // URL do backend
 
 const getImageUrl = (fotoUrl: string | undefined | null): string => {
   if (!fotoUrl) {
@@ -61,11 +61,6 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
 
   console.log("📸 Foto URL do banco (ProdutosModal):", fotoUrl);
 
-  // Se já tem http (de algum teste)
-  if (fotoUrl.includes('http://') || fotoUrl.includes('https://')) {
-    // Corrige porta 3000 para 4000
-    return fotoUrl.replace('localhost:3000', 'localhost:4000').replace(':3000', ':4000');
-  }
 
   // Remove qualquer prefixo /imagens/ se existir
   const nomeArquivo = fotoUrl.replace(/^\/?imagens\//, '');

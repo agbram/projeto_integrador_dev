@@ -3,6 +3,7 @@
 import { createContext, useState, ReactNode, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import api from "@/services/api";
 
 type JwtPayload = {
   sub: string;
@@ -40,7 +41,7 @@ export function AuthProvider({ children }: Props) {
   // --- LOGIN ---
   async function login(email: string, password: string): Promise<void> {
     try {
-      const res = await axios.post("http://localhost:4000/users/login", {
+      const res = await axios.post(`http://${api}/users/login`, {
         email,
         senha: password,
       });

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { XIcon, InfoIcon } from "@phosphor-icons/react";
 import styles from "./styles.module.css";
 import Product from "@/models/Product";
+import api from "@/services/api";
 
 type Action = {
   label: string;
@@ -23,7 +24,7 @@ export default function CardProduto({
   loading = false,
   actions,
 }: CardProductProps) {
-  const API_URL = "http://localhost:4000"; // URL do backend
+  const API_URL = api; // URL do backend
   const [isMobile, setIsMobile] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -35,17 +36,12 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
 
   console.log("📸 Foto URL do banco:", fotoUrl);
 
-  // Se já tem http (de algum teste)
-  if (fotoUrl.includes('http://') || fotoUrl.includes('https://')) {
-    // Corrige porta 3000 para 4000
-    return fotoUrl.replace('localhost:3000', 'localhost:4000').replace(':3000', ':4000');
-  }
 
   // Remove qualquer prefixo /imagens/ se existir
   const nomeArquivo = fotoUrl.replace(/^\/?imagens\//, '');
   
   // Retorna URL completa
-  return `http://localhost:4000/imagens/${nomeArquivo}`;
+  return `http://${api}/imagens/${nomeArquivo}`;
 };
 
   const imageSrc = getImageUrl(products.fotoUrl);

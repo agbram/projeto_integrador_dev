@@ -41,7 +41,7 @@ export function AuthProvider({ children }: Props) {
   // --- LOGIN ---
   async function login(email: string, password: string): Promise<void> {
     try {
-      const res = await axios.post(`http://${api}/users/login`, {
+      const res = await axios.post(`https://${api}/users/login`, {
         email,
         senha: password,
       });

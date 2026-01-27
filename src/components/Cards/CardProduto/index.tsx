@@ -41,7 +41,7 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
   const nomeArquivo = fotoUrl.replace(/^\/?imagens\//, '');
   
   // Retorna URL completa
-  return `http://${api}/imagens/${nomeArquivo}`;
+  return `https://${api}/imagens/${nomeArquivo}`;
 };
 
   const imageSrc = getImageUrl(products.fotoUrl);

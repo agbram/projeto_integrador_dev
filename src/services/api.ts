@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // URL dinâmica para produção/desenvolvimento
-const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:4000';
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 const api = axios.create({
   baseURL,  // Usa variável de ambiente

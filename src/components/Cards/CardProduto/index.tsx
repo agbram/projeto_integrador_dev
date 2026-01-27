@@ -24,7 +24,7 @@ export default function CardProduto({
   loading = false,
   actions,
 }: CardProductProps) {
-  const API_URL = api; // URL do backend
+  const API_URL = api.defaults.baseURL;; // URL do backend
   const [isMobile, setIsMobile] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
   const [imageError, setImageError] = useState(false);

@@ -41,10 +41,10 @@ export function AuthProvider({ children }: Props) {
   // --- LOGIN ---
   async function login(email: string, password: string): Promise<void> {
     try {
-      const res = await axios.post(`https://${api}/users/login`, {
-        email,
-        senha: password,
-      });
+const res = await api.post('/users/login', {
+  email,
+  senha: password,
+});
 
       const token = res.data.token;
       localStorage.setItem("token", token);

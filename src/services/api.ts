@@ -1,4 +1,5 @@
 import axios from 'axios';
+import "dotenv/config";
 
 // URL dinâmica para produção/desenvolvimento
 const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';

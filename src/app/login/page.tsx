@@ -6,6 +6,7 @@ import WelcomeLogin from "@/components/WelcomeLogin";
 
 export default function Page() {
   return (
+    console.log('API URL:', process.env.NEXT_PUBLIC_API_URL),
     <div className={styles.container}>
       <div className={styles.painelBoasVindas}>
         <WelcomeLogin />

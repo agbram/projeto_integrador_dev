@@ -9,7 +9,6 @@ import FAB from "@/components/FAB";
 import api from "@/services/api";
 import {
   MagnifyingGlassIcon,
-  FilePdfIcon,
   PlusIcon,
   MinusIcon,
   PencilIcon,
@@ -22,115 +21,48 @@ import Order from "@/models/order";
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 import { useSearchParams } from "next/navigation";
 import { PageActions } from "@/contexts/PageActions";
+import toast from 'react-hot-toast'; // <-- importação do toast
 
-// OPERAÇÕES PRINCIPAIS:
-
-// GERENCIAR PEDIDOS:
-// 1. Busca lista de pedidos da API e ordena por ID decrescente
-// 2. Filtra pedidos por status e permite ações específicas por status
-// 3. Atualiza status dos pedidos (Pendente → Produção → Entrega → Entregue/Cancelado)
-
-// CRIAR PEDIDO (3 etapas):
-// 1. Seleciona cliente via busca em tempo real
-// 2. Adiciona produtos com controle de quantidade
-// 3. Aplica desconto e calcula totais automaticamente
-// 4. Define datas e observações, envia para API
-
-// EDITAR PEDIDO:
-// 1. Busca dados do pedido selecionado
-// 2. Permite alterar status, datas e observações
-// 3. Mantém itens e cliente originais (somente dados principais editáveis)
-
-// CANCELAR/ENTREGAR:
-// 1. Abre modal de confirmação para ações críticas
-// 2. Atualiza status e remove da produção se cancelado
-// 3. Mostra feedback de sucesso/erro
-
-// GERAR NOTA FISCAL:
-// 1. Coleta dados completos do pedido
-// 2. Formata PDF com layout profissional
-// 3. Inclui cálculos automáticos (subtotal, desconto, total)
-// 4. Disponibiliza para download
-
-// CONTROLE DE DATAS:
-// 1. Converte datas para formato local (BR)
-// 2. Valida e formata para API (YYYY-MM-DD)
-// 3. Define datas mínimas para evitar inconsistências
-
-// BUSCA EM TEMPO REAL:
-// 1. Filtra clientes e produtos enquanto digita
-// 2. Limita resultados para melhor performance
-// 3. Seleciona itens com clique sem sair do campo
-
-// CÁLCULOS AUTOMÁTICOS:
-// 1. Soma valores dos itens (quantidade × preço)
-// 2. Aplica desconto e recalcula total
-// 3. Valida para não ter valores negativos
-
-export default function PedidosModal() {
+export default function PedidosPage() {
   const [modalShow, setModalShow] = useState(false);
   const [modalEditShow, setModalEditShow] = useState(false);
-  const [successModalShow, setSuccessModalShow] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [warningModalShow, setWarningModalShow] = useState(false);
-  const [warningMessage, setWarningMessage] = useState("");
+  // Removidos: successModalShow, successMessage, warningModalShow, warningMessage
   const [loading, setLoading] = useState(false);
   const [discount, setDiscount] = useState(0);
   const [warningDeleteModalShow, setWarningDeleteModalShow] = useState(false);
-  const [warningDeliveredModalShow, setWarningDeliveredModalShow] =
-    useState(false);
+  const [warningDeliveredModalShow, setWarningDeliveredModalShow] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
-  const [formStep, setFormStep] = useState<
-    "checkCustomer" | "selectProducts" | "order"
-  >("checkCustomer");
+  const [formStep, setFormStep] = useState<"checkCustomer" | "selectProducts" | "order">("checkCustomer");
 
   const [pedidos, setPedidos] = useState<Order[]>([]);
   const [selectPedido, setSelectPedido] = useState<Order>();
   const [pedidoToCancel, setPedidoToCancel] = useState<Order>();
   const [pedidoToDelivered, setPedidoToDelivered] = useState<Order>();
-  const [customers, setCustomers] = useState<{ id: number; name: string }[]>(
-    []
-  );
-  const [selectedCustomer, setSelectedCustomer] = useState<{
-    id: number;
-    name: string;
-  } | null>(null);
+  const [customers, setCustomers] = useState<{ id: number; name: string }[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<{ id: number; name: string } | null>(null);
 
-  // Estados para pesquisa de produtos
   const [customerSearchTerm, setCustomerSearchTerm] = useState("");
   const [productSearchTerm, setProductSearchTerm] = useState("");
   const [isCustomerSearchFocused, setIsCustomerSearchFocused] = useState(false);
   const [isProductSearchFocused, setIsProductSearchFocused] = useState(false);
-  const [filteredProducts, setFilteredProducts] = useState<
-    {
-      id: number;
-      name: string;
-      salePrice: number;
-    }[]
-  >([]);
+  const [filteredProducts, setFilteredProducts] = useState<{ id: number; name: string; salePrice: number }[]>([]);
 
-  const [products, setProducts] = useState<
-    {
-      id: number;
-      name: string;
-      salePrice: number;
-    }[]
-  >([]);
+  const [products, setProducts] = useState<{ id: number; name: string; salePrice: number }[]>([]);
 
-  const [orderItems, setOrderItems] = useState<
-    {
-      productId: number;
-      quantity: number;
-      productName: string;
-      unitPrice: number;
-    }[]
-  >([]);
+  const [orderItems, setOrderItems] = useState<{ productId: number; quantity: number; productName: string; unitPrice: number }[]>([]);
 
   const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
 
   const searchParams = useSearchParams();
   const highlightOrderId = searchParams.get("highlight");
-  const pageActions = useContext(PageActions);
+  const { setShowAddButton, setHandleAdd, setShowFilterButton, setFilterOptions, setHandleFilter } = useContext(PageActions);
+  const [activeFilter, setActiveFilter] = useState<string>("all");
+
+  // Computa a lista filtrada
+  const pedidosFiltrados = pedidos.filter((p) => {
+    if (activeFilter === "all") return true;
+    return p.status === activeFilter;
+  });
 
   const statusOptions = [
     { value: "PENDING", label: "Pendente" },
@@ -139,41 +71,50 @@ export default function PedidosModal() {
     { value: "CANCELLED", label: "Cancelado" },
   ];
 
-  
   useEffect(() => {
     if (highlightOrderId) {
       const timer = setTimeout(() => {
         const element = document.getElementById(`order-${highlightOrderId}`);
         if (element) {
-          // Scroll suave até o elemento
-          element.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-          });
-
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
           const url = new URL(window.location.href);
           url.searchParams.delete("highlight");
           window.history.replaceState({}, "", url.toString());
         }
       }, 100);
-
       return () => clearTimeout(timer);
     }
   }, [highlightOrderId, pedidos]);
 
   useEffect(() => {
-    pageActions.setShowAddButton(true);
-    pageActions.setHandleAdd(() => setModalShow(true));
-    return () => pageActions.setHandleAdd(() => () => {});
+    setShowAddButton(true);
+    setHandleAdd(() => setModalShow(true));
+
+    setShowFilterButton(true);
+    setFilterOptions([
+      { label: "Todos", value: "all" },
+      { label: "Pendentes", value: "PENDING" },
+      { label: "Em Produção", value: "IN_PRODUCTION" },
+      { label: "Entregues", value: "DELIVERED" },
+      { label: "Cancelados", value: "CANCELLED" },
+    ]);
+    setHandleFilter((value: string) => {
+      setActiveFilter(value);
+    });
+
+    return () => {
+      setShowFilterButton(false);
+      setFilterOptions([]);
+      setHandleAdd(() => () => {});
+    };
   }, []);
 
-  // Filtra produtos baseado no termo de pesquisa
   useEffect(() => {
     if (productSearchTerm) {
       const filtered = products.filter((product) =>
         product.name.toLowerCase().includes(productSearchTerm.toLowerCase())
       );
-      setFilteredProducts(filtered.slice(0, 10)); // Limita a 10 resultados
+      setFilteredProducts(filtered.slice(0, 10));
     } else {
       setFilteredProducts([]);
     }
@@ -183,12 +124,10 @@ export default function PedidosModal() {
     return `R$ ${value.toFixed(2).replace(".", ",")}`;
   };
 
-const gerarNotaFiscal = async (pedido: Order) => {
-  const { default: jsPDF } = await import("jspdf");
-  const doc = new jsPDF();
-  
-
-    // Cabeçalho estilizado
+  const gerarNotaFiscal = async (pedido: Order) => {
+    const { default: jsPDF } = await import("jspdf");
+    const doc = new jsPDF();
+    // ... (código da nota fiscal permanece igual)
     doc.setFillColor(230, 230, 250);
     doc.rect(20, 10, 170, 15, "F");
     doc.setFont("helvetica", "bold");
@@ -196,11 +135,9 @@ const gerarNotaFiscal = async (pedido: Order) => {
     doc.setTextColor(50, 50, 120);
     doc.text("RECIBO", 105, 20, { align: "center" });
 
-    // Linha divisória
     doc.setDrawColor(180, 180, 180);
     doc.line(20, 28, 190, 28);
 
-    // Dados da Empresa
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
     doc.text("DADOS DA EMPRESA", 20, 40);
@@ -220,49 +157,28 @@ const gerarNotaFiscal = async (pedido: Order) => {
     doc.text(`Endereço: ${empresa.address}`, 20, 65);
     doc.text(`Contato: ${empresa.contact}`, 20, 71);
 
-    // Dados do Cliente
     doc.setFontSize(12);
     doc.text("DADOS DO CLIENTE", 120, 40);
     doc.setFontSize(10);
     doc.text(`Nome: ${pedido.customer?.name || "Não informado"}`, 120, 47);
-    doc.text(
-      `Telefone: ${pedido.customer?.contact || "Não informado"}`,
-      120,
-      53
-    );
-    doc.text(
-      `Endereço: ${pedido.customer?.address || "Não informado"}`,
-      120,
-      59
-    );
+    doc.text(`Telefone: ${pedido.customer?.contact || "Não informado"}`, 120, 53);
+    doc.text(`Endereço: ${pedido.customer?.address || "Não informado"}`, 120, 59);
 
     doc.setDrawColor(180, 180, 180);
     doc.line(20, 28, 190, 28);
 
     doc.text(
-      `Data: ${
-        pedido.orderDate
-          ? formatDateForDisplay(pedido.orderDate.toString())
-          : "A combinar"
-      }`,
-      120,
-      71
+      `Data: ${pedido.orderDate ? formatDateForDisplay(pedido.orderDate.toString()) : "A combinar"}`,
+      120, 71
     );
     doc.text(
-      `Entrega: ${
-        pedido.deliveryDate
-          ? formatDateForDisplay(pedido.deliveryDate.toString())
-          : "A combinar"
-      }`,
-      120,
-      77
+      `Entrega: ${pedido.deliveryDate ? formatDateForDisplay(pedido.deliveryDate.toString()) : "A combinar"}`,
+      120, 77
     );
 
-    // Tabela de Produtos
     doc.setFontSize(12);
     doc.text("ITENS DO PEDIDO", 20, 95);
 
-    // Cabeçalho da tabela
     doc.setFillColor(200, 200, 200);
     doc.rect(20, 100, 170, 8, "F");
     doc.setFontSize(10);
@@ -274,22 +190,16 @@ const gerarNotaFiscal = async (pedido: Order) => {
 
     let yPosition = 115;
 
-    // Cálculos dos totais
-    const subtotalItens =
-      pedido.items?.reduce((total, item) => total + (item.subtotal || 0), 0) ||
-      0;
+    const subtotalItens = pedido.items?.reduce((total, item) => total + (item.subtotal || 0), 0) || 0;
     const desconto = pedido.discount || 0;
     const totalFinal = pedido.total || subtotalItens - desconto;
 
-    // Itens do pedido
     pedido.items?.forEach((item, index) => {
-      // Se precisar de nova página
       if (yPosition > 250) {
         doc.addPage();
         yPosition = 20;
       }
 
-      // Fundo alternado para as linhas
       if (index % 2 === 0) {
         doc.setFillColor(245, 245, 245);
         doc.rect(20, yPosition - 5, 170, 8, "F");
@@ -309,53 +219,41 @@ const gerarNotaFiscal = async (pedido: Order) => {
       yPosition += 8;
     });
 
-    // Totais - FORA DO LOOP
     yPosition += 10;
     doc.setDrawColor(180, 180, 180);
     doc.line(120, yPosition, 190, yPosition);
 
-    // Subtotal
     doc.setFont("helvetica", "bold");
     doc.text("SUBTOTAL:", 120, yPosition + 8);
     doc.text(formatCurrency(subtotalItens), 165, yPosition + 8);
 
-    // Desconto
     if (desconto > 0) {
       doc.setFont("helvetica", "normal");
       doc.text("Desconto:", 120, yPosition + 16);
       doc.text(`- ${formatCurrency(desconto)}`, 165, yPosition + 16);
     }
 
-    // Total final
     const totalY = desconto > 0 ? yPosition + 24 : yPosition + 16;
     doc.setFont("helvetica", "bold");
     doc.text("TOTAL DO PEDIDO:", 120, totalY);
     doc.text(formatCurrency(totalFinal), 165, totalY);
 
-    // Observações
     const obsStart = totalY + 10;
     if (pedido.notes) {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
       doc.text("OBSERVAÇÕES:", 20, obsStart);
-
-      // Quebra de linha automática para observações longas
       const splitNotes = doc.splitTextToSize(pedido.notes, 170);
       doc.text(splitNotes, 20, obsStart + 7);
     }
 
-    // Rodapé
     const footerY = 280;
     doc.setDrawColor(200, 200, 200);
     doc.line(20, footerY - 10, 190, footerY - 10);
     doc.setFontSize(8);
     doc.setTextColor(100, 100, 100);
-    doc.text("Agradecemos pela preferência!", 105, footerY - 2, {
-      align: "center",
-    });
-    doc.text("SANT'SAPORE - Doces Sabor Confeitaria", 105, footerY + 4, {
-      align: "center",
-    });
+    doc.text("Agradecemos pela preferência!", 105, footerY - 2, { align: "center" });
+    doc.text("SANT'SAPORE - Doces Sabor Confeitaria", 105, footerY + 4, { align: "center" });
 
     doc.save(`nota-fiscal-pedido-${pedido.id}.pdf`);
   };
@@ -377,9 +275,7 @@ const gerarNotaFiscal = async (pedido: Order) => {
     try {
       setLoading(true);
       const response = await api.get("/orders");
-      const sortedOrders = response.data.sort(
-        (a: Order, b: Order) => b.id - a.id
-      );
+      const sortedOrders = response.data.sort((a: Order, b: Order) => b.id - a.id);
       setPedidos(sortedOrders);
     } catch (error) {
       console.error("Erro ao buscar pedidos:", error);
@@ -390,41 +286,33 @@ const gerarNotaFiscal = async (pedido: Order) => {
 
   const handleDateForBackend = (dateString: string): string => {
     if (!dateString) return "";
-
     try {
-      // Se já está no formato YYYY-MM-DD, retorna direto
       if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
         return dateString;
       }
-
-      // Converte para data local
       const date = new Date(dateString);
       if (isNaN(date.getTime())) {
-        console.error(" Data inválida:", dateString);
+        console.error("Data inválida:", dateString);
         return "";
       }
-
       return getLocalDateString(date);
     } catch (error) {
-      console.error(" Erro ao processar data:", error);
+      console.error("Erro ao processar data:", error);
       return "";
     }
   };
 
   const formatDateForDisplay = (dateString: string | null): string => {
     if (!dateString) return "Não definida";
-
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return "Data inválida";
-
       const day = String(date.getDate()).padStart(2, "0");
       const month = String(date.getMonth() + 1).padStart(2, "0");
       const year = date.getFullYear();
-
       return `${day}/${month}/${year}`;
     } catch (error) {
-      console.error(" Erro ao formatar data para exibição:", error);
+      console.error("Erro ao formatar data para exibição:", error);
       return "Data inválida";
     }
   };
@@ -432,42 +320,28 @@ const gerarNotaFiscal = async (pedido: Order) => {
   const handleRemoveFromProduction = async (orderId: number) => {
     try {
       console.log(`🔄 Removendo pedido ${orderId} da produção...`);
-
       const response = await api.post(`/${orderId}/remove-from-production`);
-
       console.log(`✅ Pedido ${orderId} removido da produção:`, response.data);
       return { success: true, message: "Pedido removido da produção" };
     } catch (error: any) {
-      console.error(` Erro ao remover pedido ${orderId} da produção:`, error);
-
+      console.error(`Erro ao remover pedido ${orderId} da produção:`, error);
       if (error.response?.status === 404) {
         console.log(`Pedido ${orderId} não estava na produção`);
         return { success: true, message: "Pedido não estava na produção" };
       }
-
-      throw new Error(
-        error.response?.data?.message || "Erro ao remover da produção"
-      );
+      throw new Error(error.response?.data?.message || "Erro ao remover da produção");
     }
   };
-  const handleUpdateOrderStatus = async (
-    orderId: number,
-    newStatus: string
-  ) => {
+
+  const handleUpdateOrderStatus = async (orderId: number, newStatus: string) => {
     setUpdatingOrderId(orderId);
     try {
-      const response = await api.put(`/orders/atualiza-status/${orderId}`, {
-        status: newStatus,
-      });
+      const response = await api.put(`/orders/atualiza-status/${orderId}`, { status: newStatus });
 
       setPedidos((prevOrders) =>
         prevOrders.map((order) =>
           order.id === orderId
-            ? {
-                ...order,
-                status: newStatus as any,
-                updatedAt: new Date().toISOString(),
-              }
+            ? { ...order, status: newStatus as any, updatedAt: new Date().toISOString() }
             : order
         )
       );
@@ -478,26 +352,19 @@ const gerarNotaFiscal = async (pedido: Order) => {
         try {
           setTimeout(async () => {
             await handleRemoveFromProduction(orderId);
-            console.log(
-              `🗑️ Pedido ${orderId} removido da produção após cancelamento`
-            );
+            console.log(`🗑️ Pedido ${orderId} removido da produção após cancelamento`);
           }, 1000);
         } catch (productionError) {
-          console.error(
-            `Aviso: Não foi possível remover pedido ${orderId} da produção:`,
-            productionError
-          );
+          console.error(`Aviso: Não foi possível remover pedido ${orderId} da produção:`, productionError);
         }
       }
 
       if (newStatus === "DELIVERED") {
-        setSuccessMessage("Pedido marcado como entregue com sucesso!");
-        setSuccessModalShow(true);
+        toast.success("Pedido marcado como entregue com sucesso!"); // <-- substituído
       }
     } catch (error) {
       console.error("Erro ao atualizar status do pedido:", error);
-      setWarningMessage("Erro ao atualizar status do pedido");
-      setWarningModalShow(true);
+      toast.error("Erro ao atualizar status do pedido"); // <-- substituído
     } finally {
       setUpdatingOrderId(null);
     }
@@ -529,36 +396,23 @@ const gerarNotaFiscal = async (pedido: Order) => {
 
       console.log("Enviando atualização do pedido:", formattedData);
 
-      const response = await api.put(
-        `/orders/${selectPedido.id}`,
-        formattedData
-      );
+      const response = await api.put(`/orders/${selectPedido.id}`, formattedData);
       console.log("Pedido atualizado:", response.data);
 
       setPedidos((prevPedidos) =>
-        prevPedidos.map((pedido) =>
-          pedido.id === selectPedido.id ? response.data : pedido
-        )
+        prevPedidos.map((pedido) => (pedido.id === selectPedido.id ? response.data : pedido))
       );
 
-      setSuccessMessage("Pedido atualizado com sucesso!");
-      setSuccessModalShow(true);
+      toast.success("Pedido atualizado com sucesso!"); // <-- substituído
       handleCloseEditModal();
     } catch (error: any) {
-      console.error(" Erro ao atualizar pedido:", error);
-
+      console.error("Erro ao atualizar pedido:", error);
       if (error.response) {
         const errorData = error.response.data;
-        setWarningMessage(
-          errorData.error || "Erro ao atualizar pedido. Tente novamente."
-        );
+        toast.error(errorData.error || "Erro ao atualizar pedido. Tente novamente."); // <-- substituído
       } else {
-        setWarningMessage(
-          "Erro de conexão. Verifique se o servidor está funcionando."
-        );
+        toast.error("Erro de conexão. Verifique se o servidor está funcionando."); // <-- substituído
       }
-
-      setWarningModalShow(true);
     } finally {
       setLoading(false);
     }
@@ -571,13 +425,11 @@ const gerarNotaFiscal = async (pedido: Order) => {
 
   const handleOpenCancelModal = (pedido: Order) => {
     setPedidoToCancel(pedido);
-    setWarningMessage("Deseja realmente cancelar este pedido?");
     setWarningDeleteModalShow(true);
   };
 
   const handleConfirmCancel = async () => {
     if (!pedidoToCancel) return;
-
     await handleUpdateOrderStatus(pedidoToCancel.id, "CANCELLED");
     setWarningDeleteModalShow(false);
     setPedidoToCancel(undefined);
@@ -590,13 +442,11 @@ const gerarNotaFiscal = async (pedido: Order) => {
 
   const handleOpenDeliveredModal = (pedido: Order) => {
     setPedidoToDelivered(pedido);
-    setWarningMessage("Esse pedido realmente foi entregue?");
     setWarningDeliveredModalShow(true);
   };
 
   const handleConfirmDelivered = async () => {
     if (!pedidoToDelivered) return;
-
     await handleUpdateOrderStatus(pedidoToDelivered.id, "DELIVERED");
     setWarningDeliveredModalShow(false);
     setPedidoToDelivered(undefined);
@@ -616,38 +466,20 @@ const gerarNotaFiscal = async (pedido: Order) => {
     }
   };
 
-const fetchProducts = async () => {
-  try {
-    const response = await api.get("/products");
-    
-    const normalizedProducts = response.data.map((product: any) => ({
-      ...product,
-      salePrice: product.salePrice || 0, // Valor padrão se for null/undefined
-    }));
-    
-    setProducts(normalizedProducts);
-  } catch (error) {
-    console.error("Erro ao carregar produtos:", error);
-  }
-};
+  const fetchProducts = async () => {
+    try {
+      const response = await api.get("/products");
+      const normalizedProducts = response.data.map((product: any) => ({
+        ...product,
+        salePrice: product.salePrice || 0,
+      }));
+      setProducts(normalizedProducts);
+    } catch (error) {
+      console.error("Erro ao carregar produtos:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get("/orders");
-        const sortedOrders = response.data.sort(
-          (a: Order, b: Order) => b.id - a.id
-        );
-        setPedidos(sortedOrders);
-      } catch (err) {
-        console.log("Erro ao carregar pedidos");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchOrders();
     fetchCustomers();
     fetchProducts();
@@ -667,11 +499,7 @@ const fetchProducts = async () => {
     setSelectPedido(undefined);
   };
 
-  const handleAddProduct = (product: {
-    id: number;
-    name: string;
-    salePrice: number;
-  }) => {
+  const handleAddProduct = (product: { id: number; name: string; salePrice: number }) => {
     setOrderItems((prev) => {
       const existing = prev.find((i) => i.productId === product.id);
       if (existing) {
@@ -689,7 +517,7 @@ const fetchProducts = async () => {
         },
       ];
     });
-    setProductSearchTerm(""); // Limpa a pesquisa após adicionar
+    setProductSearchTerm("");
   };
 
   const handleAddQuantity = (productId: number) => {
@@ -708,9 +536,7 @@ const fetchProducts = async () => {
     setOrderItems((prev) =>
       prev
         .map((i) =>
-          i.productId === productId
-            ? { ...i, quantity: Math.max(0, i.quantity - 1) }
-            : i
+          i.productId === productId ? { ...i, quantity: Math.max(0, i.quantity - 1) } : i
         )
         .filter((i) => i.quantity > 0)
     );
@@ -726,15 +552,13 @@ const fetchProducts = async () => {
 
     try {
       if (!selectedCustomer) {
-        setWarningMessage("Selecione um cliente antes de cadastrar o pedido.");
-        setWarningModalShow(true);
+        toast.error("Selecione um cliente antes de cadastrar o pedido."); // <-- substituído
         setLoading(false);
         return;
       }
 
       if (!data.orderDate) {
-        setWarningMessage("A data do pedido é obrigatória.");
-        setWarningModalShow(true);
+        toast.error("A data do pedido é obrigatória."); // <-- substituído
         setLoading(false);
         return;
       }
@@ -745,15 +569,13 @@ const fetchProducts = async () => {
         : null;
 
       if (!formattedOrderDate) {
-        setWarningMessage("Data do pedido inválida.");
-        setWarningModalShow(true);
+        toast.error("Data do pedido inválida."); // <-- substituído
         setLoading(false);
         return;
       }
 
       if (orderItems.length === 0) {
-        setWarningMessage("Adicione pelo menos um produto ao pedido.");
-        setWarningModalShow(true);
+        toast.error("Adicione pelo menos um produto ao pedido."); // <-- substituído
         setLoading(false);
         return;
       }
@@ -781,8 +603,7 @@ const fetchProducts = async () => {
       setOrderItems([]);
       setDiscount(0);
       fetchOrders();
-      setSuccessMessage("Pedido cadastrado com sucesso!");
-      setSuccessModalShow(true);
+      toast.success("Pedido cadastrado com sucesso!"); // <-- substituído
       handleCloseModal();
     } catch (error: any) {
       console.error("Erro ao cadastrar Pedido:", error);
@@ -792,36 +613,23 @@ const fetchProducts = async () => {
         console.error("Detalhes do erro:", errorData);
 
         if (error.response.status === 400) {
-          setWarningMessage(
-            errorData.error ||
-              "Dados inválidos. Verifique as informações do pedido."
-          );
+          toast.error(errorData.error || "Dados inválidos. Verifique as informações do pedido."); // <-- substituído
         } else {
-          setWarningMessage(
-            `Erro ${error.response.status}: ${
-              errorData.message || "Erro ao cadastrar pedido"
-            }`
-          );
+          toast.error(`Erro ${error.response.status}: ${errorData.message || "Erro ao cadastrar pedido"}`); // <-- substituído
         }
       } else if (error.request) {
-        setWarningMessage(
-          "Erro de conexão. Verifique se o servidor está rodando."
-        );
+        toast.error("Erro de conexão. Verifique se o servidor está rodando."); // <-- substituído
       } else {
-        setWarningMessage("Erro inesperado. Tente novamente.");
+        toast.error("Erro inesperado. Tente novamente."); // <-- substituído
       }
-
-      setWarningModalShow(true);
     } finally {
       setLoading(false);
     }
   };
-const calculateSubtotal = () => {
-  return orderItems.reduce(
-    (total, item) => total + ((item.unitPrice || 0) * item.quantity), 
-    0
-  );
-};
+
+  const calculateSubtotal = () => {
+    return orderItems.reduce((total, item) => total + ((item.unitPrice || 0) * item.quantity), 0);
+  };
 
   const calculateTotal = () => {
     const subtotal = calculateSubtotal();
@@ -835,34 +643,35 @@ const calculateSubtotal = () => {
 
   const getLocalDateString = (date: Date = new Date()): string => {
     const now = new Date();
-    const offset = now.getTimezoneOffset(); // offset em minutos
-    const brazilOffset = 180; // Brasil é UTC-3 (180 minutos)
-    const totalOffset = (offset + brazilOffset) * 60 * 1000; // converte para milissegundos
-
+    const offset = now.getTimezoneOffset();
+    const brazilOffset = 180;
+    const totalOffset = (offset + brazilOffset) * 60 * 1000;
     const adjustedDate = new Date(now.getTime() + totalOffset);
-
     const year = adjustedDate.getUTCFullYear();
     const month = String(adjustedDate.getUTCMonth() + 1).padStart(2, "0");
     const day = String(adjustedDate.getUTCDate()).padStart(2, "0");
-
     return `${year}-${month}-${day}`;
   };
 
   return (
     <>
       <div className={styles.containerPrincipal}>
-        {pedidos.length === 0 ? (
+        {pedidosFiltrados.length === 0 ? (
           <div className={styles.emptyState}>
-            <h3>Nenhum pedido encontrado</h3>
-            <p>Crie seu primeiro pedido para começar</p>
+            <h3>
+              {activeFilter !== "all"
+                ? "Nenhum pedido encontrado para este filtro"
+                : "Nenhum pedido encontrado"}
+            </h3>
+            <p>
+              {activeFilter === "all"
+                ? "Crie seu primeiro pedido para começar"
+                : "Tente outro filtro"}
+            </p>
           </div>
         ) : (
-          pedidos.map((p) => (
-            <div
-              key={p.id}
-              id={`order-${p.id}`}
-              className={styles.divContainerCliente}
-            >
+          pedidosFiltrados.map((p) => (
+            <div key={p.id} id={`order-${p.id}`} className={styles.divContainerCliente}>
               <CardOrder
                 title={p.customer?.name ?? "Cliente desconhecido"}
                 order={p}
@@ -918,7 +727,6 @@ const calculateSubtotal = () => {
       {/* MODAL PRINCIPAL - CRIAR PEDIDO */}
       <Modal show={modalShow} onHide={handleCloseModal} size="lg" centered>
         <Modal.Body className={styles.modalPedidosBody}>
-          {/* Selecionar cliente - mantém igual */}
           {formStep === "checkCustomer" && (
             <div className={styles.searchContainer}>
               <h4>Selecione um cliente</h4>
@@ -931,20 +739,13 @@ const calculateSubtotal = () => {
                   value={customerSearchTerm}
                   onChange={(e) => setCustomerSearchTerm(e.target.value)}
                   onFocus={() => setIsCustomerSearchFocused(true)}
-                  onBlur={() =>
-                    setTimeout(() => setIsCustomerSearchFocused(false), 200)
-                  }
+                  onBlur={() => setTimeout(() => setIsCustomerSearchFocused(false), 200)}
                 />
               </div>
-
               {isCustomerSearchFocused && (
                 <div className={styles.containerResults}>
                   {customers
-                    .filter((c) =>
-                      c.name
-                        .toLowerCase()
-                        .includes(customerSearchTerm.toLowerCase())
-                    )
+                    .filter((c) => c.name.toLowerCase().includes(customerSearchTerm.toLowerCase()))
                     .slice(0, 10)
                     .map((c) => (
                       <div
@@ -964,18 +765,13 @@ const calculateSubtotal = () => {
             </div>
           )}
 
-          {/* Selecionar produtos - ATUALIZADO com desconto */}
           {formStep === "selectProducts" && selectedCustomer && (
             <div className={styles.productSelectionContainer}>
               <h4>Selecione os produtos para {selectedCustomer.name}</h4>
 
-              {/* Barra de pesquisa de produtos */}
               <div className={styles.searchContainer}>
                 <div className={styles.searchWrapper}>
-                  <MagnifyingGlassIcon
-                    className={styles.searchIcon}
-                    width={20}
-                  />
+                  <MagnifyingGlassIcon className={styles.searchIcon} width={20} />
                   <input
                     type="text"
                     className={styles.searchInput}
@@ -983,9 +779,7 @@ const calculateSubtotal = () => {
                     value={productSearchTerm}
                     onChange={(e) => setProductSearchTerm(e.target.value)}
                     onFocus={() => setIsProductSearchFocused(true)}
-                    onBlur={() =>
-                      setTimeout(() => setIsProductSearchFocused(false), 200)
-                    }
+                    onBlur={() => setTimeout(() => setIsProductSearchFocused(false), 200)}
                   />
                 </div>
 
@@ -1001,15 +795,10 @@ const calculateSubtotal = () => {
                           onMouseDown={() => handleAddProduct(product)}
                         >
                           <div className={styles.searchItemContent}>
-                            <div className={styles.productName}>
-                              {product.name}
-                            </div>
+                            <div className={styles.productName}>{product.name}</div>
                             <div className={styles.searchItemAdd}>
                               <div className={styles.productPrice}>
-                                R${" "}
-                                {product.salePrice
-                                  ? product.salePrice.toFixed(2)
-                                  : "0.00"}
+                                R$ {product.salePrice ? product.salePrice.toFixed(2) : "0.00"}
                               </div>
                               <PlusIcon size={20} className={styles.addIcon} />
                             </div>
@@ -1017,45 +806,29 @@ const calculateSubtotal = () => {
                         </div>
                       ))}
                     {filteredProducts.length === 0 && productSearchTerm && (
-                      <div className={styles.noResults}>
-                        Nenhum produto encontrado
-                      </div>
+                      <div className={styles.noResults}>Nenhum produto encontrado</div>
                     )}
                   </div>
                 )}
               </div>
 
-              {/* Lista de produtos adicionados */}
               {orderItems.length > 0 && (
                 <div className={styles.selectedProducts}>
                   <h5>Produtos Selecionados</h5>
                   {orderItems.map((item) => (
-                    <div
-                      key={item.productId}
-                      className={styles.selectedProductItem}
-                    >
+                    <div key={item.productId} className={styles.selectedProductItem}>
                       <div className={styles.productInfo}>
-                        <span className={styles.productName}>
-                          {item.productName}
-                        </span>
+                        <span className={styles.productName}>{item.productName}</span>
                         <span className={styles.productPrice}>
                           R$ {item.unitPrice ? item.unitPrice.toFixed(2) : '0.00'}
                         </span>
                       </div>
                       <div className={styles.quantityControls}>
-                        <button
-                          className={styles.btnQuantity}
-                          onClick={() => handleRemoveQuantity(item.productId)}
-                        >
+                        <button className={styles.btnQuantity} onClick={() => handleRemoveQuantity(item.productId)}>
                           <MinusIcon size={16} />
                         </button>
-                        <span className={styles.quantityValue}>
-                          {item.quantity}
-                        </span>
-                        <button
-                          className={styles.btnQuantity}
-                          onClick={() => handleAddQuantity(item.productId)}
-                        >
+                        <span className={styles.quantityValue}>{item.quantity}</span>
+                        <button className={styles.btnQuantity} onClick={() => handleAddQuantity(item.productId)}>
                           <PlusIcon size={16} />
                         </button>
                       </div>
@@ -1066,9 +839,7 @@ const calculateSubtotal = () => {
                   ))}
 
                   <div className={styles.discountSection}>
-                    <label className={styles.discountLabel}>
-                      Desconto (Atacado):
-                    </label>
+                    <label className={styles.discountLabel}>Desconto (Atacado):</label>
                     <div className={styles.discountInputWrapper}>
                       <span className={styles.currencySymbol}>R$</span>
                       <input
@@ -1077,9 +848,7 @@ const calculateSubtotal = () => {
                         min="0"
                         max={calculateSubtotal()}
                         value={discount}
-                        onChange={(e) =>
-                          setDiscount(parseFloat(e.target.value) || 0)
-                        }
+                        onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
                         className={styles.discountInput}
                         placeholder="0,00"
                       />
@@ -1094,9 +863,7 @@ const calculateSubtotal = () => {
                     {discount > 0 && (
                       <div className={styles.totalLine}>
                         <span>Desconto:</span>
-                        <span className={styles.discountText}>
-                          - R$ {discount.toFixed(2)}
-                        </span>
+                        <span className={styles.discountText}>- R$ {discount.toFixed(2)}</span>
                       </div>
                     )}
                     <div className={styles.totalLine}>
@@ -1108,22 +875,10 @@ const calculateSubtotal = () => {
               )}
 
               <div className={styles.productsActions}>
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    setFormStep("checkCustomer");
-                    setSelectedCustomer(null);
-                    setOrderItems([]);
-                    setDiscount(0); // Reseta o desconto ao voltar
-                  }}
-                >
+                <Button variant="secondary" onClick={() => { setFormStep("checkCustomer"); setSelectedCustomer(null); setOrderItems([]); setDiscount(0); }}>
                   Voltar
                 </Button>
-                <Button
-                  variant="primary"
-                  onClick={() => setFormStep("order")}
-                  disabled={orderItems.length === 0}
-                >
+                <Button variant="primary" onClick={() => setFormStep("order")} disabled={orderItems.length === 0}>
                   Avançar
                 </Button>
               </div>
@@ -1134,26 +889,9 @@ const calculateSubtotal = () => {
             <Card
               title={`Cadastro de Pedido — ${selectedCustomer.name}`}
               fields={[
-                {
-                  name: "orderDate",
-                  label: "Data do Pedido",
-                  type: "date",
-                  value: getLocalDateString(),
-                  readOnly: true,
-                },
-                {
-                  name: "deliveryDate",
-                  label: "Data de Entrega",
-                  type: "date",
-                  value: "",
-                  min: getLocalDateString(),
-                },
-                {
-                  name: "notes",
-                  label: "Observações",
-                  type: "text",
-                  value: "",
-                },
+                { name: "orderDate", label: "Data do Pedido", type: "date", value: getLocalDateString(), readOnly: true },
+                { name: "deliveryDate", label: "Data de Entrega", type: "date", value: "", min: getLocalDateString() },
+                { name: "notes", label: "Observações", type: "text", value: "" },
               ]}
               onSubmit={handleSubmit}
               submitLabel="Cadastrar Pedido"
@@ -1162,25 +900,17 @@ const calculateSubtotal = () => {
               onCancel={() => setFormStep("selectProducts")}
               additionalInfo={
                 <div className={styles.orderSummaryContainer}>
-                  <button
-                    className={styles.orderSummaryToggle}
-                    type="button"
-                    onClick={() => setShowSummary((prev) => !prev)}
-                  >
-                    {showSummary
-                      ? "Ocultar Resumo do Pedido"
-                      : "Mostrar Resumo do Pedido"}
+                  <button className={styles.orderSummaryToggle} type="button" onClick={() => setShowSummary((prev) => !prev)}>
+                    {showSummary ? "Ocultar Resumo do Pedido" : "Mostrar Resumo do Pedido"}
                   </button>
-
                   {showSummary && (
                     <div className={styles.orderSummaryCard}>
                       <h5>Resumo do Pedido</h5>
                       {orderItems.map((item) => (
                         <div key={item.productId} className={styles.orderItem}>
-                          <span>{item.productName}</span> —
-                          <span> Qtd: {item.quantity}</span>
+                          <span>{item.productName}</span> — <span> Qtd: {item.quantity}</span>
                           <br />
-                            <span>R$ {(item.unitPrice || 0).toFixed(2)}</span>
+                          <span>R$ {(item.unitPrice || 0).toFixed(2)}</span>
                         </div>
                       ))}
                       {discount > 0 && (
@@ -1202,119 +932,52 @@ const calculateSubtotal = () => {
         </Modal.Body>
       </Modal>
 
-      {/* Modal de confirmação de cancelamento */}
-      <Modal
-        show={warningDeleteModalShow}
-        onHide={handleCloseCancelModal}
-        size="sm"
-        centered
-      >
+      {/* Modal de confirmação de cancelamento (mantido) */}
+      <Modal show={warningDeleteModalShow} onHide={handleCloseCancelModal} size="sm" centered>
         <Modal.Body className="text-center">
-          <div className="mb-3" style={{ fontSize: "48px", color: "#ffc107" }}>
-            ⚠️
-          </div>
-          <h5>
-            <strong>Atenção</strong>
-          </h5>
-          <p>{warningMessage}</p>
+          <div className="mb-3" style={{ fontSize: "48px", color: "#ffc107" }}>⚠️</div>
+          <h5><strong>Atenção</strong></h5>
+          <p>Deseja realmente cancelar este pedido?</p>
         </Modal.Body>
         <Modal.Footer className={styles.modalWarningFooter}>
-          <ButtonCancelar
-            variant="outline"
-            onClick={handleCloseCancelModal}
-            CancelLabel="Voltar"
-          />
-          <Button variant="danger" onClick={handleConfirmCancel}>
-            Cancelar
-          </Button>
+          <ButtonCancelar variant="outline" onClick={handleCloseCancelModal} CancelLabel="Voltar" />
+          <Button variant="danger" onClick={handleConfirmCancel}>Cancelar</Button>
         </Modal.Footer>
       </Modal>
 
-      {/* Modal de confirmação de entrega */}
-      <Modal
-        show={warningDeliveredModalShow}
-        onHide={handleCloseDeliveredModal}
-        size="sm"
-        centered
-      >
+      {/* Modal de confirmação de entrega (mantido) */}
+      <Modal show={warningDeliveredModalShow} onHide={handleCloseDeliveredModal} size="sm" centered>
         <Modal.Body className="text-center">
-          <div className="mb-3" style={{ fontSize: "48px", color: "#28a745" }}>
-            ✓
-          </div>
-          <h5>
-            <strong>Confirmar Entrega</strong>
-          </h5>
-          <p>{warningMessage}</p>
+          <div className="mb-3" style={{ fontSize: "48px", color: "#28a745" }}>✓</div>
+          <h5><strong>Confirmar Entrega</strong></h5>
+          <p>Esse pedido realmente foi entregue?</p>
         </Modal.Body>
         <Modal.Footer className={styles.modalWarningFooter}>
-          <ButtonCancelar
-            variant="outline"
-            onClick={handleCloseDeliveredModal}
-            CancelLabel="Voltar"
-          />
-          <Button variant="success" onClick={handleConfirmDelivered}>
-            Confirmar Entrega
-          </Button>
+          <ButtonCancelar variant="outline" onClick={handleCloseDeliveredModal} CancelLabel="Voltar" />
+          <Button variant="success" onClick={handleConfirmDelivered}>Confirmar Entrega</Button>
         </Modal.Footer>
       </Modal>
 
-      {/* MODAL DE EDIÇÃO DE PEDIDO */}
+      {/* MODAL DE EDIÇÃO DE PEDIDO (mantido) */}
       {selectPedido && (
-        <Modal
-          show={modalEditShow}
-          onHide={handleCloseEditModal}
-          size="lg"
-          centered
-        >
+        <Modal show={modalEditShow} onHide={handleCloseEditModal} size="lg" centered>
           <Modal.Header closeButton>
             <Modal.Title>Editar Pedido #{selectPedido.id}</Modal.Title>
           </Modal.Header>
           <Modal.Body className={styles.modalBodyEdit}>
             <Card
               key={selectPedido.id}
-              title={
-                `Pedido de ${selectPedido?.customer?.name}` ||
-                "Cliente não informado"
-              }
+              title={`Pedido de ${selectPedido?.customer?.name}` || "Cliente não informado"}
               fields={[
-                {
-                  name: "status",
-                  value: selectPedido.status || "PENDING",
-                  label: "Status do Pedido",
-                  type: "select",
-                  options: [
+                { name: "status", value: selectPedido.status || "PENDING", label: "Status do Pedido", type: "select", options: [
                     { value: "IN_PRODUCTION", label: "Em Produção" },
-                    {
-                      value: "READY_FOR_DELIVERY",
-                      label: "Pronto para Entrega",
-                    },
+                    { value: "READY_FOR_DELIVERY", label: "Pronto para Entrega" },
                     { value: "DELIVERED", label: "Entregue" },
                     { value: "CANCELLED", label: "Cancelado" },
-                  ],
-                },
-                {
-                  name: "orderDate",
-                  value: selectPedido.orderDate
-                    ? getLocalDateString(new Date(selectPedido.orderDate))
-                    : getLocalDateString(),
-                  label: "Data do Pedido",
-                  type: "date",
-                },
-                {
-                  name: "deliveryDate",
-                  value: selectPedido.deliveryDate
-                    ? getLocalDateString(new Date(selectPedido.deliveryDate))
-                    : "",
-                  label: "Data de Entrega",
-                  type: "date",
-                },
-                {
-                  name: "notes",
-                  value: selectPedido.notes || "",
-                  label: "Observações",
-                  type: "textarea",
-                  placeholder: "Observações sobre o pedido...",
-                },
+                  ] },
+                { name: "orderDate", value: selectPedido.orderDate ? getLocalDateString(new Date(selectPedido.orderDate)) : getLocalDateString(), label: "Data do Pedido", type: "date" },
+                { name: "deliveryDate", value: selectPedido.deliveryDate ? getLocalDateString(new Date(selectPedido.deliveryDate)) : "", label: "Data de Entrega", type: "date" },
+                { name: "notes", value: selectPedido.notes || "", label: "Observações", type: "textarea", placeholder: "Observações sobre o pedido..." },
               ]}
               showCancel
               onCancel={handleCloseEditModal}
@@ -1325,44 +988,23 @@ const calculateSubtotal = () => {
                 <div className={styles.pedidoInfoAdicional}>
                   <h6>Informações do Cliente</h6>
                   <div className={styles.clienteInfo}>
-                    <p>
-                      <strong>Cliente:</strong>{" "}
-                      {selectPedido.customer?.name || "N/A"}
-                    </p>
-                    {selectPedido.customer?.contact && (
-                      <p>
-                        <strong>Telefone:</strong>{" "}
-                        {selectPedido.customer.contact}
-                      </p>
-                    )}
+                    <p><strong>Cliente:</strong> {selectPedido.customer?.name || "N/A"}</p>
+                    {selectPedido.customer?.contact && <p><strong>Telefone:</strong> {selectPedido.customer.contact}</p>}
                   </div>
-
                   {selectPedido.items && selectPedido.items.length > 0 && (
                     <div className={styles.itensPedido}>
                       <h6>Itens do Pedido</h6>
                       <div className={styles.itensList}>
                         {selectPedido.items.map((item, index) => (
                           <div key={index} className={styles.itemRow}>
-                            <span className={styles.itemQuantity}>
-                              {item.quantity}x{" "}
-                            </span>
-                            <span className={styles.itemName}>
-                              {item.product?.name || "Produto não encontrado"} -{" "}
-                            </span>
-                            <span className={styles.itemPrice}>
-                              R${" "}
-                              {typeof item.unitPrice === "number"
-                                ? item.unitPrice.toFixed(2)
-                                : "0.00"}
-                            </span>
+                            <span className={styles.itemQuantity}>{item.quantity}x </span>
+                            <span className={styles.itemName}>{item.product?.name || "Produto não encontrado"} - </span>
+                            <span className={styles.itemPrice}>R$ {typeof item.unitPrice === "number" ? item.unitPrice.toFixed(2) : "0.00"}</span>
                           </div>
                         ))}
                       </div>
                       <div className={styles.totalPedido}>
-                        <strong>
-                          Total do Pedido: R${" "}
-                          {selectPedido.total?.toFixed(2) || "0.00"}
-                        </strong>
+                        <strong>Total do Pedido: R$ {selectPedido.total?.toFixed(2) || "0.00"}</strong>
                       </div>
                     </div>
                   )}
@@ -1376,46 +1018,7 @@ const calculateSubtotal = () => {
       {/* FAB */}
       <FAB onClick={() => setModalShow(true)} text="Adicionar" />
 
-      {/* Modal de sucesso */}
-      <Modal
-        show={successModalShow}
-        onHide={() => setSuccessModalShow(false)}
-        size="sm"
-        centered
-      >
-        <Modal.Body className={`text-center ${styles.successProdutosBody}`}>
-          <div className={styles.successProdutosIconContainer} aria-hidden>
-            <span className={styles.successProdutosIcon}>✓</span>
-          </div>
-          <h5>{successMessage}</h5>
-        </Modal.Body>
-        <Modal.Footer className="justify-content-center">
-          <Button variant="success" onClick={() => setSuccessModalShow(false)}>
-            OK
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      {/* Modal de aviso */}
-      <Modal
-        show={warningModalShow}
-        onHide={() => setWarningModalShow(false)}
-        size="sm"
-        centered
-      >
-        <Modal.Body className="text-center">
-          <div style={{ fontSize: "48px", color: "#ffc107" }}>⚠️</div>
-          <h5>
-            <strong>Atenção</strong>
-          </h5>
-          <p>{warningMessage}</p>
-        </Modal.Body>
-        <Modal.Footer className="justify-content-center">
-          <Button variant="warning" onClick={() => setWarningModalShow(false)}>
-            Entendi
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {/* Modais de sucesso e aviso removidos */}
     </>
   );
 }

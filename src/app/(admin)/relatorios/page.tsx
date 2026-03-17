@@ -15,42 +15,6 @@ import {
   ExportIcon,
 } from "@phosphor-icons/react";
 
-// OPERAÇÕES PRINCIPAIS:
-
-// BUSCAR DADOS:
-// 1. Faz chamadas paralelas para orders, customers e products
-// 2. Processa dados para analytics
-// 3. Atualiza estados com informações coletadas
-
-// PROCESSAR ANALYTICS:
-// 1. Filtra orders por período (semana/mês/ano)
-// 2. Calcula métricas: receita total, pedidos, clientes, produtos
-// 3. Identifica cliente mais frequente e valores gastos
-// 4. Encontra produtos mais e menos vendidos
-// 5. Agrupa pedidos por status
-// 6. Gera dados para gráficos (receita mensal, pedidos mensais)
-
-// FILTRAR POR PERÍODO:
-// - Semana: últimos 7 dias
-// - Mês: último mês
-// - Ano: último ano
-// Aplica filtro às orders e recalcula todas as métricas
-
-// GERAR GRÁFICOS:
-// 1. Receita Mensal: Linha temporal da receita
-// 2. Pedidos Mensais: Barras com quantidade de pedidos
-// 3. Status: Pizza/Doughnut com distribuição
-// 4. Produtos: Top 10 produtos mais vendidos
-
-// EXPORTAR DADOS:
-// 1. Coleta métricas principais
-// 2. Formata em CSV
-// 3. Gera arquivo para download
-
-// NAVEGAÇÃO:
-// - Redireciona para página de pedidos com highlight
-// - Permissão de clique em pedidos recentes
-
 // Importações do Chart.js
 import {
   Chart as ChartJS,
@@ -68,9 +32,10 @@ import { Bar, Line, Pie, Doughnut } from "react-chartjs-2";
 import Order from "@/models/order";
 import Customer from "@/models/Customer";
 import Product from "@/models/Product";
-import { link } from "fs";
 import { useRouter } from "next/navigation";
 import { PageActions } from "@/contexts/PageActions";
+import FixedExpense from '@/models/FixedExpenses';
+import toast from "react-hot-toast";
 
 // Registrando componentes do Chart.js
 ChartJS.register(
@@ -114,28 +79,27 @@ interface AnalyticsData {
   };
   recentOrders: Order[];
   monthlyRevenue: { month: string; revenue: number }[];
-  monthlyOrders: { month: string; count: number }[]; // Corrigido para mensal
+  monthlyOrders: { month: string; count: number }[];
   productSales: { product: string; quantity: number; revenue: number }[];
+  totalExpenses: number;
+  monthlyExpenses: { month: string; total: number }[];
+  expensesByCategory: { category: string; total: number }[];
 }
 
-export default function Relatorios() {
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
-    null
-  );
+export default function RelatoriosPage() {
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState<"week" | "month" | "year">(
-    "month"
-  );
+  const [timeRange, setTimeRange] = useState<"week" | "month" | "year">("month");
   const [orders, setOrders] = useState<Order[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [fixedExpenses, setFixedExpenses] = useState<FixedExpense[]>([]);
   const router = useRouter();
   const pageActions = useContext(PageActions);
-  
 
-    useEffect(() => {
-      pageActions.setShowAddButton(false);
-    }, []);
+  useEffect(() => {
+    pageActions.setShowAddButton(false);
+  }, [pageActions]);
 
   useEffect(() => {
     fetchData();
@@ -147,17 +111,13 @@ export default function Relatorios() {
 
   const formatDisplayDate = (dateString: string | null): string => {
     if (!dateString) return "Não definida";
-
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return "Data inválida";
-
       const adjustedDate = new Date(date.getTime() + 3 * 60 * 60 * 1000);
-
       const day = String(adjustedDate.getUTCDate()).padStart(2, "0");
       const month = String(adjustedDate.getUTCMonth() + 1).padStart(2, "0");
       const year = adjustedDate.getUTCFullYear();
-
       return `${day}/${month}/${year}`;
     } catch (error) {
       console.error("Erro ao formatar data:", error);
@@ -168,30 +128,33 @@ export default function Relatorios() {
   const fetchData = async () => {
     try {
       setLoading(true);
-
-      const [ordersResponse, customersResponse, productsResponse] =
-        await Promise.all([
-          api.get("/orders"),
-          api.get("/customers"),
-          api.get("/products"),
-        ]);
+      const [ordersResponse, customersResponse, productsResponse, expensesResponse] = await Promise.all([
+        api.get("/orders"),
+        api.get("/customers"),
+        api.get("/products"),
+        api.get("/fixedExpenses"),
+      ]);
 
       const ordersData = ordersResponse.data;
       const customersData = customersResponse.data;
       const productsData = productsResponse.data;
+      const expensesData = expensesResponse.data;
 
       setOrders(ordersData);
       setCustomers(customersData);
       setProducts(productsData);
+      setFixedExpenses(expensesData);
 
       const processedData = processAnalyticsData(
         ordersData,
         customersData,
-        productsData
+        productsData,
+        expensesData
       );
       setAnalyticsData(processedData);
     } catch (error) {
       console.error("Erro ao buscar dados:", error);
+      toast.error("Erro ao carregar os dados. Tente novamente."); // <-- feedback visual adicionado
     } finally {
       setLoading(false);
     }
@@ -200,39 +163,28 @@ export default function Relatorios() {
   const processAnalyticsData = (
     orders: Order[],
     customers: Customer[],
-    products: Product[]
+    products: Product[],
+    fixedExpenses: FixedExpense[]
   ): AnalyticsData => {
     const filteredOrders = filterOrdersByTimeRange(orders, timeRange);
-    const deliveredOrders = filteredOrders.filter(
-      (order) => order.status === "DELIVERED"
-    );
-    const totalRevenue = deliveredOrders.reduce(
-      (sum, order) => sum + (order.total || 0),
-      0
-    );
+    const deliveredOrders = filteredOrders.filter((order) => order.status === "DELIVERED");
+    const totalRevenue = deliveredOrders.reduce((sum, order) => sum + (order.total || 0), 0);
 
-    // Estatísticas básicas
     const totalOrders = filteredOrders.length;
     const totalCustomers = customers.length;
     const totalProducts = products.length;
-    const averageOrderValue =
-      deliveredOrders.length > 0 ? totalRevenue / deliveredOrders.length : 0;
+    const averageOrderValue = deliveredOrders.length > 0 ? totalRevenue / deliveredOrders.length : 0;
 
     // Cliente que mais pediu
-    const customerOrderCount: Record<number, { count: number; total: number }> =
-      {};
+    const customerOrderCount: Record<number, { count: number; total: number }> = {};
     filteredOrders.forEach((order) => {
       if (order.customer) {
         const customerId = order.customer.id;
         if (!customerOrderCount[customerId ? customerId : 0]) {
-          customerOrderCount[customerId ? customerId : 0] = {
-            count: 0,
-            total: 0,
-          };
+          customerOrderCount[customerId ? customerId : 0] = { count: 0, total: 0 };
         }
         customerOrderCount[customerId ? customerId : 0].count++;
-        customerOrderCount[customerId ? customerId : 0].total +=
-          order.total || 0;
+        customerOrderCount[customerId ? customerId : 0].total += order.total || 0;
       }
     });
 
@@ -259,13 +211,8 @@ export default function Relatorios() {
       : { name: "N/A", orderCount: 0, totalSpent: 0 };
 
     // Produtos mais e menos vendidos
-    const productSales: Record<number, { quantity: number; revenue: number }> =
-      {};
-    const productSalesArray: {
-      product: string;
-      quantity: number;
-      revenue: number;
-    }[] = [];
+    const productSales: Record<number, { quantity: number; revenue: number }> = {};
+    const productSalesArray: { product: string; quantity: number; revenue: number }[] = [];
 
     filteredOrders.forEach((order) => {
       order.items?.forEach((item) => {
@@ -279,7 +226,6 @@ export default function Relatorios() {
       });
     });
 
-    // Converter para array para o gráfico
     Object.entries(productSales).forEach(([productId, data]) => {
       const product = products.find((p) => p.id === parseInt(productId));
       if (product) {
@@ -332,34 +278,43 @@ export default function Relatorios() {
 
     // Pedidos por status
     const ordersByStatus = {
-      pending: filteredOrders.filter((order) => order.status === "PENDING")
-        .length,
+      pending: filteredOrders.filter((order) => order.status === "PENDING").length,
       inProgress: filteredOrders.filter(
-        (order) =>
-          order.status === "IN_PROGRESS" || order.status === "IN_PRODUCTION"
+        (order) => order.status === "IN_PROGRESS" || order.status === "IN_PRODUCTION"
       ).length,
-      delivered: filteredOrders.filter((order) => order.status === "DELIVERED")
-        .length,
-      cancelled: filteredOrders.filter((order) => order.status === "CANCELLED")
-        .length,
+      delivered: filteredOrders.filter((order) => order.status === "DELIVERED").length,
+      cancelled: filteredOrders.filter((order) => order.status === "CANCELLED").length,
     };
 
     // Pedidos recentes (últimos 5)
     const recentOrders = filteredOrders
       .sort(
         (a, b) =>
-          new Date(
-            b.orderDate ? new Date(b.orderDate.toString()).toISOString() : ""
-          ).getTime() -
-          new Date(
-            a.orderDate ? new Date(a.orderDate.toString()).toISOString() : ""
-          ).getTime()
+          new Date(b.orderDate ? new Date(b.orderDate.toString()).toISOString() : "").getTime() -
+          new Date(a.orderDate ? new Date(a.orderDate.toString()).toISOString() : "").getTime()
       )
       .slice(0, 5);
 
     // Dados para gráficos
     const monthlyRevenue = generateMonthlyRevenue(filteredOrders);
     const monthlyOrders = generateMonthlyOrders(filteredOrders);
+
+    // --- Processamento das despesas fixas ---
+    const filteredExpenses = filterExpensesByTimeRange(fixedExpenses, timeRange);
+    const totalExpenses = filteredExpenses.reduce((sum, exp) => sum + exp.value, 0);
+
+    const monthlyExpenses = generateMonthlyExpenses(fixedExpenses); // histórico completo
+
+    // Agrupar por categoria (considerando apenas despesas do período filtrado)
+    const expensesByCategory = Object.entries(
+      filteredExpenses.reduce((acc, exp) => {
+        const cat = exp.category || 'Outros';
+        acc[cat] = (acc[cat] || 0) + exp.value;
+        return acc;
+      }, {} as Record<string, number>)
+    )
+      .map(([category, total]) => ({ category, total }))
+      .sort((a, b) => b.total - a.total);
 
     return {
       totalRevenue,
@@ -374,40 +329,22 @@ export default function Relatorios() {
       recentOrders,
       monthlyRevenue,
       monthlyOrders,
-      productSales: productSalesArray
-        .sort((a, b) => b.quantity - a.quantity)
-        .slice(0, 10),
+      productSales: productSalesArray.sort((a, b) => b.quantity - a.quantity).slice(0, 10),
+      totalExpenses,
+      monthlyExpenses,
+      expensesByCategory,
     };
   };
 
   const generateMonthlyRevenue = (orders: Order[]) => {
-    const months = [
-      "Jan",
-      "Fev",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Set",
-      "Out",
-      "Nov",
-      "Dec",
-    ];
+    const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     const revenueByMonth: { [key: string]: number } = {};
 
     orders.forEach((order) => {
       if (order.status === "DELIVERED") {
-        const date = new Date(
-          order.orderDate
-            ? new Date(order.orderDate.toString()).toISOString()
-            : ""
-        );
+        const date = new Date(order.orderDate ? new Date(order.orderDate.toString()).toISOString() : "");
         const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
-        if (!revenueByMonth[monthKey]) {
-          revenueByMonth[monthKey] = 0;
-        }
+        if (!revenueByMonth[monthKey]) revenueByMonth[monthKey] = 0;
         revenueByMonth[monthKey] += order.total || 0;
       }
     });
@@ -423,56 +360,26 @@ export default function Relatorios() {
 
   const generateMonthlyOrders = (orders: Order[]) => {
     const ordersByMonth: { [key: string]: number } = {};
-
     orders.forEach((order) => {
-      const date = new Date(
-        order.orderDate
-          ? new Date(order.orderDate.toString()).toISOString()
-          : ""
-      );
+      const date = new Date(order.orderDate ? new Date(order.orderDate.toString()).toISOString() : "");
       const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
-
-      if (!ordersByMonth[monthKey]) {
-        ordersByMonth[monthKey] = 0;
-      }
+      if (!ordersByMonth[monthKey]) ordersByMonth[monthKey] = 0;
       ordersByMonth[monthKey] += 1;
     });
 
-    // Converter para array e ordenar
-    const monthNames = [
-      "Jan",
-      "Fev",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Set",
-      "Out",
-      "Nov",
-      "Dec",
-    ];
-
+    const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     return Object.entries(ordersByMonth)
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([key, count]) => {
         const [year, month] = key.split("-");
-        return {
-          month: `${monthNames[parseInt(month)]}/${year.substring(2)}`,
-          count,
-        };
+        return { month: `${monthNames[parseInt(month)]}/${year.substring(2)}`, count };
       })
-      .slice(-12); // Últimos 12 meses
+      .slice(-12);
   };
 
-  const filterOrdersByTimeRange = (
-    orders: Order[],
-    range: "week" | "month" | "year"
-  ): Order[] => {
+  const filterOrdersByTimeRange = (orders: Order[], range: "week" | "month" | "year"): Order[] => {
     const now = new Date();
     let startDate = new Date();
-
     switch (range) {
       case "week":
         startDate.setDate(now.getDate() - 7);
@@ -484,28 +391,55 @@ export default function Relatorios() {
         startDate.setFullYear(now.getFullYear() - 1);
         break;
     }
-
     return orders.filter(
       (order) =>
-        new Date(
-          order.orderDate
-            ? new Date(order.orderDate.toString()).toISOString()
-            : ""
-        ) >= startDate
+        new Date(order.orderDate ? new Date(order.orderDate.toString()).toISOString() : "") >= startDate
     );
+  };
+
+  // Funções auxiliares para despesas
+  const filterExpensesByTimeRange = (expenses: FixedExpense[], range: "week" | "month" | "year"): FixedExpense[] => {
+    const now = new Date();
+    let startDate = new Date();
+    switch (range) {
+      case "week":
+        startDate.setDate(now.getDate() - 7);
+        break;
+      case "month":
+        startDate.setMonth(now.getMonth() - 1);
+        break;
+      case "year":
+        startDate.setFullYear(now.getFullYear() - 1);
+        break;
+    }
+    return expenses.filter(exp => new Date(exp.date) >= startDate);
+  };
+
+  const generateMonthlyExpenses = (expenses: FixedExpense[]): { month: string; total: number }[] => {
+    const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    const expenseByMonth: Record<string, number> = {};
+
+    expenses.forEach(exp => {
+      const date = new Date(exp.date);
+      const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+      expenseByMonth[monthKey] = (expenseByMonth[monthKey] || 0) + exp.value;
+    });
+
+    return Object.entries(expenseByMonth)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .slice(-12)
+      .map(([key, total]) => {
+        const [year, monthIndex] = key.split('-');
+        return { month: `${months[parseInt(monthIndex)]}/${year.slice(2)}`, total };
+      });
   };
 
   // Configurações dos gráficos
   const revenueChartOptions = {
     responsive: true,
     plugins: {
-      legend: {
-        position: "top" as const,
-      },
-      title: {
-        display: true,
-        text: "Receita Mensal",
-      },
+      legend: { position: "top" as const },
+      title: { display: true, text: "Receita Mensal" },
     },
   };
 
@@ -521,17 +455,11 @@ export default function Relatorios() {
     ],
   };
 
-  // CORRIGIDO: Agora mostra pedidos mensais
   const ordersChartOptions = {
     responsive: true,
     plugins: {
-      legend: {
-        position: "top" as const,
-      },
-      title: {
-        display: true,
-        text: "Pedidos Mensais", // Título atualizado
-      },
+      legend: { position: "top" as const },
+      title: { display: true, text: "Pedidos Mensais" },
     },
   };
 
@@ -549,13 +477,8 @@ export default function Relatorios() {
   const statusChartOptions = {
     responsive: true,
     plugins: {
-      legend: {
-        position: "top" as const,
-      },
-      title: {
-        display: true,
-        text: "Distribuição de Status dos Pedidos",
-      },
+      legend: { position: "top" as const },
+      title: { display: true, text: "Distribuição de Status dos Pedidos" },
     },
   };
 
@@ -565,10 +488,7 @@ export default function Relatorios() {
       {
         label: "Quantidade",
         data: analyticsData
-          ? [
-              analyticsData.ordersByStatus.delivered,
-              analyticsData.ordersByStatus.cancelled,
-            ]
+          ? [analyticsData.ordersByStatus.delivered, analyticsData.ordersByStatus.cancelled]
           : [],
         backgroundColor: ["rgba(75, 192, 192, 0.5)", "rgba(255, 99, 132, 0.5)"],
         borderColor: ["rgba(75, 192, 192, 1)", "rgba(255, 99, 132, 1)"],
@@ -580,13 +500,8 @@ export default function Relatorios() {
   const productsChartOptions = {
     responsive: true,
     plugins: {
-      legend: {
-        position: "top" as const,
-      },
-      title: {
-        display: true,
-        text: "Top 10 Produtos Mais Vendidos",
-      },
+      legend: { position: "top" as const },
+      title: { display: true, text: "Top 10 Produtos Mais Vendidos" },
     },
   };
 
@@ -601,37 +516,70 @@ export default function Relatorios() {
     ],
   };
 
+  // Gráficos de despesas
+  const expensesChartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { position: "top" as const },
+      title: { display: true, text: "Despesas Mensais" },
+    },
+  };
+
+  const expensesChartData = {
+    labels: analyticsData?.monthlyExpenses.map((item) => item.month) || [],
+    datasets: [
+      {
+        label: "Despesas (R$)",
+        data: analyticsData?.monthlyExpenses.map((item) => item.total) || [],
+        borderColor: "rgb(255, 99, 132)",
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
+      },
+    ],
+  };
+
+  const categoryChartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { position: "right" as const },
+      title: { display: true, text: "Despesas por Categoria" },
+    },
+  };
+
+  const categoryChartData = {
+    labels: analyticsData?.expensesByCategory.map((item) => item.category) || [],
+    datasets: [
+      {
+        data: analyticsData?.expensesByCategory.map((item) => item.total) || [],
+        backgroundColor: [
+          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+          '#FF9F40', '#E7E9ED', '#76A346', '#E7A1B0', '#F1C40F',
+        ],
+      },
+    ],
+  };
+
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
+    return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
   };
 
   const exportToCSV = () => {
     if (!analyticsData) return;
 
     const headers = ["Métrica", "Valor"];
-
     const data = [
       ["Receita Total", formatCurrency(analyticsData.totalRevenue)],
       ["Total de Pedidos", analyticsData.totalOrders],
       ["Total de Clientes", analyticsData.totalCustomers],
       ["Total de Produtos", analyticsData.totalProducts],
-      [
-        "Valor Médio por Pedido",
-        formatCurrency(analyticsData.averageOrderValue),
-      ],
+      ["Valor Médio por Pedido", formatCurrency(analyticsData.averageOrderValue)],
       ["Cliente Mais Frequente", analyticsData.topCustomer.name],
       ["Pedidos do Cliente Top", analyticsData.topCustomer.orderCount],
       ["Produto Mais Vendido", analyticsData.topProduct.name],
       ["Quantidade Vendida", analyticsData.topProduct.quantitySold],
+      ["Despesas no Período", formatCurrency(analyticsData.totalExpenses)],
     ];
 
-    const csvContent = [headers, ...data]
-      .map((row) => row.join(","))
-      .join("\n");
-
+    const csvContent = [headers, ...data].map((row) => row.join(",")).join("\n");
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -654,9 +602,7 @@ export default function Relatorios() {
     return (
       <div className={styles.errorContainer}>
         <p>Erro ao carregar dados. Tente novamente.</p>
-        <button onClick={fetchData} className={styles.retryButton}>
-          Tentar Novamente
-        </button>
+        <button onClick={fetchData} className={styles.retryButton}>Tentar Novamente</button>
       </div>
     );
   }
@@ -668,31 +614,19 @@ export default function Relatorios() {
         <div className={styles.headerActions}>
           <div className={styles.timeFilter}>
             <button
-              className={`${styles.timeButton} ${
-                timeRange === "week" ? styles.active : ""
-              }`}
+              className={`${styles.timeButton} ${timeRange === "week" ? styles.active : ""}`}
               onClick={() => setTimeRange("week")}
-            >
-              Semana
-            </button>
+            >Semana</button>
             <button
-              className={`${styles.timeButton} ${
-                timeRange === "month" ? styles.active : ""
-              }`}
+              className={`${styles.timeButton} ${timeRange === "month" ? styles.active : ""}`}
               onClick={() => setTimeRange("month")}
-            >
-              Mês
-            </button>
+            >Mês</button>
             <button
-              className={`${styles.timeButton} ${
-                timeRange === "year" ? styles.active : ""
-              }`}
+              className={`${styles.timeButton} ${timeRange === "year" ? styles.active : ""}`}
               onClick={() => setTimeRange("year")}
-            >
-              Ano
-            </button>
+            >Ano</button>
           </div>
-          <button onClick={exportToCSV} className={styles.exportButton} disabled>
+          <button onClick={exportToCSV} className={styles.exportButton}>
             <ExportIcon size={20} />
             Exportar CSV
           </button>
@@ -706,10 +640,7 @@ export default function Relatorios() {
             <CurrencyDollarIcon size={24} className={styles.metricIcon} />
             <span className={styles.metricTitle}>Receita Total</span>
           </div>
-          <div className={styles.metricValue}>
-            {formatCurrency(analyticsData.totalRevenue)}
-          </div>
-          <div className={styles.metricTrend}></div>
+          <div className={styles.metricValue}>{formatCurrency(analyticsData.totalRevenue)}</div>
         </div>
         <div className={styles.metricCard}>
           <div className={styles.metricHeader}>
@@ -718,67 +649,72 @@ export default function Relatorios() {
           </div>
           <div className={styles.metricValue}>{analyticsData.totalOrders}</div>
         </div>
-
         <div className={styles.metricCard}>
           <div className={styles.metricHeader}>
             <UsersIcon size={24} className={styles.metricIcon} />
             <span className={styles.metricTitle}>Clientes</span>
           </div>
-          <div className={styles.metricValue}>
-            {analyticsData.totalCustomers}
-          </div>
+          <div className={styles.metricValue}>{analyticsData.totalCustomers}</div>
         </div>
-
         <div className={styles.metricCard}>
           <div className={styles.metricHeader}>
             <PackageIcon size={24} className={styles.metricIcon} />
             <span className={styles.metricTitle}>Produtos</span>
           </div>
-          <div className={styles.metricValue}>
-            {analyticsData.totalProducts}
+          <div className={styles.metricValue}>{analyticsData.totalProducts}</div>
+        </div>
+        {/* NOVO: Card de Despesas */}
+        <div className={styles.metricCard}>
+          <div className={styles.metricHeader}>
+            <CurrencyDollarIcon size={24} className={styles.metricIcon} />
+            <span className={styles.metricTitle}>Despesas no Período</span>
           </div>
+          <div className={styles.metricValue}>{formatCurrency(analyticsData.totalExpenses)}</div>
         </div>
       </div>
 
       {/* Grid de Gráficos */}
       <div className={styles.chartsGrid}>
-        {/* Gráfico de Receita Mensal */}
+        {/* Receita Mensal */}
         <div className={styles.chartCard}>
-          <div className={styles.chartHeader}>
-            <h3>Receita Mensal</h3>
-          </div>
+          <div className={styles.chartHeader}><h3>Receita Mensal</h3></div>
           <div className={styles.chartContainer}>
             <Line options={revenueChartOptions} data={revenueChartData} />
           </div>
         </div>
-
-        {/* Gráfico de Status dos Pedidos */}
+        {/* Status dos Pedidos */}
         <div className={styles.chartCard}>
-          <div className={styles.chartHeader}>
-            <h3>Status dos Pedidos</h3>
-          </div>
+          <div className={styles.chartHeader}><h3>Status dos Pedidos</h3></div>
           <div className={styles.chartContainer}>
             <Doughnut options={statusChartOptions} data={statusChartData} />
           </div>
         </div>
-
-        {/* CORRIGIDO: Gráfico de Pedidos Mensais */}
+        {/* Pedidos Mensais */}
         <div className={styles.chartCard}>
-          <div className={styles.chartHeader}>
-            <h3>Pedidos Mensais</h3>
-          </div>
+          <div className={styles.chartHeader}><h3>Pedidos Mensais</h3></div>
           <div className={styles.chartContainer}>
             <Bar options={ordersChartOptions} data={ordersChartData} />
           </div>
         </div>
-
-        {/* Gráfico de Produtos Mais Vendidos */}
+        {/* Produtos Mais Vendidos */}
         <div className={styles.chartCard}>
-          <div className={styles.chartHeader}>
-            <h3>Produtos Mais Vendidos</h3>
-          </div>
+          <div className={styles.chartHeader}><h3>Produtos Mais Vendidos</h3></div>
           <div className={styles.chartContainer}>
             <Bar options={productsChartOptions} data={productsChartData} />
+          </div>
+        </div>
+        {/* NOVO: Despesas Mensais */}
+        <div className={styles.chartCard}>
+          <div className={styles.chartHeader}><h3>Despesas Mensais</h3></div>
+          <div className={styles.chartContainer}>
+            <Line options={expensesChartOptions} data={expensesChartData} />
+          </div>
+        </div>
+        {/* NOVO: Despesas por Categoria */}
+        <div className={styles.chartCard}>
+          <div className={styles.chartHeader}><h3>Despesas por Categoria</h3></div>
+          <div className={styles.chartContainer}>
+            <Pie options={categoryChartOptions} data={categoryChartData} />
           </div>
         </div>
       </div>
@@ -793,20 +729,10 @@ export default function Relatorios() {
           </h3>
           <div className={styles.analysisContent}>
             <div className={styles.customerInfo}>
-              <div className={styles.customerName}>
-                {analyticsData.topCustomer.name}
-              </div>
+              <div className={styles.customerName}>{analyticsData.topCustomer.name}</div>
               <div className={styles.customerStats}>
-                <div className={styles.statItem}>
-                  <span>Pedidos:</span>
-                  <strong>{analyticsData.topCustomer.orderCount}</strong>
-                </div>
-                <div className={styles.statItem}>
-                  <span>Total Gasto:</span>
-                  <strong>
-                    {formatCurrency(analyticsData.topCustomer.totalSpent)}
-                  </strong>
-                </div>
+                <div className={styles.statItem}><span>Pedidos:</span> <strong>{analyticsData.topCustomer.orderCount}</strong></div>
+                <div className={styles.statItem}><span>Total Gasto:</span> <strong>{formatCurrency(analyticsData.topCustomer.totalSpent)}</strong></div>
               </div>
             </div>
           </div>
@@ -820,22 +746,10 @@ export default function Relatorios() {
           </h3>
           <div className={styles.analysisContent}>
             <div className={styles.productInfo}>
-              <div className={styles.productName}>
-                {analyticsData.topProduct.name}
-              </div>
+              <div className={styles.productName}>{analyticsData.topProduct.name}</div>
               <div className={styles.productStats}>
-                <div className={styles.statItem}>
-                  <span>Quantidade:</span>
-                  <strong>
-                    {analyticsData.topProduct.quantitySold} unidades
-                  </strong>
-                </div>
-                <div className={styles.statItem}>
-                  <span>Receita:</span>
-                  <strong>
-                    {formatCurrency(analyticsData.topProduct.revenue)}
-                  </strong>
-                </div>
+                <div className={styles.statItem}><span>Quantidade:</span> <strong>{analyticsData.topProduct.quantitySold} unidades</strong></div>
+                <div className={styles.statItem}><span>Receita:</span> <strong>{formatCurrency(analyticsData.topProduct.revenue)}</strong></div>
               </div>
             </div>
           </div>
@@ -849,22 +763,10 @@ export default function Relatorios() {
           </h3>
           <div className={styles.analysisContent}>
             <div className={styles.productInfo}>
-              <div className={styles.productName}>
-                {analyticsData.leastSoldProduct.name}
-              </div>
+              <div className={styles.productName}>{analyticsData.leastSoldProduct.name}</div>
               <div className={styles.productStats}>
-                <div className={styles.statItem}>
-                  <span>Quantidade:</span>
-                  <strong>
-                    {analyticsData.leastSoldProduct.quantitySold} unidades
-                  </strong>
-                </div>
-                <div className={styles.statItem}>
-                  <span>Receita:</span>
-                  <strong>
-                    {formatCurrency(analyticsData.leastSoldProduct.revenue)}
-                  </strong>
-                </div>
+                <div className={styles.statItem}><span>Quantidade:</span> <strong>{analyticsData.leastSoldProduct.quantitySold} unidades</strong></div>
+                <div className={styles.statItem}><span>Receita:</span> <strong>{formatCurrency(analyticsData.leastSoldProduct.revenue)}</strong></div>
               </div>
             </div>
           </div>
@@ -891,53 +793,19 @@ export default function Relatorios() {
               </div>
               <div className={styles.tableBody}>
                 {analyticsData.recentOrders.map((order) => (
-                  <div
-                    key={order.id}
-                    className={styles.tableRow}
-                    onClick={() => openOrdersPage(order)}
-                  >
-                    <div className={styles.tableCell} data-label="Pedido">
-                      <strong>#{order.id}</strong>
-                    </div>
-                    <div className={styles.tableCell} data-label="Cliente">
-                      <div className={styles.customerCell}>
-                        {order.customer?.name || "Cliente"}
-                      </div>
-                    </div>
-                    <div className={styles.tableCell} data-label="Data">
-                      {order.orderDate
-                        ? formatDisplayDate(order.orderDate.toString())
-                        : null}
-                    </div>
-                    <div className={styles.tableCell} data-label="Itens">
-                      {order.items?.length || 0}
-                    </div>
-                    <div className={styles.tableCell} data-label="Total">
-                      <strong>{formatCurrency(order.total || 0)}</strong>
-                    </div>
+                  <div key={order.id} className={styles.tableRow} onClick={() => openOrdersPage(order)}>
+                    <div className={styles.tableCell} data-label="Pedido"><strong>#{order.id}</strong></div>
+                    <div className={styles.tableCell} data-label="Cliente"><div className={styles.customerCell}>{order.customer?.name || "Cliente"}</div></div>
+                    <div className={styles.tableCell} data-label="Data">{order.orderDate ? formatDisplayDate(order.orderDate.toString()) : null}</div>
+                    <div className={styles.tableCell} data-label="Itens">{order.items?.length || 0}</div>
+                    <div className={styles.tableCell} data-label="Total"><strong>{formatCurrency(order.total || 0)}</strong></div>
                     <div className={styles.tableCell} data-label="Status">
-                      <span
-                        className={`${styles.statusPill} ${
-                          styles[order.status.toLowerCase()]
-                        }`}
-                      >
-                        {order.status === "DELIVERED"
-                          ? "Entregue"
-                          : order.status === "CANCELLED"
-                          ? "Cancelado"
-                          : "Em Andamento"}
+                      <span className={`${styles.statusPill} ${styles[order.status.toLowerCase()]}`}>
+                        {order.status === "DELIVERED" ? "Entregue" : order.status === "CANCELLED" ? "Cancelado" : "Em Andamento"}
                       </span>
                     </div>
                     <div className={styles.tableCell}>
-                      <button
-                        className={styles.actionButton}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openOrdersPage(order);
-                        }}
-                      >
-                        Ver Detalhes
-                      </button>
+                      <button className={styles.actionButton} onClick={(e) => { e.stopPropagation(); openOrdersPage(order); }}>Ver Detalhes</button>
                     </div>
                   </div>
                 ))}

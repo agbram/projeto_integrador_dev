@@ -13,8 +13,8 @@ import styles from "./styles.module.css";
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 import ActionBar from "@/components/Navigation/ActionBar";
 import { PageActions } from "@/contexts/PageActions";
+import toast from 'react-hot-toast'; // <-- import adicionado
 
-// ✅ Funções de validação movidas para fora do componente
 const isValidCPF = (cpf: string): boolean => {
   cpf = cpf.replace(/[^\d]+/g, "");
   if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
@@ -79,12 +79,9 @@ const applyMask = (value: string): string => {
   }
 };
 
-export default function ClientesModal() {
+export default function ClientesPage() {
   const [modalShow, setModalShow] = useState(false);
   const [modalEditShow, setModalEditShow] = useState(false);
-  const [successModalShow, setSuccessModalShow] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [warningModalShow, setWarningModalShow] = useState(false);
   const [warningDeleteModalShow, setWarningDeleteModalShow] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -93,18 +90,38 @@ export default function ClientesModal() {
   const [clientes, setClientes] = useState<Customer[]>([]);
   const [selectCliente, setSelectCliente] = useState<Customer>();
   const [documentValue, setDocumentValue] = useState("");
-  const pageActions = useContext(PageActions);
-  const [showDisabled, setShowDisabled] = useState(false);
+  const { setShowFilterButton, setFilterOptions, setHandleFilter, setShowAddButton, setHandleAdd } = useContext(PageActions);
+  const [activeFilter, setActiveFilter] = useState<string>("all");
 
+  // Computa a lista filtrada a partir do estado completo
+  const clientesFiltrados = clientes.filter((c) => {
+    if (activeFilter === "disabled") return c.isActive === false;
+    if (activeFilter === "all") return c.isActive !== false;
+    // filtros de modalidade — só entre ativos
+    return c.isActive !== false && c.modality === activeFilter;
+  });
 
   useEffect(() => {
-    pageActions.setShowAddButton(true);
-    pageActions.setHandleAdd(() => {setModalShow(true);});
+    setShowAddButton(true);
+    setHandleAdd(() => { setModalShow(true); });
+
+    setShowFilterButton(true);
+    setFilterOptions([
+      { label: "Todos", value: "all" },
+      { label: "Atacado", value: "Atacado" },
+      { label: "Varejo", value: "Varejo" },
+      { label: "Desativados", value: "disabled" },
+    ]);
+    setHandleFilter((value: string) => {
+      setActiveFilter(value);
+    });
+
     return () => {
-      pageActions.setHandleAdd(() => () => { });
+      setShowFilterButton(false);
+      setFilterOptions([]);
+      setHandleAdd(() => () => {});
     };
   }, []);
-
 
   const modalityOptions = [
     { value: "Atacado", label: "Atacado" },
@@ -118,8 +135,7 @@ export default function ClientesModal() {
       setClientes(response.data);
     } catch (error) {
       console.error("Erro ao buscar clientes:", error);
-      setWarningMessage("Erro ao carregar os clientes cadastrados.");
-      setWarningModalShow(true);
+      toast.error("Erro ao carregar os clientes cadastrados.");
     } finally {
       setLoading(false);
     }
@@ -134,37 +150,32 @@ export default function ClientesModal() {
     const type = doc.length <= 11 ? CustomerType.PF_CPF : CustomerType.PJ_CNPJ;
 
     if (!doc) {
-      setWarningMessage("Por favor, informe um CPF ou CNPJ.");
-      setWarningModalShow(true);
+      toast.error("Por favor, informe um CPF ou CNPJ.");
       return;
     }
 
     if (type === CustomerType.PF_CPF && !isValidCPF(doc)) {
-      setWarningMessage("CPF inválido. Verifique e tente novamente.");
-      setWarningModalShow(true);
+      toast.error("CPF inválido. Verifique e tente novamente.");
       return;
     }
 
     if (type === CustomerType.PJ_CNPJ && !isValidCNPJ(doc)) {
-      setWarningMessage("CNPJ inválido. Verifique e tente novamente.");
-      setWarningModalShow(true);
+      toast.error("CNPJ inválido. Verifique e tente novamente.");
       return;
     }
 
     setLoading(true);
     try {
       const response = await api.get(`/customers/check-document/${doc}`);
-      setWarningMessage(
+      toast.error(
         `${type === CustomerType.PF_CPF ? "CPF" : "CNPJ"} já cadastrado no sistema. Verifique os dados e tente novamente.`
       );
-      setWarningModalShow(true);
     } catch (error: any) {
       if (error.response?.status === 404) {
         setDocDataCheck({ document: data.document, type: type });
         setFormStep("register");
       } else {
-        setWarningMessage("Erro ao verificar documento. Tente novamente.");
-        setWarningModalShow(true);
+        toast.error("Erro ao verificar documento. Tente novamente.");
       }
     } finally {
       setLoading(false);
@@ -174,27 +185,16 @@ export default function ClientesModal() {
   const handleCadastroSubmit = async (data: any) => {
     setLoading(true);
     try {
-      const fullData = {
-        ...docDataCheck,
-        ...data,
-      };
-
-      console.log("Dados do cliente:", fullData);
+      const fullData = { ...docDataCheck, ...data };
       const response = await api.post("/customers", fullData);
-      console.log("Cliente cadastrado:", response.data);
-
       setClientes((prev) => [...prev, response.data]);
-      setSuccessMessage("Cliente cadastrado com sucesso!");
-      setSuccessModalShow(true);
+      toast.success("Cliente cadastrado com sucesso!");
       setDocumentValue("");
       setModalShow(false);
       setFormStep("check");
     } catch (error: any) {
       console.error("Erro ao cadastrar cliente:", error);
-      setWarningMessage(
-        error.response?.data?.message || "Erro ao cadastrar cliente. Tente novamente."
-      );
-      setWarningModalShow(true);
+      toast.error(error.response?.data?.message || "Erro ao cadastrar cliente. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -203,28 +203,16 @@ export default function ClientesModal() {
   const handleSalvarAlteracoes = async (data: any) => {
     setLoading(true);
     try {
-      const fullData = {
-        ...data
-      };
-
-      console.log("Editando cliente:", fullData);
+      const fullData = { ...data };
       const response = await api.put(`/customers/${selectCliente?.id}`, fullData);
-      console.log("Cliente alterado com sucesso:", response.data);
-
-      // ✅ Atualizar a lista de clientes
       setClientes(prev => prev.map(cliente =>
         cliente.id === selectCliente?.id ? response.data : cliente
       ));
-
-      setSuccessMessage("Cliente atualizado com sucesso!");
-      setSuccessModalShow(true);
+      toast.success("Cliente atualizado com sucesso!");
       setModalEditShow(false);
     } catch (error: any) {
       console.error("Erro ao editar cliente:", error);
-      setWarningMessage(
-        error.response?.data?.message || "Erro ao editar cliente. Tente novamente."
-      );
-      setWarningModalShow(true);
+      toast.error(error.response?.data?.message || "Erro ao editar cliente. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -256,62 +244,56 @@ export default function ClientesModal() {
   const handleDesativaUser = async () => {
     setLoading(true);
     try {
-      const response = await api.delete(`/customers/${selectCliente?.id}`);
-      console.log("Cliente desativado com sucesso:", response.data);
-
-      setClientes(prev => prev.map(cliente =>
-        cliente.id === selectCliente?.id ? response.data : cliente
-      ));
+      await api.delete(`/customers/${selectCliente?.id}`);
       setWarningDeleteModalShow(false);
-      setSuccessMessage("Cliente desativado com sucesso!");
-      setSuccessModalShow(true);
+      toast.success("Cliente desativado com sucesso!");
       setModalEditShow(false);
       fetchClientes();
     } catch (error: any) {
       console.error("Erro ao desativar cliente:", error);
-      setWarningMessage(
-        error.response?.data?.message || "Erro ao desativar cliente. Tente novamente."
-      );
-      setWarningModalShow(true);
+      toast.error(error.response?.data?.message || "Erro ao desativar cliente. Tente novamente.");
     } finally {
       setLoading(false);
     }
   };
 
-
   return (
     <>
       <div className={styles.containerPrincipal}>
-        {clientes.length === 0 ? (
+        {clientesFiltrados.length === 0 ? (
           <div className={styles.emptyState}>
-            <h3>Nenhum Cliente encontrado</h3>
-            <p>Cadastre seu primeiro cliente para começar</p>
+            <h3>
+              {activeFilter === "disabled"
+                ? "Nenhum cliente desativado"
+                : "Nenhum Cliente encontrado"}
+            </h3>
+            <p>
+              {activeFilter === "disabled"
+                ? "Não há clientes desativados no momento"
+                : "Cadastre seu primeiro cliente para começar"}
+            </p>
           </div>
         ) : (
-        clientes.map((cliente) => (
-          <div
-            key={cliente.id}
-            className={styles.divContainerCliente}
-          >
-            <CardCliente
-              title={`${cliente.name}`}
-              customer={cliente}
-              loading={loading}
-              actions={[
-                {
-                  label: "Editar",
-                  onClick: () => {
-                    setSelectCliente(cliente);
-                    setModalEditShow(true);
+          clientesFiltrados.map((cliente) => (
+            <div key={cliente.id} className={styles.divContainerCliente}>
+              <CardCliente
+                title={`${cliente.name}`}
+                customer={cliente}
+                loading={loading}
+                actions={[
+                  {
+                    label: "Editar",
+                    onClick: () => {
+                      setSelectCliente(cliente);
+                      setModalEditShow(true);
+                    },
                   },
-                },
-              ]}
-            />
-          </div>
-        ))
-      )}
-    </div>
-
+                ]}
+              />
+            </div>
+          ))
+        )}
+      </div>
 
       {/* Modal de Edição */}
       <Modal
@@ -415,7 +397,7 @@ export default function ClientesModal() {
         </Modal.Body>
       </Modal>
 
-      {/* Modal de alerta de delete */}
+      {/* Modal de confirmação de exclusão */}
       <Modal
         show={warningDeleteModalShow}
         onHide={() => setWarningDeleteModalShow(false)}
@@ -438,54 +420,9 @@ export default function ClientesModal() {
         </Modal.Footer>
       </Modal>
 
-      {/* Modal de sucesso */}
-      <Modal
-        show={successModalShow}
-        onHide={() => setSuccessModalShow(false)}
-        size="sm"
-        centered
-        className={styles.successClientesModal}
-      >
-        <Modal.Body className={styles.successClientesBody}>
-          <div className={styles.successClientesIconContainer} aria-hidden>
-            <span className={styles.successClientesIcon}>✓</span>
-          </div>
-          <h5 className={styles.successClientesTitle}>{successMessage}</h5>
-        </Modal.Body>
-        <Modal.Footer className={styles.successClientesFooter}>
-          <button
-            className={styles.successClientesButton}
-            onClick={() => setSuccessModalShow(false)}
-          >
-            OK
-          </button>
-        </Modal.Footer>
-      </Modal>
-
-      {/* Modal de aviso */}
-      <Modal
-        show={warningModalShow}
-        onHide={() => setWarningModalShow(false)}
-        size="sm"
-        centered
-        className={styles.warningClientesModal}
-      >
-        <Modal.Body className={styles.warningClientesBody}>
-          <div className={styles.warningClientesIconContainer} aria-hidden>
-            <span className={styles.warningClientesIcon}>⚠</span>
-          </div>
-          <h5 className={styles.warningClientesTitle}>Atenção</h5>
-          <p className={styles.warningClientesMessage}>{warningMessage}</p>
-        </Modal.Body>
-        <Modal.Footer className={styles.warningClientesFooter}>
-          <button
-            className={styles.warningClientesButton}
-            onClick={() => setWarningModalShow(false)}
-          >
-            Entendi
-          </button>
-        </Modal.Footer>
-      </Modal>
+      {/* Modais de sucesso e aviso foram removidos */}
     </>
   );
-}
+} 
+
+

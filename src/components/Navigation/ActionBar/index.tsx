@@ -80,7 +80,7 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
         <form className={styles.searchBox} onSubmit={submitSearch}>
           <input
             className={styles.searchInput}
-            placeholder="Procurar!"
+            placeholder="Procurar"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             aria-label="Procurar"
@@ -90,26 +90,32 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
             type="button"
             aria-label="Pesquisar"
             className={styles.iconBtn}
-            onClick={pageAction.handleFilter}
-            
+            onClick={() => pageAction.handleFilter(q)}
           >
             <MagnifyingGlassIcon size={16} />
           </button>
          
         </form>
 
-        <Dropdown className={styles.filterDropdown}>
-          <Dropdown.Toggle id="dropdown-basic" className={styles.filterBtn}>
-            <FunnelSimpleIcon size={16} className="me-2" />
-            Filtrar
-          </Dropdown.Toggle>
+        {pageAction.showFilterButton && pageAction.filterOptions.length > 0 && (
+          <Dropdown className={styles.filterDropdown}>
+            <Dropdown.Toggle id="dropdown-filter" className={styles.filterBtn}>
+              <FunnelSimpleIcon size={16} className="me-2" />
+              Filtrar
+            </Dropdown.Toggle>
 
-          <Dropdown.Menu>
-            <Dropdown.Item onClick={() => onFilter?.()}>Opção 1</Dropdown.Item>
-            <Dropdown.Item onClick={() => onFilter?.()}>Opção 2</Dropdown.Item>
-            <Dropdown.Item onClick={() => onFilter?.()}>Opção 3</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
+            <Dropdown.Menu>
+              {pageAction.filterOptions.map((opt) => (
+                <Dropdown.Item
+                  key={opt.value}
+                  onClick={() => pageAction.handleFilter(opt.value)}
+                >
+                  {opt.label}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+        )}
 
         {pageAction.showAddButton && (
           <Button

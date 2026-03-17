@@ -9,6 +9,7 @@ type Customer = {
   address: string
   modality: string
   ordersCount?: number;
+  isActive?: boolean;
 }
 
 export enum CustomerType{

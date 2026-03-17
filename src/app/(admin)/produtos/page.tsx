@@ -12,73 +12,70 @@ import fileToBase64 from "@/utils/fileToBase64";
 import Product from "@/models/Product";
 import { PageActions } from "@/contexts/PageActions";
 import { CalculatorIcon } from "@phosphor-icons/react";
-
-// OPERAÇÕES PRINCIPAIS:
-
-// CADASTRAR PRODUTO:
-// 1. Coleta dados básicos do formulário
-// 2. Converte imagem para base64
-// 3. Envia POST para /products (sem preço)
-// 4. Produto é criado com status NOT_CALCULATED
-// 5. Usuário deve ir para precificação para adicionar ingredientes
-
-// EDITAR PRODUTO:
-// 1. Busca produto selecionado
-// 2. Preenche formulário com dados atuais
-// 3. Envia PUT para /products/:id
-// 4. Não inclui campos de preço (agora é automático)
-
-// DESATIVAR PRODUTO:
-// 1. Abre modal de confirmação
-// 2. Envia DELETE para /products/:id
-// 3. Atualiza status do produto na lista
-
-// GERENCIAMENTO DE MODAIS:
-// - Modal principal: Cadastro básico
-// - Modal edição: Alteração de dados
-// - Modal sucesso: Feedback positivo
-// - Modal alerta: Erros e confirmações
-
-export default function ProdutosModal() {
+import toast from "react-hot-toast"; // <-- importação adicionada
+export default function ProdutosPage() {
   const [modalShow, setModalShow] = useState(false);
   const [modalEditShow, setModalEditShow] = useState(false);
-  const [successModalShow, setSuccessModalShow] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [warningModalShow, setWarningModalShow] = useState(false);
-  const [warningMessage, setWarningMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [produtos, setProdutos] = useState<Product[]>([]);
   const [selectProduto, setSelectProduto] = useState<Product>();
   const [warningDeleteModalShow, setWarningDeleteModalShow] = useState(false);
-  const pageActions = useContext(PageActions);
-  
-  const API_URL = api; // URL do backend
+  const { setShowAddButton, setHandleAdd, setShowFilterButton, setFilterOptions, setHandleFilter } = useContext(PageActions);
+  const [activeFilter, setActiveFilter] = useState<string>("all");
 
-const getImageUrl = (fotoUrl: string | undefined | null): string => {
-  if (!fotoUrl) {
-    return "/placeholder.png";
-  }
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-  console.log("📸 Foto URL do banco (ProdutosModal):", fotoUrl);
+  const getImageUrl = (fotoUrl: string | undefined | null): string => {
+    if (!fotoUrl) {
+      return 'https://via.placeholder.com/150?text=Sem+imagem';
+    }
+    if (fotoUrl.startsWith('http')) {
+      return fotoUrl;
+    }
+    const nomeArquivo = fotoUrl.replace(/^.*[\\\/]/, '');
+    return `${API_BASE_URL}/imagens/${nomeArquivo}`;
+  };
 
+  // Computa a lista filtrada
+  const produtosFiltrados = produtos.filter((p) => {
+    if (activeFilter === "disabled") return p.isActive === false;
+    if (activeFilter === "calculated") return p.isActive !== false && p.priceStatus === "CALCULATED";
+    if (activeFilter === "not_calculated") return p.isActive !== false && p.priceStatus !== "CALCULATED";
+    if (activeFilter === "BOLOS") return p.isActive !== false && p.category === "BOLOS";
+    if (activeFilter === "DOCINHOS") return p.isActive !== false && p.category === "DOCINHOS";
+    // "all" — só ativos
+    return p.isActive !== false;
+  });
 
-  // Remove qualquer prefixo /imagens/ se existir
-  const nomeArquivo = fotoUrl.replace(/^\/?imagens\//, '');
-  
-  // Retorna URL completa
-  return `${API_URL}/imagens/${nomeArquivo}`;
-};
   useEffect(() => {
-    pageActions.setShowAddButton(true);
+    setShowAddButton(true);
+    setHandleAdd(() => { setModalShow(true); });
+
+    setShowFilterButton(true);
+    setFilterOptions([
+      { label: "Todos", value: "all" },
+      { label: "Bolos", value: "BOLOS" },
+      { label: "Docinhos", value: "DOCINHOS" },
+      { label: "Precificados", value: "calculated" },
+      { label: "Não Precificados", value: "not_calculated" },
+      { label: "Desativados", value: "disabled" },
+    ]);
+    setHandleFilter((value: string) => {
+      setActiveFilter(value);
+    });
+
+    return () => {
+      setShowFilterButton(false);
+      setFilterOptions([]);
+      setHandleAdd(() => () => {});
+    };
   }, []);
 
-  // Categorias disponíveis (do enum Category do Prisma)
   const categoryOptions = [
     { value: "BOLOS", label: "BOLOS" },
     { value: "DOCINHOS", label: "DOCINHOS" },
   ];
 
-  // Buscar produtos
   const fetchProdutos = async () => {
     try {
       setLoading(true);
@@ -86,8 +83,7 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
       setProdutos(response.data);
     } catch (error) {
       console.error("Erro ao buscar produtos:", error);
-      setWarningMessage("Erro ao carregar os produtos cadastrados.");
-      setWarningModalShow(true);
+      toast.error("Erro ao carregar os produtos cadastrados.");
     } finally {
       setLoading(false);
     }
@@ -97,57 +93,32 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
     fetchProdutos();
   }, []);
 
-  // Configurar botão de adicionar
-  useEffect(() => {
-    pageActions.setHandleAdd(() => {
-      setModalShow(true);
-    });
-    
-    return () => {
-      pageActions.setHandleAdd(() => () => {});
-    };
-  }, []);
-
-  // CADASTRO DE NOVO PRODUTO
   const handleSubmit = async (data: FormData) => {
     setLoading(true);
-
     try {
-      // Preparar dados para envio (SEM campos de preço)
       const formattedData = {
         name: data.name,
         description: data.description || null,
         category: data.category,
         isActive: true,
-        // Campos opcionais da precificação
-        weight: data.weight ? parseFloat(data.weight.toString()) : null,
         yield: data.yield ? parseFloat(data.yield.toString()) : null,
-        // Imagem (opcional)
         fotoData: data.fotoData ? await fileToBase64(data.fotoData as File) : undefined,
       };
 
       const response = await api.post("/products", formattedData);
       console.log("Produto cadastrado:", response.data);
-      
-      // Atualizar lista
       await fetchProdutos();
-      
-      // Mensagem informativa sobre o próximo passo
-      setSuccessMessage("Produto cadastrado com sucesso! Agora vá para a página de Precificação para adicionar ingredientes e calcular o preço.");
-      setSuccessModalShow(true);
+
+      toast.success("Produto cadastrado com sucesso! Agora vá para a página de Precificação para adicionar ingredientes e calcular o preço.");
       setModalShow(false);
     } catch (error: any) {
       console.error("Erro ao cadastrar produto:", error);
-      setWarningMessage(
-        error.response?.data?.error || "Erro ao cadastrar produto. Tente novamente."
-      );
-      setWarningModalShow(true);
+      toast.error(error.response?.data?.error || "Erro ao cadastrar produto. Tente novamente.");
     } finally {
       setLoading(false);
     }
   };
 
-  // EDIÇÃO DE PRODUTO
   const handleSalvarAlteracoes = async (data: any) => {
     setLoading(true);
     try {
@@ -156,10 +127,7 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
         description: data.description || null,
         category: data.category,
         isActive: true,
-        // Campos opcionais da precificação
-        weight: data.weight ? parseFloat(data.weight) : null,
         yield: data.yield ? parseFloat(data.yield) : null,
-        // Imagem (opcional - só envia se foi alterada)
         fotoData: data.fotoData ? await fileToBase64(data.fotoData as File) : undefined,
       };
 
@@ -167,30 +135,24 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
       const response = await api.put(`/products/${selectProduto?.id}`, formattedData);
       console.log("Produto alterado com sucesso:", response.data);
 
-      // Atualizar lista local
       setProdutos(prev => prev.map(produto =>
         produto.id === selectProduto?.id ? response.data : produto
       ));
 
-      setSuccessMessage("Produto atualizado com sucesso!");
-      setSuccessModalShow(true);
+      toast.success("Produto atualizado com sucesso!");
       setModalEditShow(false);
     } catch (error: any) {
       console.error("Erro ao editar produto:", error);
-      setWarningMessage(
-        error.response?.data?.error || "Erro ao editar produto. Tente novamente."
-      );
-      setWarningModalShow(true);
+      toast.error(error.response?.data?.error || "Erro ao editar produto. Tente novamente.");
     } finally {
       setLoading(false);
     }
   };
 
-  // DESATIVAÇÃO DE PRODUTO
   const handleWarningDelete = () => {
     setModalEditShow(false);
     setWarningDeleteModalShow(true);
-    setWarningMessage("Deseja realmente desativar este produto?");
+    // Mensagem fixa no modal, não precisa de estado
   };
 
   const handleDesativaProduct = async () => {
@@ -199,27 +161,21 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
       const response = await api.delete(`/products/${selectProduto?.id}`);
       console.log("Produto desativado com sucesso:", response.data);
 
-      // Atualizar lista local
       setProdutos(prev => prev.map(produto =>
         produto.id === selectProduto?.id ? response.data : produto
       ));
-      
+
       setWarningDeleteModalShow(false);
-      setSuccessMessage("Produto desativado com sucesso!");
-      setSuccessModalShow(true);
+      toast.success("Produto desativado com sucesso!");
       setModalEditShow(false);
     } catch (error: any) {
       console.error("Erro ao desativar produto:", error);
-      setWarningMessage(
-        error.response?.data?.error || "Erro ao desativar produto. Tente novamente."
-      );
-      setWarningModalShow(true);
+      toast.error(error.response?.data?.error || "Erro ao desativar produto. Tente novamente.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Fechar modais
   const handleCloseEditModal = () => {
     setModalEditShow(false);
     setSelectProduto(undefined);
@@ -230,7 +186,6 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
     setWarningDeleteModalShow(false);
   };
 
-  // Navegar para página de precificação
   const goToPricing = (productId: number) => {
     window.location.href = `/precificacao?produto=${productId}`;
   };
@@ -238,26 +193,34 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
   return (
     <>
       <div className={styles.containerPrincipal}>
-        {produtos.length === 0 ? (
+        {produtosFiltrados.length === 0 ? (
           <div className={styles.emptyState}>
-            <h3>Nenhum produto encontrado</h3>
-            <p>Cadastre seu primeiro produto para começar</p>
+            <h3>
+              {activeFilter === "disabled"
+                ? "Nenhum produto desativado"
+                : activeFilter !== "all"
+                ? "Nenhum produto encontrado para este filtro"
+                : "Nenhum produto encontrado"}
+            </h3>
+            <p>
+              {activeFilter === "all"
+                ? "Cadastre seu primeiro produto para começar"
+                : "Tente outro filtro"}
+            </p>
           </div>
         ) : (
           <div className={styles.productsGrid}>
-            {produtos.map((produto) => (
+            {produtosFiltrados.map((produto) => (
               <div key={produto.id} className={styles.productCard}>
                 <div className={styles.productCardHeader}>
                   {produto.fotoUrl && (
-                    <img 
-                      src={getImageUrl(produto.fotoUrl)} 
-                      alt={produto.name} 
+                    <img
+                      src={getImageUrl(produto.fotoUrl)}
+                      alt={produto.name}
                       className={styles.productImage}
                       onError={(e) => {
-                        console.error("❌ Erro ao carregar imagem:", produto.fotoUrl);
-                        e.currentTarget.src = "/placeholder.png";
+                        e.currentTarget.src = 'https://via.placeholder.com/150?text=Erro';
                       }}
-                      onLoad={() => console.log("✅ Imagem carregada:", produto.name)}
                     />
                   )}
                   <h4>{produto.name}</h4>
@@ -288,7 +251,6 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
                   )}
                   
                   <div className={styles.productInfo}>
-                    {produto.weight && <span>Peso: {produto.weight}kg</span>}
                     {produto.yield && <span>Rendimento: {produto.yield} un</span>}
                   </div>
                 </div>
@@ -347,42 +309,11 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
           <Card
             title=""
             fields={[
-              { 
-                name: "name", 
-                label: "Nome do Produto *", 
-                placeholder: "Ex: Bolo de Chocolate"
-              },
-              { 
-                name: "description", 
-                label: "Descrição",
-                placeholder: "Descrição detalhada do produto",
-                type: "textarea"
-              },
-              {
-                name: "category",
-                label: "Categoria *",
-                type: "select",
-                options: categoryOptions,
-              },
-              { 
-                name: "weight",
-                label: "Peso (kg)",
-                type: "number",
-                step: "0.01",
-                placeholder: "Ex: 1.5 para 1,5kg",
-              },
-              { 
-                name: "yield",
-                label: "Rendimento (unidades)",
-                type: "number",
-                step: "1",
-                placeholder: "Ex: 10 unidades",
-              },
-              { 
-                name: "fotoData", 
-                label: "Imagem do Produto", 
-                type: "file",
-              },
+              { name: "name", label: "Nome do Produto *", placeholder: "Ex: Bolo de Chocolate" },
+              { name: "description", label: "Descrição", placeholder: "Descrição detalhada do produto", type: "textarea" },
+              { name: "category", label: "Categoria *", type: "select", options: categoryOptions },
+              { name: "yield", label: "Rendimento (unidades)", type: "number", step: "1", placeholder: "Ex: 10 unidades" },
+              { name: "fotoData", label: "Imagem do Produto", type: "file" },
             ]}
             onSubmit={handleSubmit}
             submitLabel="Cadastrar Produto"
@@ -415,9 +346,7 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
                   <span className={`${styles.statusBadge} ${
                     selectProduto.priceStatus === 'CALCULATED' ? styles.calculated : styles.pending
                   }`}>
-                    {selectProduto.priceStatus === 'CALCULATED' 
-                      ? 'Preço calculado' 
-                      : 'Aguardando precificação'}
+                    {selectProduto.priceStatus === 'CALCULATED' ? 'Preço calculado' : 'Aguardando precificação'}
                   </span>
                 </p>
                 
@@ -443,47 +372,11 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
                 key={selectProduto?.id}
                 title=""
                 fields={[
-                  { 
-                    name: "name", 
-                    label: "Nome do Produto *", 
-                    value: selectProduto?.name || "",
-                    placeholder: "Nome do produto"
-                  },
-                  { 
-                    name: "description", 
-                    label: "Descrição",
-                    value: selectProduto?.description || "",
-                    placeholder: "Descrição do produto",
-                    type: "textarea"
-                  },
-                  {
-                    name: "category",
-                    label: "Categoria *",
-                    type: "select",
-                    options: categoryOptions,
-                    value: selectProduto?.category || "BOLOS",
-                  },
-                  { 
-                    name: "weight",
-                    label: "Peso (kg)",
-                    type: "number",
-                    step: "0.01",
-                    value: selectProduto?.weight?.toString() || "",
-                    placeholder: "Ex: 1.5"
-                  },
-                  { 
-                    name: "yield",
-                    label: "Rendimento (unidades)",
-                    type: "number",
-                    step: "1",
-                    value: selectProduto?.yield?.toString() || "",
-                    placeholder: "Ex: 10"
-                  },
-                  { 
-                    name: "fotoData", 
-                    label: "Alterar imagem", 
-                    type: "file",
-                  },
+                  { name: "name", label: "Nome do Produto *", value: selectProduto?.name || "", placeholder: "Nome do produto" },
+                  { name: "description", label: "Descrição", value: selectProduto?.description || "", placeholder: "Descrição do produto", type: "textarea" },
+                  { name: "category", label: "Categoria *", type: "select", options: categoryOptions, value: selectProduto?.category || "BOLOS" },
+                  { name: "yield", label: "Rendimento (unidades)", type: "number", step: "1", value: selectProduto?.yield?.toString() || "", placeholder: "Ex: 10" },
+                  { name: "fotoData", label: "Alterar imagem", type: "file" },
                 ]}
                 showDelete
                 onDelete={handleWarningDelete}
@@ -498,30 +391,7 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
         </Modal.Body>
       </Modal>
 
-      {/* MODAL DE SUCESSO */}
-      <Modal
-        show={successModalShow}
-        onHide={() => setSuccessModalShow(false)}
-        size="lg"
-        centered
-        className={styles.successModal}
-      >
-        <Modal.Body className={styles.successBody}>
-          <div className={styles.successIcon}>✓</div>
-          <h5>Sucesso!</h5>
-          <p>{successMessage}</p>
-        </Modal.Body>
-        <Modal.Footer className={styles.successFooter}>
-          <button
-            className={styles.successButton}
-            onClick={() => setSuccessModalShow(false)}
-          >
-            OK
-          </button>
-        </Modal.Footer>
-      </Modal>
-
-      {/* MODAL DE CONFIRMAÇÃO DE DESATIVAÇÃO */}
+      {/* MODAL DE CONFIRMAÇÃO DE DESATIVAÇÃO (mantido) */}
       <Modal
         show={warningDeleteModalShow}
         onHide={() => setWarningDeleteModalShow(false)}
@@ -532,7 +402,7 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
         <Modal.Body className={styles.warningBody}>
           <div className={styles.warningIcon}>⚠</div>
           <h5>Confirmar Desativação</h5>
-          <p>{warningMessage}</p>
+          <p>Deseja realmente desativar este produto?</p>
           <p className={styles.warningNote}>
             <small>
               <strong>Atenção:</strong> Desativar um produto não remove seus dados, 
@@ -541,44 +411,14 @@ const getImageUrl = (fotoUrl: string | undefined | null): string => {
           </p>
         </Modal.Body>
         <Modal.Footer className={styles.modalWarningFooter}>
-          <ButtonCancelar 
-            variant="outline" 
-            onClick={handleCloseWarningModal} 
-            CancelLabel="Cancelar" 
-          />
-          <Button 
-            variant="danger" 
-            onClick={handleDesativaProduct} 
-            className={styles.warningButton}
-            disabled={loading}
-          >
+          <ButtonCancelar variant="outline" onClick={handleCloseWarningModal} CancelLabel="Cancelar" />
+          <Button variant="danger" onClick={handleDesativaProduct} className={styles.warningButton} disabled={loading}>
             {loading ? "Processando..." : "Desativar"}
           </Button>
         </Modal.Footer>
       </Modal>
 
-      {/* MODAL DE ERRO/ALERTA */}
-      <Modal
-        show={warningModalShow}
-        onHide={() => setWarningModalShow(false)}
-        size="sm"
-        centered
-        className={styles.warningModal}
-      >
-        <Modal.Body className={styles.warningBody}>
-          <div className={styles.warningIcon}>⚠</div>
-          <h5>Atenção</h5>
-          <p>{warningMessage}</p>
-        </Modal.Body>
-        <Modal.Footer className={styles.warningFooter}>
-          <button
-            className={styles.warningButton}
-            onClick={() => setWarningModalShow(false)}
-          >
-            Entendi
-          </button>
-        </Modal.Footer>
-      </Modal>
+      {/* MODAIS DE SUCESSO E ERRO FORAM REMOVIDOS */}
     </>
   );
 }

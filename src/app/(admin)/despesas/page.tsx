@@ -1,136 +1,305 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import Card, { FormData } from "@/components/Cards/Card";
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import Card from '@/components/Cards/Card';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import FAB from "@/components/FAB";
-import api from "@/services/api";
-import "bootstrap/dist/css/bootstrap.min.css";
-import styles from "./styles.module.css"
-import { HourglassMediumIcon } from "@phosphor-icons/react/dist/ssr";
+import api from '@/services/api';
+import FixedExpense from '@/models/FixedExpenses';
+import CardFixedExpense from '@/components/Cards/CardFixedExpense';
+import styles from './styles.module.css';
+import ButtonCancelar from '@/components/Buttons/ButtonCancel';
+import { PageActions } from '@/contexts/PageActions';
+import toast from 'react-hot-toast';
 
-export default function DespesasModal() {
-  const [modalShow, setModalShow] = useState(false);
-  const [successModalShow, setSuccessModalShow] = useState(false);
-  const [warningModalShow, setWarningModalShow] = useState(false);
-  const [warningMessage, setWarningMessage] = useState("");
+const categoryOptions = [
+  { value: 'Ingredientes', label: 'Ingredientes' },
+  { value: 'Equipamentos', label: 'Equipamentos' },
+  { value: 'Manutenção', label: 'Manutenção' },
+  { value: 'Aluguel', label: 'Aluguel' },
+  { value: 'Energia', label: 'Energia' },
+  { value: 'Água', label: 'Água' },
+  { value: 'Internet', label: 'Internet' },
+  { value: 'Salários', label: 'Salários' },
+  { value: 'Marketing', label: 'Marketing' },
+  { value: 'Outros', label: 'Outros' },
+];
+
+export default function FixedExpensesPage() {
+  const [expenses, setExpenses] = useState<FixedExpense[]>([]);
+  const [selectedExpense, setSelectedExpense] = useState<FixedExpense | undefined>();
   const [loading, setLoading] = useState(false);
 
-  const categoryOptions = [
-    { value: "Despesas Variavel", label: "Despesas Variavel" },
-    { value: "Despesas Fixas", label: "Despesas Fixas" }
-  ];
-  const handleSubmit = async (data: any) => {
+  const [modalAddShow, setModalAddShow] = useState(false);
+  const [modalEditShow, setModalEditShow] = useState(false);
+  const [modalDeleteShow, setModalDeleteShow] = useState(false);
+  const [monthlyTotal, setMonthlyTotal] = useState<number>(0);
+
+  // Extrai as funções necessárias (estáveis)
+  const { setShowAddButton, setHandleAdd, setShowFilterButton, setFilterOptions, setHandleFilter } = useContext(PageActions);
+  const [activeFilter, setActiveFilter] = useState<string>("all");
+
+  // Computa a lista filtrada
+  const despesasFiltradas = expenses.filter((e) => {
+    if (activeFilter === "recurring") return e.recurring === true;
+    if (activeFilter === "unique") return e.recurring === false;
+    return true; // "all"
+  });
+
+  // Configura o botão "Adicionar" e filtros do layout global
+  useEffect(() => {
+    setShowAddButton(true);
+    setHandleAdd(() => setModalAddShow(true));
+
+    setShowFilterButton(true);
+    setFilterOptions([
+      { label: "Todas", value: "all" },
+      { label: "Recorrentes", value: "recurring" },
+      { label: "Únicas", value: "unique" },
+    ]);
+    setHandleFilter((value: string) => {
+      setActiveFilter(value);
+    });
+
+    return () => {
+      setShowFilterButton(false);
+      setFilterOptions([]);
+      setHandleAdd(() => {}); // limpa ao desmontar
+    };
+  }, [setShowAddButton, setHandleAdd, setShowFilterButton, setFilterOptions, setHandleFilter]); // dependências estáveis → executa apenas uma vez
+
+  // Carrega as despesas do backend
+  const loadExpenses = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await api.post("/products", data);
-      console.log("Despesas Anotada:", response.data);
+      const response = await api.get('/fixedExpenses');
+      const expensesData = response.data;
+      setExpenses(expensesData);
 
-      setSuccessModalShow(true);
-      setModalShow(false);
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth(); // 0-11
 
+      const total = expensesData.reduce((acc: number, exp: FixedExpense) => {
+        const [datePart] = exp.date.split('T');
+        const [year, month] = datePart.split('-').map(Number); // month = 1-12
+        if (year === currentYear && month - 1 === currentMonth) {
+          return acc + (Number(exp.value) || 0);
+        }
+        return acc;
+      }, 0);
+
+      setMonthlyTotal(total);
+    } catch (error) {
+      console.error('Erro ao buscar despesas:', error);
+      toast.error('Erro ao carregar as despesas.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadExpenses();
+  }, [loadExpenses]);
+
+  const handleAddSubmit = async (data: any) => {
+    setLoading(true);
+    try {
+      const payload = {
+        ...data,
+        value: parseFloat(data.value),
+        date: data.date ? new Date(data.date).toISOString() : new Date().toISOString(),
+        recurring: data.recurring === 'true' || data.recurring === true,
+      };
+      await api.post('/fixedExpenses', payload);
+      await loadExpenses();
+      toast.success('Despesa cadastrada com sucesso!');
+      setModalAddShow(false);
     } catch (error: any) {
-      console.error("Erro ao Anotar Despesas:", error);
-      if (
-        error.response?.status === 409 ||
-        error.response?.data?.error?.includes("Despesas") ||
-        error.response?.data?.error?.includes("já cadastrado")
-      ) {
-        setWarningMessage("Despesas já cadastrada no sistema. Verifique os dados e tente novamente.");
-      } else {
-        setWarningMessage("Erro ao cadastrar produto. Tente novamente.");
-      }
-      setWarningModalShow(true);
+      console.error('Erro ao cadastrar despesa:', error);
+      toast.error(error.response?.data?.message || 'Erro ao cadastrar despesa.');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleEditSubmit = async (data: any) => {
+    if (!selectedExpense) return;
+    setLoading(true);
+    try {
+      const payload = {
+        ...data,
+        value: parseFloat(data.value),
+        date: data.date ? new Date(data.date).toISOString() : undefined,
+        recurring: data.recurring === 'true' || data.recurring === true,
+      };
+      await api.put(`/fixedExpenses/${selectedExpense.id}`, payload);
+      await loadExpenses();
+      toast.success('Despesa atualizada com sucesso!');
+      setModalEditShow(false);
+      setSelectedExpense(undefined);
+    } catch (error: any) {
+      console.error('Erro ao editar despesa:', error);
+      toast.error(error.response?.data?.message || 'Erro ao editar despesa.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedExpense) return;
+    setLoading(true);
+    try {
+      await api.delete(`/fixedExpenses/${selectedExpense.id}`);
+      await loadExpenses();
+      toast.success('Despesa removida com sucesso!');
+      setModalDeleteShow(false);
+      setSelectedExpense(undefined);
+    } catch (error: any) {
+      console.error('Erro ao deletar despesa:', error);
+      toast.error(error.response?.data?.message || 'Erro ao deletar despesa.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openEditModal = (expense: FixedExpense) => {
+    setSelectedExpense(expense);
+    setModalEditShow(true);
+  };
+
+  const openDeleteModal = (expense: FixedExpense) => {
+    setSelectedExpense(expense);
+    setModalDeleteShow(true);
+  };
+
   return (
     <>
-      <h1 className={styles.dev}>EM DESEVOLVIMENTO...<HourglassMediumIcon size={60} /></h1>
-      <FAB
-        onClick={() => setModalShow(true)}
-        text="+"
-      />
-      
-      <Modal
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-        size="lg"
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-      >
-        <Modal.Body>
+      <div className={styles.containerPrincipal}>
+        {/* Card de resumo mensal */}
+        <div className={styles.monthlySummaryCard}>
+          <h4>Total de Despesas no Mês</h4>
+          <p className={styles.monthlyValue}>
+            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(monthlyTotal)}
+          </p>
+        </div>
+
+        {despesasFiltradas.length === 0 && !loading ? (
+          <div className={styles.emptyState}>
+            <h3>
+              {activeFilter !== "all"
+                ? "Nenhuma despesa encontrada para este filtro"
+                : "Nenhuma despesa encontrada"}
+            </h3>
+            <p>
+              {activeFilter === "all"
+                ? "Cadastre sua primeira despesa fixa para começar"
+                : "Tente outro filtro"}
+            </p>
+          </div>
+        ) : (
+          despesasFiltradas.map(expense => (
+            <div key={expense.id} className={styles.divContainerCliente}>
+              <CardFixedExpense
+                expense={expense}
+                actions={[
+                  { label: 'Editar', onClick: () => openEditModal(expense), variant: 'edit' },
+                  { label: 'Excluir', onClick: () => openDeleteModal(expense), variant: 'delete' },
+                ]}
+              />
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Modal de adicionar */}
+      <Modal show={modalAddShow} onHide={() => setModalAddShow(false)} size="lg" centered className={styles.modalExpense}>
+        <Modal.Header closeButton className={styles.modalExpenseHeader}>
+          <Modal.Title className={styles.modalExpenseTitle}>Nova Despesa Fixa</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className={styles.modalExpenseBody}>
           <Card
-            title="Cadastro de Produtoss"
+            title=""
             fields={[
-              { name: "description", label: "Descrição" },
-              {name: "value", label:"Valor"},
-              { name: "date", label: "Data" },
-              { name: "recurring", label: "Despesas Recorrente" },
-              { name: "note", label: "Nota de Despesas" },
-              { name: "category", label: "Tipo de Despesas", type: "select", options: categoryOptions},
+              { name: 'description', label: 'Descrição', type: 'text' },
+              { name: 'value', label: 'Valor (R$)', type: 'number', step: '0.01' },
+              { name: 'date', label: 'Data', type: 'date', value: new Date().toISOString().split('T')[0] },
+              {
+                name: 'recurring',
+                label: 'Recorrente',
+                type: 'select',
+                options: [
+                  { value: 'false', label: 'Não' },
+                  { value: 'true', label: 'Sim' },
+                ],
+              },
+              { name: 'category', label: 'Categoria', type: 'select', options: categoryOptions },
+              { name: 'note', label: 'Observação', type: 'textarea' },
             ]}
-
-            submitLabel="Salvar"
-            loading={loading} onSubmit={function (data: FormData): void {
-              throw new Error("Function not implemented.");
-            } }          />
+            onSubmit={handleAddSubmit}
+            submitLabel="Cadastrar"
+            loading={loading}
+            showCancel
+            onCancel={() => setModalAddShow(false)}
+          />
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setModalShow(false)}>
-            Fechar
-          </Button>
-        </Modal.Footer>
       </Modal>
 
+      {/* Modal de edição */}
       <Modal
-        show={successModalShow}
-        onHide={() => setSuccessModalShow(false)}
-        size="sm"
-        aria-labelledby="contained-modal-title-vcenter"
+        show={modalEditShow}
+        onHide={() => { setModalEditShow(false); setSelectedExpense(undefined); }}
+        size="lg"
         centered
+        className={styles.modalExpense}
       >
-        <Modal.Body className="text-center">
-          <div className="mb-3">
-            <div style={{ fontSize: '48px', color: '#28a745' }}>✓</div>
-          </div>
-          <h5>Produtos cadastrado com sucesso!</h5>
+        <Modal.Header closeButton className={styles.modalExpenseHeader}>
+          <Modal.Title className={styles.modalExpenseTitle}>Editar Despesa</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className={styles.modalBodyEdit}>
+          <Card
+            key={selectedExpense?.id}
+            title=""
+            fields={[
+              { name: 'description', value: selectedExpense?.description || '', label: 'Descrição', type: 'text' },
+              { name: 'value', value: selectedExpense?.value || '', label: 'Valor (R$)', type: 'number', step: '0.01' },
+              { name: 'date', value: selectedExpense?.date ? selectedExpense.date.split('T')[0] : '', label: 'Data', type: 'date' },
+              {
+                name: 'recurring',
+                value: selectedExpense?.recurring ? 'true' : 'false',
+                label: 'Recorrente',
+                type: 'select',
+                options: [
+                  { value: 'false', label: 'Não' },
+                  { value: 'true', label: 'Sim' },
+                ],
+              },
+              { name: 'category', value: selectedExpense?.category || '', label: 'Categoria', type: 'select', options: categoryOptions },
+              { name: 'note', value: selectedExpense?.note || '', label: 'Observação', type: 'textarea' },
+            ]}
+            showDelete
+            onDelete={() => { setModalEditShow(false); setModalDeleteShow(true); }}
+            showCancel
+            onCancel={() => { setModalEditShow(false); setSelectedExpense(undefined); }}
+            onSubmit={handleEditSubmit}
+            submitLabel="Salvar Alterações"
+            loading={loading}
+          />
         </Modal.Body>
-        <Modal.Footer className="justify-content-center">
-          <Button 
-            variant="success" 
-            onClick={() => setSuccessModalShow(false)}
-          >
-            OK
-          </Button>
-        </Modal.Footer>
       </Modal>
 
-
-      <Modal
-        show={warningModalShow}
-        onHide={() => setWarningModalShow(false)}
-        size="sm"
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-      >
-        <Modal.Body className="text-center">
-          <div className="mb-3">
-            <div style={{ fontSize: '48px', color: '#ffc107' }}>⚠️</div>
+      {/* Modal de confirmação de exclusão */}
+      <Modal show={modalDeleteShow} onHide={() => setModalDeleteShow(false)} size="sm" centered className={styles.warningExpenseModal}>
+        <Modal.Body className={styles.warningExpenseBody}>
+          <div className={styles.warningExpenseIconContainer}>
+            <span className={styles.warningExpenseIcon}>⚠</span>
           </div>
-          <h5>Atenção</h5>
-          <p>{warningMessage}</p>
+          <h5 className={styles.warningExpenseTitle}>Confirmação</h5>
+          <p className={styles.warningExpenseMessage}>Deseja realmente excluir esta despesa?</p>
         </Modal.Body>
-        <Modal.Footer className="justify-content-center">
-          <Button 
-            variant="warning" 
-            onClick={() => setWarningModalShow(false)}
-          >
-            Entendi
-          </Button>
+        <Modal.Footer className={styles.modalWarningFooter}>
+          <ButtonCancelar variant="outline" onClick={() => setModalDeleteShow(false)} CancelLabel="Cancelar" />
+          <Button variant="danger" onClick={handleDeleteConfirm} className={styles.warningExpenseButton}>Excluir</Button>
         </Modal.Footer>
       </Modal>
     </>

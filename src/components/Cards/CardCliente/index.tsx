@@ -57,6 +57,7 @@ const isHotCustomer = (ordersCount: number): boolean => {
 };
 
 const formatDocument = (type: string, document: string): string => {
+  if (!document) return '—';
   const cleanDoc = document.replace(/\D/g, '')
   if (type === "PF_CPF") {
     return cleanDoc.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')

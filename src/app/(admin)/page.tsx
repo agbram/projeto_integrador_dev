@@ -10,37 +10,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 import { PageActions } from "@/contexts/PageActions";
-
-// OPERAÇÕES PRINCIPAIS:
-
-// SINCRONIZAÇÃO DE PEDIDOS:
-// 1. Sincronização Inteligente: Adiciona apenas novos pedidos sem perder progresso atual
-// 2. Sincronização Completa: Reseta toda a produção e reprocessa todos os pedidos
-// 3. Verificação de Status: Identifica pedidos não sincronizados antes da ação
-
-// CONTROLE DE PRODUÇÃO:
-// 1. Busca dashboard com resumo de tarefas e estatísticas
-// 2. Inicia produção: Muda status de PENDING para IN_PRODUCTION
-// 3. Atualiza progresso: Registra quantidades produzidas
-// 4. Conclui tarefas: Marca como COMPLETED quando toda quantidade é produzida
-
-// GESTÃO DE TAREFAS:
-// 1. Organiza por prioridade (Urgente, Alta, Média, Baixa)
-// 2. Controla status (Pendente, Em Produção, Concluída, Cancelada)
-// 3. Calcula progresso automaticamente baseado em quantidades
-// 4. Exibe prazos e informações dos produtos
-
-// ATUALIZAÇÃO DE PROGRESSO:
-// 1. Valida quantidade informada (não pode ser negativa ou exceder pendente)
-// 2. Atualiza quantidades pendentes e concluídas
-// 3. Recalcula porcentagem de progresso automaticamente
-// 4. Fecha modal e atualiza lista após sucesso
-
-// CONTROLE DE ESTADOS:
-// 1. Loading durante operações assíncronas
-// 2. Modais de confirmação para ações críticas
-// 3. Feedback visual de sucesso/erro
-// 4. Indicadores visuais por prioridade e status
+import toast from "react-hot-toast"; // <-- importação do toast
 
 // Tipos para as tarefas de produção
 interface ProductionTask {
@@ -83,13 +53,10 @@ interface DashboardSummary {
   }>;
 }
 
-export default function ProductionTasksModal() {
+export default function ProductionPage() {
   const [modalShow, setModalShow] = useState(false);
   const [modalDetailShow, setModalDetailShow] = useState(false);
-  const [successModalShow, setSuccessModalShow] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [warningModalShow, setWarningModalShow] = useState(false);
-  const [warningMessage, setWarningMessage] = useState("");
+  // Estados de feedback removidos: successModalShow, warningModalShow, successMessage, warningMessage
   const [loading, setLoading] = useState(false);
   const [tasks, setTasks] = useState<ProductionTask[]>([]);
   const [dashboardSummary, setDashboardSummary] = useState<DashboardSummary | null>(null);
@@ -112,8 +79,7 @@ export default function ProductionTasksModal() {
       setDashboardSummary(response.data.summary);
     } catch (error) {
       console.error(" Erro ao buscar tarefas de produção:", error);
-      setWarningMessage("Erro ao carregar as tarefas de produção.");
-      setWarningModalShow(true);
+      toast.error("Erro ao carregar as tarefas de produção.");
     } finally {
       setLoading(false);
     }
@@ -123,87 +89,79 @@ export default function ProductionTasksModal() {
     fetchProductionDashboard();
   }, []);
 
-const handleForceRefresh = () => {
-  fetchProductionDashboard();
-  setSuccessMessage("Lista de produção atualizada!");
-  setSuccessModalShow(true);
-};
+  const handleForceRefresh = () => {
+    fetchProductionDashboard();
+    toast.success("Lista de produção atualizada!");
+  };
 
-const handleSmartSync = async () => {
-  try {
-    setSyncLoading(true);
-    
-    const statusResponse = await api.get("/task/sync-status");
-    const { unsyncedOrders } = statusResponse.data.syncStatus;
-    
-    if (unsyncedOrders === 0) {
-      setSuccessMessage("Todos os pedidos já estão sincronizados!");
-      setSuccessModalShow(true);
-      return;
+  const handleSmartSync = async () => {
+    try {
+      setSyncLoading(true);
+      
+      const statusResponse = await api.get("/task/sync-status");
+      const { unsyncedOrders } = statusResponse.data.syncStatus;
+      
+      if (unsyncedOrders === 0) {
+        toast.success("Todos os pedidos já estão sincronizados!");
+        return;
+      }
+
+      const response = await api.post("/task/sync-new-orders");
+      
+      toast.success(
+        `${response.data.summary.successCount} novos pedidos sincronizados! Produção atual preservada.`
+      );
+      
+      fetchProductionDashboard();
+      
+    } catch (error: any) {
+      console.error("Erro na sincronização inteligente:", error);
+      toast.error(
+        error.response?.data?.message || "Erro ao sincronizar pedidos. Tente novamente."
+      );
+    } finally {
+      setSyncLoading(false);
     }
+  };
 
-    const response = await api.post("/task/sync-new-orders");
-    
-    setSuccessMessage(
-      `${response.data.summary.successCount} novos pedidos sincronizados! Produção atual preservada.`
-    );
-    setSuccessModalShow(true);
-    
-    fetchProductionDashboard();
-    
-  } catch (error: any) {
-    console.error("Erro na sincronização inteligente:", error);
-    setWarningMessage(
-      error.response?.data?.message || "Erro ao sincronizar pedidos. Tente novamente."
-    );
-    setWarningModalShow(true);
-  } finally {
-    setSyncLoading(false);
-  }
-};
-const handleFullSync = () => {
-  setConfirmFullSyncModalShow(true);
-};
+  const handleFullSync = () => {
+    setConfirmFullSyncModalShow(true);
+  };
 
-const confirmFullSync = async () => {
-  setConfirmFullSyncModalShow(false); 
-  
-  try {
-    setSyncLoading(true);
-    const response = await api.post("/task/sync-all-orders-clean");
+  const confirmFullSync = async () => {
+    setConfirmFullSyncModalShow(false); 
     
-    setSuccessMessage("Sincronização completa realizada. Todos os pedidos foram reprocessados.");
-    setSuccessModalShow(true);
-    
-    fetchProductionDashboard();
-    
-  } catch (error: any) {
-    console.error("Erro na sincronização completa:", error);
-    setWarningMessage("Erro na sincronização completa. Tente novamente.");
-    setWarningModalShow(true);
-  } finally {
-    setSyncLoading(false);
-  }
-};
+    try {
+      setSyncLoading(true);
+      const response = await api.post("/task/sync-all-orders-clean");
+      
+      toast.success("Sincronização completa realizada. Todos os pedidos foram reprocessados.");
+      
+      fetchProductionDashboard();
+      
+    } catch (error: any) {
+      console.error("Erro na sincronização completa:", error);
+      toast.error("Erro na sincronização completa. Tente novamente.");
+    } finally {
+      setSyncLoading(false);
+    }
+  };
 
-const cancelFullSync = () => {
-  setConfirmFullSyncModalShow(false);
-};
-
+  const cancelFullSync = () => {
+    setConfirmFullSyncModalShow(false);
+  };
 
   const handleStartProduction = async (taskId: number) => {
     try {
       setProgressLoading(true);
       await api.patch(`/task/${taskId}/status`, { status: "IN_PRODUCTION" });
-      setSuccessMessage("Produção iniciada com sucesso!");
-      setSuccessModalShow(true);
+      toast.success("Produção iniciada com sucesso!");
       fetchProductionDashboard();
     } catch (error: any) {
       console.error("Erro ao iniciar produção:", error);
-      setWarningMessage(
+      toast.error(
         error.response?.data?.error || "Erro ao iniciar produção. Tente novamente."
       );
-      setWarningModalShow(true);
     } finally {
       setProgressLoading(false);
     }
@@ -216,27 +174,13 @@ const cancelFullSync = () => {
       setProgressLoading(true);
       const completedQuantity = Number(formData.completedQuantity);
       
-    if (isNaN(completedQuantity) || completedQuantity <= 0) {
-      setWarningMessage("Digite uma quantidade válida maior que zero.");
-      setWarningModalShow(true);
-      return;
-    }
-
-    if (completedQuantity > selectedTask.pendingQuantity) {
-      setWarningMessage(`Quantidade excede o pendente (${selectedTask.pendingQuantity} unidades)`);
-      setWarningModalShow(true);
-      return;
-    }
-
-      if (completedQuantity <= 0) {
-        setWarningMessage("A quantidade deve ser maior que zero.");
-        setWarningModalShow(true);
+      if (isNaN(completedQuantity) || completedQuantity <= 0) {
+        toast.error("Digite uma quantidade válida maior que zero.");
         return;
       }
 
       if (completedQuantity > selectedTask.pendingQuantity) {
-        setWarningMessage(`Quantidade excede o pendente. Máximo: ${selectedTask.pendingQuantity}`);
-        setWarningModalShow(true);
+        toast.error(`Quantidade excede o pendente (${selectedTask.pendingQuantity} unidades)`);
         return;
       }
 
@@ -244,34 +188,29 @@ const cancelFullSync = () => {
         completedQuantity 
       });
       
-      setSuccessMessage("Progresso atualizado com sucesso!");
-      setSuccessModalShow(true);
+      toast.success("Progresso atualizado com sucesso!");
       fetchProductionDashboard();
       setModalDetailShow(false);
       setSelectedTask(null);
     } catch (error: any) {
       console.error("Erro ao atualizar progresso:", error);
-      setWarningMessage(
+      toast.error(
         error.response?.data?.error || "Erro ao atualizar progresso. Tente novamente."
       );
-      setWarningModalShow(true);
     } finally {
       setProgressLoading(false);
     }
   };
-  
 
   const handleCompleteTask = async (taskId: number) => {
     try {
       setProgressLoading(true);
       await api.patch(`/task/${taskId}/status`, { status: "COMPLETED" });
-      setSuccessMessage("Tarefa marcada como concluída!");
-      setSuccessModalShow(true);
+      toast.success("Tarefa marcada como concluída!");
       fetchProductionDashboard();
     } catch (error: any) {
       console.error("Erro ao concluir tarefa:", error);
-      setWarningMessage("Erro ao concluir tarefa. Tente novamente.");
-      setWarningModalShow(true);
+      toast.error("Erro ao concluir tarefa. Tente novamente.");
     } finally {
       setProgressLoading(false);
     }
@@ -287,7 +226,6 @@ const cancelFullSync = () => {
     return priorityMap[priority] || priority;
   };
 
-  // 🎨 Cor da prioridade
   const getPriorityColor = (priority: string) => {
     const colors: { [key: string]: string } = {
       'URGENT': '#ff4444',
@@ -308,13 +246,11 @@ const cancelFullSync = () => {
     return colors[status] || '#6c757d';
   };
 
-  //  Calcular porcentagem de progresso
   const calculateProgress = (task: ProductionTask) => {
     if (task.totalQuantity === 0) return 0;
     return (task.completedQuantity / task.totalQuantity) * 100;
   };
 
-  // 📋 Formatar status para exibição
   const formatStatus = (status: string) => {
     const statusMap: { [key: string]: string } = {
       'PENDING': 'Pendente',
@@ -355,54 +291,52 @@ const cancelFullSync = () => {
         </div>
       )}
 
-<div className={styles.syncContainer}>
-  <div className={styles.syncButtons}>
-    <Button
-  variant="outline-primary"
-  onClick={handleSmartSync}
-  disabled={syncLoading}
-  className={styles.smartSyncButton}
->
-  <GearIcon size={20} className={syncLoading ? styles.spinning : ''} />
-  {syncLoading ? (
-    <>
-      <div className={styles.spinner}></div>
-      Sincronizando...
-    </>
-  ) : (
-    "Sincronizar Novos Pedidos"
-  )}
-</Button>
+      <div className={styles.syncContainer}>
+        <div className={styles.syncButtons}>
+          <Button
+            variant="outline-primary"
+            onClick={handleSmartSync}
+            disabled={syncLoading}
+            className={styles.smartSyncButton}
+          >
+            <GearIcon size={20} className={syncLoading ? styles.spinning : ''} />
+            {syncLoading ? (
+              <>
+                <div className={styles.spinner}></div>
+                Sincronizando...
+              </>
+            ) : (
+              "Sincronizar Novos Pedidos"
+            )}
+          </Button>
 
-    <Button
-      variant="outline-info"
-      onClick={handleForceRefresh}
-      disabled={loading}
-      className={styles.refreshButton}
-    >
-      🔄 Atualizar Lista
-    </Button>
-    
-    {/*  Sync Completo (SECUNDÁRIO) */}
-    <Button
-      variant="outline-secondary"
-      onClick={handleFullSync}
-      disabled={syncLoading}
-      className={styles.fullSyncButton}
-      title="Sincronização completa (reseta toda a produção)"
-    >
-      <GearIcon size={16} />
-      Sync Completo
-    </Button>
-  </div>
-  
-  {/*  Status de Sincronização */}
-  <div className={styles.syncStatus}>
-    <small>
-      <strong>Dica:</strong> Use "Sincronizar Novos Pedidos" para adicionar pedidos sem perder o progresso atual.
-    </small>
-  </div>
-</div>
+          <Button
+            variant="outline-info"
+            onClick={handleForceRefresh}
+            disabled={loading}
+            className={styles.refreshButton}
+          >
+            🔄 Atualizar Lista
+          </Button>
+          
+          <Button
+            variant="outline-secondary"
+            onClick={handleFullSync}
+            disabled={syncLoading}
+            className={styles.fullSyncButton}
+            title="Sincronização completa (reseta toda a produção)"
+          >
+            <GearIcon size={16} />
+            Sync Completo
+          </Button>
+        </div>
+        
+        <div className={styles.syncStatus}>
+          <small>
+            <strong>Dica:</strong> Use "Sincronizar Novos Pedidos" para adicionar pedidos sem perder o progresso atual.
+          </small>
+        </div>
+      </div>
 
       <div className={styles.containerPrincipal}>
         {loading ? (
@@ -539,7 +473,7 @@ const cancelFullSync = () => {
         )}
       </div>
 
-      {/* ✅ MODAL DE CONFIRMAÇÃO PARA SYNC COMPLETO - ATUALIZADO */}
+      {/* MODAL DE CONFIRMAÇÃO PARA SYNC COMPLETO */}
       <Modal
         show={confirmFullSyncModalShow}
         onHide={cancelFullSync}
@@ -615,7 +549,7 @@ const cancelFullSync = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* ✅ MODAL DE DETALHES DA TAREFA - ATUALIZADO */}
+      {/* MODAL DE DETALHES DA TAREFA */}
       <Modal
         show={modalDetailShow}
         onHide={() => {
@@ -717,55 +651,7 @@ const cancelFullSync = () => {
         </Modal.Body>
       </Modal>
 
-      {/* ✅ MODAL DE SUCESSO - ATUALIZADO */}
-      <Modal
-        show={successModalShow}
-        onHide={() => setSuccessModalShow(false)}
-        size="sm"
-        centered
-        className={styles.productionSuccessModal}
-      >
-        <Modal.Body className={styles.productionSuccessModalBody}>
-          <div className={styles.productionSuccessIconContainer} aria-hidden>
-            <span className={styles.productionSuccessIcon}>✓</span>
-          </div>
-          <h5 className={styles.productionSuccessTitle}>Sucesso!</h5>
-          <p className={styles.productionSuccessMessage}>{successMessage}</p>
-        </Modal.Body>
-        <Modal.Footer className={styles.productionSuccessFooter}>
-          <button
-            className={styles.productionSuccessButton}
-            onClick={() => setSuccessModalShow(false)}
-          >
-            OK
-          </button>
-        </Modal.Footer>
-      </Modal>
-
-      {/* ✅ MODAL DE AVISO - ATUALIZADO */}
-      <Modal
-        show={warningModalShow}
-        onHide={() => setWarningModalShow(false)}
-        size="sm"
-        centered
-        className={styles.productionWarningModal}
-      >
-        <Modal.Body className={styles.productionWarningModalBody}>
-          <div className={styles.productionWarningIconContainer} aria-hidden>
-            <span className={styles.productionWarningIcon}>⚠</span>
-          </div>
-          <h5 className={styles.productionWarningTitle}>Atenção</h5>
-          <p className={styles.productionWarningMessage}>{warningMessage}</p>
-        </Modal.Body>
-        <Modal.Footer className={styles.productionWarningFooter}>
-          <button
-            className={styles.productionWarningButton}
-            onClick={() => setWarningModalShow(false)}
-          >
-            Entendi
-          </button>
-        </Modal.Footer>
-      </Modal>
+      {/* Modais de sucesso e aviso foram removidos */}
     </div>
   );
 }

@@ -7,6 +7,7 @@ import PrivateRouter from "@/components/PrivateRouter";
 import PagesWallpaper from "@/components/PagesWallpaper";
 import Header from "@/components/Navigation/Header";
 import { PageActionProvider } from "@/contexts/PageActions";
+import { ToastContainer } from "@/components/ToastContainer";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -32,8 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div className="pageWrapper">
                 {children}
               </div>
-
-
+              <ToastContainer />
             </PageActionProvider>
           </PrivateRouter>
         </AuthProvider>

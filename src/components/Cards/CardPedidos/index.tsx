@@ -238,7 +238,7 @@ const formatDateTime = (dateString: string | null): string => {
               <span>Pedido Entregue</span>
             </div>
             <small className={styles.deliveredDate}>
-              Entregue em: {formatDateTime(order.updatedAt?.toString() || null)}
+              Entregue na data: {formatDateTime(order.deliveryDate?.toString() || order.updatedAt?.toString() || null)}
             </small>
           </div>
         )}

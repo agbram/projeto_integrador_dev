@@ -485,11 +485,184 @@
   transition: all 0.3s ease;
 }
 
-.divContainerCliente {
-  transition: all 0.3s ease;
-  margin-bottom: 16px;
-}
-
 .divContainerCliente:hover {
   transform: translateY(-2px);
+}
+
+/* ======== ADVANCED DATE FILTERS ======== */
+.advancedFiltersContainer {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.filterModeToggle {
+  display: flex;
+  gap: 8px;
+  background: #f8f9fa;
+  padding: 6px;
+  border-radius: 10px;
+  width: fit-content;
+}
+
+.modeBtn {
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modeBtn:hover {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.activeMode {
+  background: #007bff;
+  color: white;
+}
+
+.activeMode:hover {
+  background: #0069d9;
+  color: white;
+}
+
+.subFilterRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dateInput {
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-family: inherit;
+  color: #495057;
+  outline: none;
+}
+
+.dateInput:focus {
+  border-color: #007bff;
+}
+
+.navBtn {
+  background: white;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #495057;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.navBtn:hover {
+  background: #f8f9fa;
+  border-color: #adb5bd;
+}
+
+.weekLabel {
+  font-weight: 600;
+  color: #333;
+  min-width: 140px;
+  text-align: center;
+}
+
+.monthFilterContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.monthSelector {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  padding: 4px;
+  scrollbar-width: none;
+}
+
+.monthSelector::-webkit-scrollbar {
+  display: none;
+}
+
+.monthBtn {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.monthBtn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.activeMonthBtn {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.activeMonthBtn:hover {
+  background: #0069d9;
+  border-color: #0069d9;
+}
+
+.weekSubSelector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.weekBtn {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.weekBtn:hover {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.activeWeekBtn {
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
+}
+
+.activeWeekBtn:hover {
+  background: #5a6268;
+  border-color: #5a6268;
 }

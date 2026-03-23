@@ -273,7 +273,7 @@ export default function PrecificacaoPage() {
     }
     setLoading(true);
     try {
-      await api.put(`/pricing/products/${selectProduto.id}/product-ingredients/${editingProductIngredient.id}`, {
+      await api.put(`/pricing/products/${selectProduto.id}/ingredients/${editingProductIngredient.id}`, {
         quantity: parseFloat(editFormData.quantity),
         unit: editFormData.unit,
         notes: editFormData.notes,

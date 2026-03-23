@@ -38,13 +38,34 @@ export default function FixedExpensesPage() {
   // Extrai as funções necessárias (estáveis)
   const { setShowAddButton, setHandleAdd, setShowFilterButton, setFilterOptions, setHandleFilter } = useContext(PageActions);
   const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth());
 
-  // Computa a lista filtrada
-  const despesasFiltradas = expenses.filter((e) => {
+  const currentYear = new Date().getFullYear();
+  const MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+  // 1. Filtra por mês (se recorrente, vale do mês de criação em diante; se única, só no mês exato)
+  const despesasDoMes = expenses.filter(exp => {
+    const [datePart] = exp.date.split('T');
+    const [year, month] = datePart.split('-').map(Number);
+    const expDate = new Date(year, month - 1, 1);
+    const filterDate = new Date(currentYear, selectedMonth, 1);
+    
+    if (exp.recurring) {
+      return expDate <= filterDate;
+    } else {
+      return year === currentYear && (month - 1) === selectedMonth;
+    }
+  });
+
+  // 2. Aplica o filtro selecionado no TopBar (Todas/Recorrentes/Únicas)
+  const despesasFiltradas = despesasDoMes.filter((e) => {
     if (activeFilter === "recurring") return e.recurring === true;
     if (activeFilter === "unique") return e.recurring === false;
     return true; // "all"
   });
+
+  // 3. Calcula o total dinamicamente
+  const currentMonthlyTotal = despesasFiltradas.reduce((acc, exp) => acc + (Number(exp.value) || 0), 0);
 
   // Configura o botão "Adicionar" e filtros do layout global
   useEffect(() => {
@@ -73,23 +94,7 @@ export default function FixedExpensesPage() {
     setLoading(true);
     try {
       const response = await api.get('/fixedExpenses');
-      const expensesData = response.data;
-      setExpenses(expensesData);
-
-      const now = new Date();
-      const currentYear = now.getFullYear();
-      const currentMonth = now.getMonth(); // 0-11
-
-      const total = expensesData.reduce((acc: number, exp: FixedExpense) => {
-        const [datePart] = exp.date.split('T');
-        const [year, month] = datePart.split('-').map(Number); // month = 1-12
-        if (year === currentYear && month - 1 === currentMonth) {
-          return acc + (Number(exp.value) || 0);
-        }
-        return acc;
-      }, 0);
-
-      setMonthlyTotal(total);
+      setExpenses(response.data);
     } catch (error) {
       console.error('Erro ao buscar despesas:', error);
       toast.error('Erro ao carregar as despesas.');
@@ -176,11 +181,24 @@ export default function FixedExpensesPage() {
   return (
     <>
       <div className={styles.containerPrincipal}>
+        {/* Filtro de Meses */}
+        <div className={styles.monthSelector}>
+          {MONTHS.map((m, i) => (
+            <button 
+              key={i} 
+              className={`${styles.monthBtn} ${selectedMonth === i ? styles.monthBtnActive : ''}`}
+              onClick={() => setSelectedMonth(i)}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+
         {/* Card de resumo mensal */}
         <div className={styles.monthlySummaryCard}>
           <h4>Total de Despesas no Mês</h4>
           <p className={styles.monthlyValue}>
-            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(monthlyTotal)}
+            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentMonthlyTotal)}
           </p>
         </div>
 

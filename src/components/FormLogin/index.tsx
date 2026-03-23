@@ -11,6 +11,8 @@ import { Toast, ToastContainer, ProgressBar } from "react-bootstrap";
 import styles from "./styles.module.css";
 import ButtonLogin from "../Buttons/ButtonLogin"; 
 
+import { Eye, EyeSlash } from "@phosphor-icons/react";
+
 export default function FormLogin() {
   return (
     <div className={styles.container}>
@@ -30,6 +32,7 @@ export default function FormLogin() {
 function FormTextLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // Estado do toast (mensagem, cor e visibilidade)
   const [toast, setToast] = useState<{ show: boolean; message: string; variant: string }>({
@@ -97,14 +100,27 @@ function FormTextLogin() {
           />
         </FloatingLabel>
 
-        <FloatingLabel controlId="floatingPassword" label="Senha" className="mb-3">
-          <Form.Control
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </FloatingLabel>
+        <div className={`${styles.passwordWrapper} mb-3`}>
+          <FloatingLabel controlId="floatingPassword" label="Senha">
+            <Form.Control
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={styles.passwordInput}
+            />
+          </FloatingLabel>
+          
+          <button
+            type="button"
+            className={styles.eyeButton}
+            onClick={() => setShowPassword(!showPassword)}
+            tabIndex={-1}
+            aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+          >
+            {showPassword ? <Eye size={22} weight="bold" /> : <EyeSlash size={22} weight="bold" />}
+          </button>
+        </div>
 
         <ButtonLogin type="submit" />
       </form>

@@ -90,6 +90,7 @@ export default function RelatoriosPage() {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<"week" | "month" | "year">("month");
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -101,9 +102,18 @@ export default function RelatoriosPage() {
     pageActions.setShowAddButton(false);
   }, [pageActions]);
 
+  // Fetch only once on mount
   useEffect(() => {
     fetchData();
-  }, [timeRange]);
+  }, []);
+
+  // Re-process data when filters change, without re-fetching
+  useEffect(() => {
+    if (orders.length > 0 || customers.length > 0 || products.length > 0 || fixedExpenses.length > 0) {
+      const processedData = processAnalyticsData(orders, customers, products, fixedExpenses);
+      setAnalyticsData(processedData);
+    }
+  }, [timeRange, selectedMonth, orders, customers, products, fixedExpenses]);
 
   const openOrdersPage = (order: Order) => {
     router.push(`/pedidos?highlight=${order.id}`);
@@ -144,17 +154,9 @@ export default function RelatoriosPage() {
       setCustomers(customersData);
       setProducts(productsData);
       setFixedExpenses(expensesData);
-
-      const processedData = processAnalyticsData(
-        ordersData,
-        customersData,
-        productsData,
-        expensesData
-      );
-      setAnalyticsData(processedData);
     } catch (error) {
       console.error("Erro ao buscar dados:", error);
-      toast.error("Erro ao carregar os dados. Tente novamente."); // <-- feedback visual adicionado
+      toast.error("Erro ao carregar os dados. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -166,7 +168,7 @@ export default function RelatoriosPage() {
     products: Product[],
     fixedExpenses: FixedExpense[]
   ): AnalyticsData => {
-    const filteredOrders = filterOrdersByTimeRange(orders, timeRange);
+    const filteredOrders = filterOrdersByTimeRange(orders, timeRange, selectedMonth);
     const deliveredOrders = filteredOrders.filter((order) => order.status === "DELIVERED");
     const totalRevenue = deliveredOrders.reduce((sum, order) => sum + (order.total || 0), 0);
 
@@ -300,7 +302,7 @@ export default function RelatoriosPage() {
     const monthlyOrders = generateMonthlyOrders(filteredOrders);
 
     // --- Processamento das despesas fixas ---
-    const filteredExpenses = filterExpensesByTimeRange(fixedExpenses, timeRange);
+    const filteredExpenses = filterExpensesByTimeRange(fixedExpenses, timeRange, selectedMonth);
     const totalExpenses = filteredExpenses.reduce((sum, exp) => sum + exp.value, 0);
 
     const monthlyExpenses = generateMonthlyExpenses(fixedExpenses); // histórico completo
@@ -377,42 +379,67 @@ export default function RelatoriosPage() {
       .slice(-12);
   };
 
-  const filterOrdersByTimeRange = (orders: Order[], range: "week" | "month" | "year"): Order[] => {
+  const filterOrdersByTimeRange = (orders: Order[], range: "week" | "month" | "year", selectedMonth: number | null): Order[] => {
     const now = new Date();
-    let startDate = new Date();
-    switch (range) {
-      case "week":
-        startDate.setDate(now.getDate() - 7);
-        break;
-      case "month":
-        startDate.setMonth(now.getMonth() - 1);
-        break;
-      case "year":
-        startDate.setFullYear(now.getFullYear() - 1);
-        break;
-    }
-    return orders.filter(
-      (order) =>
-        new Date(order.orderDate ? new Date(order.orderDate.toString()).toISOString() : "") >= startDate
-    );
+    
+    return orders.filter((order) => {
+      const orderDateStr = order.orderDate ? new Date(order.orderDate.toString()).toISOString() : "";
+      if (!orderDateStr) return false;
+      const orderDate = new Date(orderDateStr);
+
+      if (selectedMonth !== null) {
+        return orderDate.getFullYear() === now.getFullYear() && orderDate.getMonth() === selectedMonth;
+      }
+
+      let startDate = new Date();
+      switch (range) {
+        case "week":
+          startDate.setDate(now.getDate() - 7);
+          break;
+        case "month":
+          startDate.setMonth(now.getMonth() - 1);
+          break;
+        case "year":
+          startDate.setFullYear(now.getFullYear() - 1);
+          break;
+      }
+      return orderDate >= startDate;
+    });
   };
 
   // Funções auxiliares para despesas
-  const filterExpensesByTimeRange = (expenses: FixedExpense[], range: "week" | "month" | "year"): FixedExpense[] => {
+  const filterExpensesByTimeRange = (expenses: FixedExpense[], range: "week" | "month" | "year", selectedMonth: number | null): FixedExpense[] => {
     const now = new Date();
-    let startDate = new Date();
-    switch (range) {
-      case "week":
-        startDate.setDate(now.getDate() - 7);
-        break;
-      case "month":
-        startDate.setMonth(now.getMonth() - 1);
-        break;
-      case "year":
-        startDate.setFullYear(now.getFullYear() - 1);
-        break;
-    }
-    return expenses.filter(exp => new Date(exp.date) >= startDate);
+    const currentYear = now.getFullYear();
+    
+    return expenses.filter(exp => {
+      const [datePart] = exp.date.split('T');
+      const [year, month] = datePart.split('-').map(Number);
+      const expDate = new Date(year, month - 1, 1);
+
+      if (selectedMonth !== null) {
+        const filterDate = new Date(currentYear, selectedMonth, 1);
+        if (exp.recurring) {
+          return expDate <= filterDate;
+        } else {
+          return year === currentYear && (month - 1) === selectedMonth;
+        }
+      }
+
+      let startDate = new Date();
+      switch (range) {
+        case "week":
+          startDate.setDate(now.getDate() - 7);
+          break;
+        case "month":
+          startDate.setMonth(now.getMonth() - 1);
+          break;
+        case "year":
+          startDate.setFullYear(now.getFullYear() - 1);
+          break;
+      }
+      return new Date(exp.date) >= startDate;
+    });
   };
 
   const generateMonthlyExpenses = (expenses: FixedExpense[]): { month: string; total: number }[] => {
@@ -612,19 +639,33 @@ export default function RelatoriosPage() {
       {/* Cabeçalho */}
       <div className={styles.header}>
         <div className={styles.headerActions}>
-          <div className={styles.timeFilter}>
-            <button
-              className={`${styles.timeButton} ${timeRange === "week" ? styles.active : ""}`}
-              onClick={() => setTimeRange("week")}
-            >Semana</button>
-            <button
-              className={`${styles.timeButton} ${timeRange === "month" ? styles.active : ""}`}
-              onClick={() => setTimeRange("month")}
-            >Mês</button>
-            <button
-              className={`${styles.timeButton} ${timeRange === "year" ? styles.active : ""}`}
-              onClick={() => setTimeRange("year")}
-            >Ano</button>
+          <div className={styles.filterSection}>
+            <div className={styles.timeFilter}>
+              <button
+                className={`${styles.timeButton} ${timeRange === "week" && selectedMonth === null ? styles.active : ""}`}
+                onClick={() => { setTimeRange("week"); setSelectedMonth(null); }}
+              >Semana</button>
+              <button
+                className={`${styles.timeButton} ${timeRange === "month" && selectedMonth === null ? styles.active : ""}`}
+                onClick={() => { setTimeRange("month"); setSelectedMonth(null); }}
+              >Mês Atual</button>
+              <button
+                className={`${styles.timeButton} ${timeRange === "year" && selectedMonth === null ? styles.active : ""}`}
+                onClick={() => { setTimeRange("year"); setSelectedMonth(null); }}
+              >Ano Atual</button>
+            </div>
+            
+            <div className={styles.monthSelector}>
+              {["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"].map((m, i) => (
+                <button 
+                  key={i} 
+                  className={`${styles.monthBtn} ${selectedMonth === i ? styles.monthBtnActive : ''}`}
+                  onClick={() => setSelectedMonth(i)}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
           </div>
           <button onClick={exportToCSV} className={styles.exportButton}>
             <ExportIcon size={20} />

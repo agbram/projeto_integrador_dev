@@ -82,4 +82,39 @@
     width: 32px;
     height: 32px;
   }
+
+  .userName {
+    display: none;
+  }
+}
+
+.userArea {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.userName {
+  color: #F7F2EF; /* cor clara para o header escuro */
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.logoutBtn {
+  background: transparent;
+  border: none;
+  color: #C84555;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.logoutBtn:hover {
+  background: rgba(200, 69, 85, 0.1);
+  transform: scale(1.05);
 }

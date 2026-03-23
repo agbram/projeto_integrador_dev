@@ -35,6 +35,50 @@
   padding: 0 16px;
 }
 
+/* ===== FILTRO DE MESES ===== */
+.monthSelector {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 4px;
+  margin-bottom: 8px;
+  scrollbar-width: none; 
+}
+
+.monthSelector::-webkit-scrollbar {
+  display: none;
+}
+
+.monthBtn {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.monthBtn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.monthBtnActive {
+  background: #2c5530;
+  color: white;
+  border-color: #2c5530;
+}
+
+.monthBtnActive:hover {
+  background: #234526;
+  border-color: #234526;
+}
+
 .divContainerCliente {
   display: flex;
   align-items: center;

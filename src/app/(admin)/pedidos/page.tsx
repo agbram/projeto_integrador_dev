@@ -14,6 +14,7 @@ import {
   PencilIcon,
   ReceiptIcon,
   ReceiptXIcon,
+  CheckCircleIcon,
 } from "@phosphor-icons/react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
@@ -38,6 +39,7 @@ export default function PedidosPage() {
   const [selectPedido, setSelectPedido] = useState<Order>();
   const [pedidoToCancel, setPedidoToCancel] = useState<Order>();
   const [pedidoToDelivered, setPedidoToDelivered] = useState<Order>();
+  const [deliveryDateInput, setDeliveryDateInput] = useState<string>("");
   const [customers, setCustomers] = useState<{ id: number; name: string }[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<{ id: number; name: string } | null>(null);
 
@@ -58,10 +60,105 @@ export default function PedidosPage() {
   const { setShowAddButton, setHandleAdd, setShowFilterButton, setFilterOptions, setHandleFilter } = useContext(PageActions);
   const [activeFilter, setActiveFilter] = useState<string>("all");
 
+  // Advanced Date Filters States
+  const [filterMode, setFilterMode] = useState<"all" | "day" | "week" | "month">("all");
+  const [selectedDateDay, setSelectedDateDay] = useState<string>(() => {
+    const today = new Date();
+    const parts = today.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" }).split("/");
+    return `${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
+  });
+  
+  const getStartOfWeek = (d: Date) => {
+    const date = new Date(d);
+    date.setHours(0, 0, 0, 0);
+    const day = date.getDay(); // 0 = Domingo
+    const diff = date.getDate() - day;
+    return new Date(date.setDate(diff));
+  };
+  const getEndOfWeek = (d: Date) => {
+    const date = new Date(d);
+    date.setHours(23, 59, 59, 999);
+    const start = getStartOfWeek(date);
+    return new Date(start.setDate(start.getDate() + 6));
+  };
+
+  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => getStartOfWeek(new Date()));
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(new Date().getMonth());
+  const [selectedMonthYear, setSelectedMonthYear] = useState<number>(new Date().getFullYear());
+  const [selectedMonthWeekIdx, setSelectedMonthWeekIdx] = useState<number | null>(null);
+
+  const getWeeksInMonth = (month: number, year: number) => {
+    const weeks = [];
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+
+    let currentStart = getStartOfWeek(firstDayOfMonth);
+
+    while (currentStart <= lastDayOfMonth) {
+      const currentEnd = getEndOfWeek(new Date(currentStart));
+      // Recorta o início e o fim da semana para os limites do mês
+      const clampedStart = currentStart < firstDayOfMonth ? new Date(firstDayOfMonth) : new Date(currentStart);
+      const clampedEnd = currentEnd > lastDayOfMonth ? new Date(lastDayOfMonth) : new Date(currentEnd);
+      weeks.push({ start: clampedStart, end: clampedEnd, rawStart: new Date(currentStart), rawEnd: new Date(currentEnd) });
+      currentStart = new Date(currentStart);
+      currentStart.setDate(currentStart.getDate() + 7);
+    }
+    return weeks;
+  };
+
+  // Para o filtro de semana: semanas do mês em que currentWeekStart se encontra
+  const weekFilterMonth = currentWeekStart.getMonth();
+  const weekFilterYear = currentWeekStart.getFullYear();
+  const weeksInCurrentMonth = getWeeksInMonth(weekFilterMonth, weekFilterYear);
+
   // Computa a lista filtrada
   const pedidosFiltrados = pedidos.filter((p) => {
-    if (activeFilter === "all") return true;
-    return p.status === activeFilter;
+    // 1. Filtro por Status
+    if (activeFilter !== "all" && p.status !== activeFilter) {
+      return false;
+    }
+
+    // 2. Filtro por Data
+    if (filterMode === "all") return true;
+
+    const orderDateStr = p.orderDate ? p.orderDate.toString() : "";
+    if (!orderDateStr) return false;
+
+    // Extrai a data como local, sem conversão de fuso.
+    // Se vier como "YYYY-MM-DD" ou "YYYY-MM-DDT..." pega só a parte da data.
+    const datePart = orderDateStr.substring(0, 10); // "YYYY-MM-DD"
+    const [py, pm, pd] = datePart.split("-").map(Number);
+    // Cria um Date local (sem UTC) para comparações
+    const localDate = new Date(py, pm - 1, pd);
+
+    if (filterMode === "day") {
+      const [y, m, d] = selectedDateDay.split("-").map(Number);
+      return localDate.getFullYear() === y && localDate.getMonth() === (m - 1) && localDate.getDate() === d;
+    }
+
+    if (filterMode === "week") {
+      const start = getStartOfWeek(currentWeekStart);
+      const end = getEndOfWeek(currentWeekStart);
+      return localDate >= start && localDate <= end;
+    }
+
+    if (filterMode === "month" && selectedMonth !== null) {
+      const currentYear = selectedMonthYear;
+      
+      if (selectedMonthWeekIdx !== null) {
+        // Filtra pela semana específica dentro do mês (usando rawStart/rawEnd para não perder dias)
+        const weeks = getWeeksInMonth(selectedMonth, currentYear);
+        if (weeks[selectedMonthWeekIdx]) {
+          const { rawStart, rawEnd } = weeks[selectedMonthWeekIdx];
+          return localDate >= rawStart && localDate <= rawEnd;
+        }
+      } else {
+        // Filtro pelo mês inteiro
+        return localDate.getFullYear() === currentYear && localDate.getMonth() === selectedMonth;
+      }
+    }
+
+    return true;
   });
 
   const statusOptions = [
@@ -305,12 +402,14 @@ export default function PedidosPage() {
   const formatDateForDisplay = (dateString: string | null): string => {
     if (!dateString) return "Não definida";
     try {
+      // Se vier como "YYYY-MM-DD", interpreta como data local (sem conversão de fuso)
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+        const [year, month, day] = dateString.split("-");
+        return `${day}/${month}/${year}`;
+      }
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return "Data inválida";
-      const day = String(date.getDate()).padStart(2, "0");
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const year = date.getFullYear();
-      return `${day}/${month}/${year}`;
+      return date.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
     } catch (error) {
       console.error("Erro ao formatar data para exibição:", error);
       return "Data inválida";
@@ -320,7 +419,7 @@ export default function PedidosPage() {
   const handleRemoveFromProduction = async (orderId: number) => {
     try {
       console.log(`🔄 Removendo pedido ${orderId} da produção...`);
-      const response = await api.post(`/${orderId}/remove-from-production`);
+      const response = await api.post(`/task/${orderId}/remove-from-production`);
       console.log(`✅ Pedido ${orderId} removido da produção:`, response.data);
       return { success: true, message: "Pedido removido da produção" };
     } catch (error: any) {
@@ -443,13 +542,46 @@ export default function PedidosPage() {
   const handleOpenDeliveredModal = (pedido: Order) => {
     setPedidoToDelivered(pedido);
     setWarningDeliveredModalShow(true);
+    
+    // Set to today's date by default in Brasilia timezone
+    const today = new Date();
+    const parts = today.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" }).split("/");
+    setDeliveryDateInput(`${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`);
   };
 
   const handleConfirmDelivered = async () => {
     if (!pedidoToDelivered) return;
-    await handleUpdateOrderStatus(pedidoToDelivered.id, "DELIVERED");
-    setWarningDeliveredModalShow(false);
-    setPedidoToDelivered(undefined);
+    setLoading(true);
+    try {
+      const formattedDeliveryDate = handleDateForBackend(deliveryDateInput);
+      
+      const payload = {
+        status: "DELIVERED",
+        deliveryDate: formattedDeliveryDate,
+        orderDate: pedidoToDelivered.orderDate ? handleDateForBackend(String(pedidoToDelivered.orderDate)) : null,
+        notes: pedidoToDelivered.notes || ""
+      };
+
+      const response = await api.put(`/orders/${pedidoToDelivered.id}`, payload);
+      
+      setPedidos((prevOrders) =>
+        prevOrders.map((order) =>
+          order.id === pedidoToDelivered.id ? response.data : order
+        )
+      );
+      
+      toast.success("Pedido entregue com sucesso!");
+    } catch (error) {
+      console.error("Erro ao registrar entrega:", error);
+      toast.error("Erro ao registrar entrega. Tentando fallback apenas de status...");
+      
+      // Fallback
+      await handleUpdateOrderStatus(pedidoToDelivered.id, "DELIVERED");
+    } finally {
+      setLoading(false);
+      setWarningDeliveredModalShow(false);
+      setPedidoToDelivered(undefined);
+    }
   };
 
   const handleCloseDeliveredModal = () => {
@@ -642,20 +774,158 @@ export default function PedidosPage() {
   }
 
   const getLocalDateString = (date: Date = new Date()): string => {
-    const now = new Date();
-    const offset = now.getTimezoneOffset();
-    const brazilOffset = 180;
-    const totalOffset = (offset + brazilOffset) * 60 * 1000;
-    const adjustedDate = new Date(now.getTime() + totalOffset);
-    const year = adjustedDate.getUTCFullYear();
-    const month = String(adjustedDate.getUTCMonth() + 1).padStart(2, "0");
-    const day = String(adjustedDate.getUTCDate()).padStart(2, "0");
+    // Usa o fuso de Brasília (America/Sao_Paulo) para formatar a data corretamente
+    const parts = date.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" }).split("/");
+    // parts = [dd, mm, yyyy]
+    const day = parts[0].padStart(2, "0");
+    const month = parts[1].padStart(2, "0");
+    const year = parts[2];
     return `${year}-${month}-${day}`;
+  };
+
+  const formatWeekRange = (start: Date) => {
+    const end = getEndOfWeek(start);
+    const m1 = String(start.getMonth() + 1).padStart(2, "0");
+    const d1 = String(start.getDate()).padStart(2, "0");
+    const m2 = String(end.getMonth() + 1).padStart(2, "0");
+    const d2 = String(end.getDate()).padStart(2, "0");
+    return `${d1}/${m1} até ${d2}/${m2}`;
+  };
+
+  const goToPreviousWeek = () => {
+    const prev = new Date(currentWeekStart);
+    prev.setDate(prev.getDate() - 7);
+    // Não permite navegar para fora do mês atual do filtro de semana
+    const firstOfMonth = new Date(prev.getFullYear(), prev.getMonth(), 1);
+    if (prev < firstOfMonth) {
+      setCurrentWeekStart(getStartOfWeek(firstOfMonth));
+    } else {
+      setCurrentWeekStart(prev);
+    }
+  };
+
+  const goToNextWeek = () => {
+    const next = new Date(currentWeekStart);
+    next.setDate(next.getDate() + 7);
+    // Não permite navegar para além do mês corrente do filtro
+    const lastOfMonth = new Date(currentWeekStart.getFullYear(), currentWeekStart.getMonth() + 1, 0);
+    if (next > lastOfMonth) {
+      // vai para o próximo mês, primeiro dia
+      const firstNextMonth = new Date(currentWeekStart.getFullYear(), currentWeekStart.getMonth() + 1, 1);
+      setCurrentWeekStart(getStartOfWeek(firstNextMonth));
+    } else {
+      setCurrentWeekStart(next);
+    }
+  };
+
+  const goToPreviousWeekMonth = () => {
+    const d = new Date(currentWeekStart.getFullYear(), currentWeekStart.getMonth() - 1, 1);
+    setCurrentWeekStart(getStartOfWeek(d));
+  };
+
+  const goToNextWeekMonth = () => {
+    const d = new Date(currentWeekStart.getFullYear(), currentWeekStart.getMonth() + 1, 1);
+    setCurrentWeekStart(getStartOfWeek(d));
   };
 
   return (
     <>
       <div className={styles.containerPrincipal}>
+        {/* Filtros de Data Avançados */}
+        <div className={styles.advancedFiltersContainer}>
+          <div className={styles.filterModeToggle}>
+            <button className={`${styles.modeBtn} ${filterMode === "all" ? styles.activeMode : ""}`} onClick={() => setFilterMode("all")}>Todo o Período</button>
+            <button className={`${styles.modeBtn} ${filterMode === "day" ? styles.activeMode : ""}`} onClick={() => setFilterMode("day")}>Dia</button>
+            <button className={`${styles.modeBtn} ${filterMode === "week" ? styles.activeMode : ""}`} onClick={() => setFilterMode("week")}>Semana</button>
+            <button className={`${styles.modeBtn} ${filterMode === "month" ? styles.activeMode : ""}`} onClick={() => setFilterMode("month")}>Mês</button>
+          </div>
+
+          {filterMode === "day" && (
+            <div className={styles.subFilterRow}>
+              <input 
+                type="date" 
+                value={selectedDateDay} 
+                onChange={(e) => setSelectedDateDay(e.target.value)} 
+                className={styles.dateInput} 
+              />
+            </div>
+          )}
+
+          {filterMode === "week" && (
+            <div className={styles.monthFilterContainer}>
+              {/* Navegação de mês */}
+              <div className={styles.subFilterRow} style={{ marginBottom: "8px" }}>
+                <button className={styles.navBtn} onClick={goToPreviousWeekMonth}>&lt;</button>
+                <span className={styles.weekLabel} style={{ fontWeight: 600 }}>
+                  {currentWeekStart.toLocaleDateString("pt-BR", { month: "long", year: "numeric", timeZone: "America/Sao_Paulo" })}
+                </span>
+                <button className={styles.navBtn} onClick={goToNextWeekMonth}>&gt;</button>
+              </div>
+              {/* Semanas do mês */}
+              <div className={styles.weekSubSelector}>
+                {weeksInCurrentMonth.map((week, idx) => {
+                  const isActive = currentWeekStart >= week.rawStart && currentWeekStart <= week.rawEnd;
+                  const d1 = String(week.start.getDate()).padStart(2, "0");
+                  const m1 = String(week.start.getMonth() + 1).padStart(2, "0");
+                  const d2 = String(week.end.getDate()).padStart(2, "0");
+                  const m2 = String(week.end.getMonth() + 1).padStart(2, "0");
+                  return (
+                    <button
+                      key={idx}
+                      className={`${styles.weekBtn} ${isActive ? styles.activeWeekBtn : ""}`}
+                      onClick={() => setCurrentWeekStart(new Date(week.rawStart))}
+                    >
+                      {`${d1}/${m1} - ${d2}/${m2}`}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {filterMode === "month" && (
+            <div className={styles.monthFilterContainer}>
+              <div className={styles.monthSelector}>
+                {["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"].map((m, i) => (
+                  <button 
+                    key={i} 
+                    className={`${styles.monthBtn} ${selectedMonth === i ? styles.activeMonthBtn : ""}`} 
+                    onClick={() => { setSelectedMonth(i); setSelectedMonthWeekIdx(null); setSelectedMonthYear(new Date().getFullYear()); }}
+                  >
+                    {m}
+                  </button>
+                ))}
+              </div>
+              
+              {selectedMonth !== null && (
+                <div className={styles.weekSubSelector}>
+                  <button 
+                    className={`${styles.weekBtn} ${selectedMonthWeekIdx === null ? styles.activeWeekBtn : ""}`} 
+                    onClick={() => setSelectedMonthWeekIdx(null)}
+                  >
+                    Mês Inteiro
+                  </button>
+                  {getWeeksInMonth(selectedMonth, selectedMonthYear).map((week, idx) => {
+                    const d1 = String(week.start.getDate()).padStart(2, "0");
+                    const m1 = String(week.start.getMonth() + 1).padStart(2, "0");
+                    const d2 = String(week.end.getDate()).padStart(2, "0");
+                    const m2 = String(week.end.getMonth() + 1).padStart(2, "0");
+                    return (
+                      <button 
+                        key={idx} 
+                        className={`${styles.weekBtn} ${selectedMonthWeekIdx === idx ? styles.activeWeekBtn : ""}`} 
+                        onClick={() => setSelectedMonthWeekIdx(idx)}
+                      >
+                        {`${d1}/${m1} - ${d2}/${m2}`}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         {pedidosFiltrados.length === 0 ? (
           <div className={styles.emptyState}>
             <h3>
@@ -709,7 +979,7 @@ export default function PedidosPage() {
                           label: (
                             <div className={styles.botaocancelar}>
                               <ReceiptXIcon size={18} />
-                              <span>Cancelar</span>
+                              <span style={{ marginLeft: "4px" }}>Cancelar</span>
                             </div>
                           ),
                           onClick: () => handleOpenCancelModal(p),
@@ -945,16 +1215,33 @@ export default function PedidosPage() {
         </Modal.Footer>
       </Modal>
 
-      {/* Modal de confirmação de entrega (mantido) */}
+      {/* Modal de confirmação de entrega */}
       <Modal show={warningDeliveredModalShow} onHide={handleCloseDeliveredModal} size="sm" centered>
         <Modal.Body className="text-center">
           <div className="mb-3" style={{ fontSize: "48px", color: "#28a745" }}>✓</div>
           <h5><strong>Confirmar Entrega</strong></h5>
           <p>Esse pedido realmente foi entregue?</p>
+          <div className="mb-3 text-start mt-4">
+            <label htmlFor="deliveryDate" className="form-label" style={{ fontSize: "14px", fontWeight: "600", color: "#495057" }}>Data de Entrega:</label>
+            <input
+              id="deliveryDate"
+              type="date"
+              className="form-control"
+              value={deliveryDateInput}
+              onChange={(e) => setDeliveryDateInput(e.target.value)}
+              style={{ borderRadius: "8px", border: "1px solid #ced4da" }}
+            />
+          </div>
         </Modal.Body>
         <Modal.Footer className={styles.modalWarningFooter}>
           <ButtonCancelar variant="outline" onClick={handleCloseDeliveredModal} CancelLabel="Voltar" />
-          <Button variant="success" onClick={handleConfirmDelivered}>Confirmar Entrega</Button>
+          <Button 
+            variant="success" 
+            onClick={handleConfirmDelivered} 
+            disabled={loading}
+          >
+            {loading ? "Salvando..." : "Confirmar Entrega"}
+          </Button>
         </Modal.Footer>
       </Modal>
 

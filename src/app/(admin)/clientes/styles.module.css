@@ -13,13 +13,7 @@
     justify-items: center;
 }
 
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  margin-top: 220px;
-  justify-content: center;
-  align-items: center;
-}
+
 
 /* ===== CONTAINER PRINCIPAL E CARDS ===== */
 
@@ -28,7 +22,7 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  gap: 8px;
+  gap: 2px;
   width: 100%;
   max-width: 1200px;
   margin: 10px auto;
@@ -41,7 +35,7 @@
   justify-content: center;
   width: 100%;
   max-height: fit-content;
-  margin: 4px 0;
+  margin: 1px 0;
 }
 
 /* ===== MODALS PROFISSIONAIS PARA CLIENTES ===== */
@@ -365,6 +359,8 @@
   }
   
   .containerPrincipal {
+    flex-direction: column;
+    padding: 0 10px;
     gap: 4px;
   }
   

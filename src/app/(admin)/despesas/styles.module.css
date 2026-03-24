@@ -13,13 +13,7 @@
     justify-items: center;
 }
 
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  margin-top: 220px;
-  justify-content: center;
-  align-items: center;
-}
+
 
 /* ===== CONTAINER PRINCIPAL E CARDS ===== */
 
@@ -28,7 +22,7 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  gap: 8px;
+  gap: 2px;
   width: 100%;
   max-width: 1200px;
   margin: 10px auto;
@@ -39,10 +33,10 @@
 .monthSelector {
   display: flex;
   overflow-x: auto;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
-  padding: 8px 4px;
-  margin-bottom: 8px;
+  padding: 6px 2px;
+  margin-bottom: 6px;
   scrollbar-width: none; 
 }
 
@@ -51,32 +45,33 @@
 }
 
 .monthBtn {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: rgba(255,255,255,0.8);
+  border: 1px solid rgba(46, 28, 28, 0.1);
   border-radius: 20px;
-  padding: 8px 20px;
-  font-size: 14px;
+  padding: 6px 16px;
+  font-size: 13px;
   font-weight: 500;
-  color: #64748b;
+  color: #6b5a5a;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .monthBtn:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
+  background: rgba(247, 166, 184, 0.12);
+  border-color: rgba(247, 166, 184, 0.3);
 }
 
 .monthBtnActive {
-  background: #2c5530;
+  background: linear-gradient(135deg, #2c5530 0%, #1e3f20 100%);
   color: white;
-  border-color: #2c5530;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(44, 85, 48, 0.2);
 }
 
 .monthBtnActive:hover {
-  background: #234526;
-  border-color: #234526;
+  background: linear-gradient(135deg, #1e3f20 0%, #152c16 100%);
+  border-color: transparent;
 }
 
 .divContainerCliente {
@@ -85,7 +80,7 @@
   justify-content: center;
   width: 100%;
   max-height: fit-content;
-  margin: 4px 0;
+  margin: 1px 0;
 }
 
 /* ===== MODALS PROFISSIONAIS PARA CLIENTES ===== */
@@ -409,6 +404,8 @@
   }
   
   .containerPrincipal {
+    flex-direction: column;
+    padding: 0 10px;
     gap: 4px;
   }
   
@@ -461,25 +458,26 @@
 }
 
 .monthlySummaryCard {
-  background: linear-gradient(135deg, #2c5530 0%, #1e3b21 100%);
+  background: linear-gradient(135deg, #2c5530 0%, #1e3f20 100%);
   color: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  margin-bottom: 2rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 16px rgba(44, 85, 48, 0.18);
 }
 
 .monthlySummaryCard h4 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 500;
+  opacity: 0.9;
 }
 
 .monthlyValue {
   margin: 0;
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: 700;
 }

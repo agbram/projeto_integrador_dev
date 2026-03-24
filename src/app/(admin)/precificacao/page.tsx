@@ -811,7 +811,7 @@ export default function PrecificacaoPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className={styles.emptyState}>
+                  <div className="emptyStateStandard">
                     <p>Faça uma simulação primeiro.</p>
                     <button
                       className={styles.btnNewSimulation}
@@ -1163,10 +1163,10 @@ export default function PrecificacaoPage() {
         {/* Conteúdo das abas principais */}
         <div className={styles.productsGrid}>
           {loading ? (
-            <div className={styles.emptyState}>Carregando...</div>
+            <div className="emptyStateStandard">Carregando...</div>
           ) : activeTab === "para-calcular" ? (
             produtosParaCalcular.length === 0 ? (
-              <div className={styles.emptyState}>
+              <div className="emptyStateStandard">
                 <h3>Nenhum produto aguardando precificação</h3>
               </div>
             ) : (
@@ -1174,7 +1174,7 @@ export default function PrecificacaoPage() {
             )
           ) : activeTab === "calculados" ? (
             produtosCalculados.length === 0 ? (
-              <div className={styles.emptyState}>
+              <div className="emptyStateStandard">
                 <h3>Nenhum produto com preço calculado</h3>
               </div>
             ) : (

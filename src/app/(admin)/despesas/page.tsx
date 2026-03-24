@@ -203,7 +203,7 @@ export default function FixedExpensesPage() {
         </div>
 
         {despesasFiltradas.length === 0 && !loading ? (
-          <div className={styles.emptyState}>
+          <div className="emptyStateStandard">
             <h3>
               {activeFilter !== "all"
                 ? "Nenhuma despesa encontrada para este filtro"

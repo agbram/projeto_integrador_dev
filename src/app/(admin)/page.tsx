@@ -345,7 +345,7 @@ export default function ProductionPage() {
             <p>Carregando tarefas de produção...</p>
           </div>
         ) : tasks.length === 0 ? (
-          <div className={styles.emptyState}>
+          <div className="emptyStateStandard">
             <GearIcon size={48} />
             <h3>Nenhuma tarefa de produção encontrada</h3>
             <p>Clique em "Sincronizar Pedidos" para gerar tarefas a partir dos pedidos.</p>

@@ -5,7 +5,7 @@
     #0F0C0B 0%,
     #1A1412 100%
   );
-  padding: 14px 0;
+  padding: 8px 0;
   position: fixed;
   z-index: 1000;
   top: 0;
@@ -16,12 +16,12 @@
 .headerInner {
   margin: 0 auto;
   width: 100%;
-  max-width: 1200px; /* limite para onde o conteúdo pode esticar */
+  max-width: 1200px;
   padding: 0 16px;
   display: flex;
-  flex-direction: column; /* TopBar / NavBar / ActionBar empilhados */
-  gap: 12px;
-  align-items: center; /* alinha horizontalmente ao centro */
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
   box-sizing: border-box;
 }
 

@@ -5,10 +5,16 @@
 }
 
 .containerPrincipal {
-  padding: 1.5rem;
-  background: var(--color-bg-soft);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 10px auto;
+  padding: 0 16px;
   min-height: calc(100vh - var(--header-height, 80px));
-  overflow-x: hidden;
 }
 
 /* Tabs simplificadas */
@@ -66,9 +72,9 @@
 .productsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.25rem;
-  align-items: center;
-  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  padding: 20px 0;
 }
 
 .productCard {
@@ -1654,7 +1660,6 @@
 /* ESTADOS VAZIOS */
 /* ============================================ */
 
-.emptyState,
 .emptyIngredients {
   text-align: center;
   padding: 2rem 1.5rem;
@@ -1663,7 +1668,6 @@
   border: 2px dashed var(--color-border);
 }
 
-.emptyState h3,
 .emptyIngredients h3 {
   margin-bottom: 0.75rem;
   color: var(--color-text);
@@ -1671,7 +1675,6 @@
   font-weight: 600;
 }
 
-.emptyState p,
 .emptyIngredients p {
   font-size: 0.9rem;
   color: var(--color-text-light);
@@ -2346,4 +2349,45 @@
 
 .savedSuccess .resultHeader h5 {
   color: var(--color-green-primary);
+}
+
+/* ===== RESPONSIVIDADE MOBILE ===== */
+@media (max-width: 768px) {
+  .containerPrincipal {
+    padding: 0 10px;
+    margin: 5px auto;
+  }
+  
+  .productsGrid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 10px 0;
+  }
+  
+  .productCard {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+  
+  .priceInfo {
+    padding: 10px;
+  }
+  
+  .btnPrecificar, .btnEditar {
+    width: 100%;
+  }
+
+  .tabsContainer {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .ingredientItemCard {
+    width: 100%;
+    min-height: auto;
+  }
+  
+  .ingredientsGrid {
+    padding: 0;
+  }
 }

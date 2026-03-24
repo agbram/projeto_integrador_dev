@@ -6,8 +6,8 @@
   align-items: center;
   width: 100%;
   box-sizing: border-box;
-  gap: 12px;
-  padding: 4px 0;
+  gap: 8px;
+  padding: 2px 0;
 }
 
 /* Área da logo (não cresce, não encolhe demais) */
@@ -15,8 +15,8 @@
   flex: 0 0 auto;
   display: flex;
   align-items: center;
-  height: 70px;        /* altura ajustável */
-  max-width: 250px;    /* largura máxima ajustável */
+  height: 44px;
+  max-width: 170px;
 }
 
 /* Logo com proporção preservada */

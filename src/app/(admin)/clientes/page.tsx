@@ -261,7 +261,7 @@ export default function ClientesPage() {
     <>
       <div className={styles.containerPrincipal}>
         {clientesFiltrados.length === 0 ? (
-          <div className={styles.emptyState}>
+          <div className="emptyStateStandard">
             <h3>
               {activeFilter === "disabled"
                 ? "Nenhum cliente desativado"

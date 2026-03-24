@@ -224,68 +224,83 @@ export default function PedidosPage() {
   const gerarNotaFiscal = async (pedido: Order) => {
     const { default: jsPDF } = await import("jspdf");
     const doc = new jsPDF();
-    // ... (código da nota fiscal permanece igual)
-    doc.setFillColor(230, 230, 250);
-    doc.rect(20, 10, 170, 15, "F");
+
+    // Brand colors
+    const brandDark = [46, 28, 28] as const;   // #2e1c1c
+    const brandAccent = [212, 123, 146] as const; // #d47b92
+    const textDark = [33, 37, 41] as const;    // #212529
+    const textMuted = [108, 117, 125] as const; // #6c757d
+    const lineColor = [222, 226, 230] as const; // #dee2e6
+
+    // Header band
+    doc.setFillColor(...brandDark);
+    doc.rect(0, 0, 210, 32, "F");
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
-    doc.setTextColor(50, 50, 120);
-    doc.text("RECIBO", 105, 20, { align: "center" });
-
-    doc.setDrawColor(180, 180, 180);
-    doc.line(20, 28, 190, 28);
-
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    doc.text("DADOS DA EMPRESA", 20, 40);
+    doc.setFontSize(22);
+    doc.setTextColor(255, 255, 255);
+    doc.text("SANT'SAPORE", 20, 18);
     doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...brandAccent);
+    doc.text("Doces Sabor Confeitaria", 20, 26);
 
-    const empresa = {
-      name: "SANT'SAPORE",
-      cnpj: "26.378.162/0001-51",
-      address: "Rua Riachuelo, 795 - Centro",
-      ie: "São Carlos - SP - CEP: 13.560-10",
-      contact: "(16) 99750-9099",
-    };
+    // RECIBO label
+    doc.setFontSize(14);
+    doc.setTextColor(255, 255, 255);
+    doc.text("RECIBO", 190, 20, { align: "right" });
 
-    doc.text(`Empresa: ${empresa.name}`, 20, 47);
-    doc.text(`CNPJ: ${empresa.cnpj}`, 20, 53);
-    doc.text(`IE: ${empresa.ie}`, 20, 59);
-    doc.text(`Endereço: ${empresa.address}`, 20, 65);
-    doc.text(`Contato: ${empresa.contact}`, 20, 71);
+    // Company info
+    doc.setFontSize(9);
+    doc.setTextColor(...textMuted);
+    doc.text("CNPJ: 26.378.162/0001-51  |  Rua Riachuelo, 795 - Centro  |  São Carlos - SP  |  (16) 99750-9099", 20, 40);
 
-    doc.setFontSize(12);
-    doc.text("DADOS DO CLIENTE", 120, 40);
+    // Divider
+    doc.setDrawColor(...lineColor);
+    doc.setLineWidth(0.5);
+    doc.line(20, 44, 190, 44);
+
+    // Client + Order Info
     doc.setFontSize(10);
-    doc.text(`Nome: ${pedido.customer?.name || "Não informado"}`, 120, 47);
-    doc.text(`Telefone: ${pedido.customer?.contact || "Não informado"}`, 120, 53);
-    doc.text(`Endereço: ${pedido.customer?.address || "Não informado"}`, 120, 59);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...brandDark);
+    doc.text("CLIENTE", 20, 52);
+    doc.text("PEDIDO", 120, 52);
 
-    doc.setDrawColor(180, 180, 180);
-    doc.line(20, 28, 190, 28);
-
-    doc.text(
-      `Data: ${pedido.orderDate ? formatDateForDisplay(pedido.orderDate.toString()) : "A combinar"}`,
-      120, 71
-    );
-    doc.text(
-      `Entrega: ${pedido.deliveryDate ? formatDateForDisplay(pedido.deliveryDate.toString()) : "A combinar"}`,
-      120, 77
-    );
-
-    doc.setFontSize(12);
-    doc.text("ITENS DO PEDIDO", 20, 95);
-
-    doc.setFillColor(200, 200, 200);
-    doc.rect(20, 100, 170, 8, "F");
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    doc.text("Produto", 22, 105);
-    doc.text("Qtd", 120, 105);
-    doc.text("Valor Unit.", 140, 105);
-    doc.text("Subtotal", 165, 105);
+    doc.setTextColor(...textDark);
+    doc.text(`${pedido.customer?.name || "Não informado"}`, 20, 59);
 
-    let yPosition = 115;
+    doc.setFontSize(9);
+    doc.setTextColor(...textMuted);
+    doc.text(`Tel: ${pedido.customer?.contact || "Não informado"}`, 20, 65);
+    doc.text(`End: ${pedido.customer?.address || "Não informado"}`, 20, 71);
+
+    doc.setTextColor(...textDark);
+    doc.setFontSize(10);
+    doc.text(`Data: ${pedido.orderDate ? formatDateForDisplay(pedido.orderDate.toString()) : "A combinar"}`, 120, 59);
+    doc.text(`Entrega: ${pedido.deliveryDate ? formatDateForDisplay(pedido.deliveryDate.toString()) : "A combinar"}`, 120, 65);
+
+    // Divider
+    doc.line(20, 76, 190, 76);
+
+    // Items header
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...brandDark);
+    doc.text("ITENS DO PEDIDO", 20, 84);
+
+    // Table header
+    doc.setFillColor(248, 249, 250);
+    doc.rect(20, 88, 170, 8, "F");
+    doc.setFontSize(9);
+    doc.setTextColor(...textMuted);
+    doc.text("Produto", 22, 93);
+    doc.text("Qtd", 130, 93);
+    doc.text("Unit.", 148, 93);
+    doc.text("Subtotal", 170, 93);
+
+    let yPosition = 101;
 
     const subtotalItens = pedido.items?.reduce((total, item) => total + (item.subtotal || 0), 0) || 0;
     const desconto = pedido.discount || 0;
@@ -298,7 +313,7 @@ export default function PedidosPage() {
       }
 
       if (index % 2 === 0) {
-        doc.setFillColor(245, 245, 245);
+        doc.setFillColor(252, 251, 250);
         doc.rect(20, yPosition - 5, 170, 8, "F");
       }
 
@@ -307,52 +322,65 @@ export default function PedidosPage() {
       const unit = item.unitPrice || 0;
       const sub = item.subtotal || qtd * unit;
 
-      doc.setTextColor(0, 0, 0);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...textDark);
       doc.text(nome, 22, yPosition);
-      doc.text(String(qtd), 125, yPosition, { align: "right" });
-      doc.text(formatCurrency(unit || 0), 140, yPosition);
-      doc.text(formatCurrency(sub), 165, yPosition);
+      doc.text(String(qtd), 133, yPosition, { align: "right" });
+      doc.text(formatCurrency(unit), 148, yPosition);
+      doc.text(formatCurrency(sub), 170, yPosition);
 
       yPosition += 8;
     });
 
-    yPosition += 10;
-    doc.setDrawColor(180, 180, 180);
+    yPosition += 6;
+    doc.setDrawColor(...lineColor);
     doc.line(120, yPosition, 190, yPosition);
 
-    doc.setFont("helvetica", "bold");
-    doc.text("SUBTOTAL:", 120, yPosition + 8);
-    doc.text(formatCurrency(subtotalItens), 165, yPosition + 8);
+    // Totals
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...textDark);
+    doc.text("Subtotal:", 120, yPosition + 8);
+    doc.text(formatCurrency(subtotalItens), 170, yPosition + 8);
 
     if (desconto > 0) {
-      doc.setFont("helvetica", "normal");
+      doc.setTextColor(220, 53, 69);
       doc.text("Desconto:", 120, yPosition + 16);
-      doc.text(`- ${formatCurrency(desconto)}`, 165, yPosition + 16);
+      doc.text(`- ${formatCurrency(desconto)}`, 170, yPosition + 16);
     }
 
-    const totalY = desconto > 0 ? yPosition + 24 : yPosition + 16;
+    const totalY = desconto > 0 ? yPosition + 26 : yPosition + 18;
     doc.setFont("helvetica", "bold");
-    doc.text("TOTAL DO PEDIDO:", 120, totalY);
-    doc.text(formatCurrency(totalFinal), 165, totalY);
+    doc.setFontSize(12);
+    doc.setTextColor(...brandDark);
+    doc.text("TOTAL:", 120, totalY);
+    doc.text(formatCurrency(totalFinal), 170, totalY);
 
-    const obsStart = totalY + 10;
+    // Notes
     if (pedido.notes) {
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
+      const obsStart = totalY + 14;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(...brandDark);
       doc.text("OBSERVAÇÕES:", 20, obsStart);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...textMuted);
       const splitNotes = doc.splitTextToSize(pedido.notes, 170);
       doc.text(splitNotes, 20, obsStart + 7);
     }
 
+    // Footer
     const footerY = 280;
-    doc.setDrawColor(200, 200, 200);
-    doc.line(20, footerY - 10, 190, footerY - 10);
+    doc.setFillColor(...brandDark);
+    doc.rect(0, footerY - 12, 210, 20, "F");
     doc.setFontSize(8);
-    doc.setTextColor(100, 100, 100);
-    doc.text("Agradecemos pela preferência!", 105, footerY - 2, { align: "center" });
-    doc.text("SANT'SAPORE - Doces Sabor Confeitaria", 105, footerY + 4, { align: "center" });
+    doc.setTextColor(...brandAccent);
+    doc.text("Agradecemos pela preferência!", 105, footerY - 3, { align: "center" });
+    doc.setTextColor(200, 200, 200);
+    doc.text("SANT'SAPORE — Doces Sabor Confeitaria  |  santsapore.com.br", 105, footerY + 4, { align: "center" });
 
-    doc.save(`nota-fiscal-pedido-${pedido.id}.pdf`);
+    doc.save(`recibo-pedido-${pedido.id}.pdf`);
   };
 
   const getStatusText = (status: string) => {
@@ -927,7 +955,7 @@ export default function PedidosPage() {
         </div>
 
         {pedidosFiltrados.length === 0 ? (
-          <div className={styles.emptyState}>
+          <div className="emptyStateStandard">
             <h3>
               {activeFilter !== "all"
                 ? "Nenhum pedido encontrado para este filtro"

@@ -592,28 +592,88 @@ export default function RelatoriosPage() {
   const exportToCSV = () => {
     if (!analyticsData) return;
 
-    const headers = ["Métrica", "Valor"];
-    const data = [
-      ["Receita Total", formatCurrency(analyticsData.totalRevenue)],
-      ["Total de Pedidos", analyticsData.totalOrders],
-      ["Total de Clientes", analyticsData.totalCustomers],
-      ["Total de Produtos", analyticsData.totalProducts],
-      ["Valor Médio por Pedido", formatCurrency(analyticsData.averageOrderValue)],
-      ["Cliente Mais Frequente", analyticsData.topCustomer.name],
-      ["Pedidos do Cliente Top", analyticsData.topCustomer.orderCount],
-      ["Produto Mais Vendido", analyticsData.topProduct.name],
-      ["Quantidade Vendida", analyticsData.topProduct.quantitySold],
-      ["Despesas no Período", formatCurrency(analyticsData.totalExpenses)],
-    ];
+    const escapeCSV = (val: any): string => {
+      const str = String(val ?? "");
+      if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
 
-    const csvContent = [headers, ...data].map((row) => row.join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv" });
+    const rows: string[][] = [];
+
+    // Section 1: Summary Metrics
+    rows.push(["=== RESUMO GERAL ==="]);
+    rows.push(["Métrica", "Valor"]);
+    rows.push(["Receita Total", formatCurrency(analyticsData.totalRevenue)]);
+    rows.push(["Total de Pedidos", String(analyticsData.totalOrders)]);
+    rows.push(["Total de Clientes", String(analyticsData.totalCustomers)]);
+    rows.push(["Total de Produtos", String(analyticsData.totalProducts)]);
+    rows.push(["Valor Médio por Pedido", formatCurrency(analyticsData.averageOrderValue)]);
+    rows.push(["Despesas no Período", formatCurrency(analyticsData.totalExpenses)]);
+    rows.push(["Lucro Estimado", formatCurrency(analyticsData.totalRevenue - analyticsData.totalExpenses)]);
+    rows.push([]);
+
+    // Section 2: Top Customer & Products
+    rows.push(["=== DESTAQUES ==="]);
+    rows.push(["Cliente Mais Frequente", analyticsData.topCustomer.name]);
+    rows.push(["Pedidos do Cliente Top", String(analyticsData.topCustomer.orderCount)]);
+    rows.push(["Total Gasto pelo Cliente Top", formatCurrency(analyticsData.topCustomer.totalSpent)]);
+    rows.push(["Produto Mais Vendido", analyticsData.topProduct.name]);
+    rows.push(["Qtd Vendida (Top)", String(analyticsData.topProduct.quantitySold)]);
+    rows.push(["Produto Menos Vendido", analyticsData.leastSoldProduct.name]);
+    rows.push(["Qtd Vendida (Menor)", String(analyticsData.leastSoldProduct.quantitySold)]);
+    rows.push([]);
+
+    // Section 3: Monthly Revenue
+    if (analyticsData.monthlyRevenue.length > 0) {
+      rows.push(["=== RECEITA MENSAL ==="]);
+      rows.push(["Mês", "Receita"]);
+      analyticsData.monthlyRevenue.forEach((item) => {
+        rows.push([item.month, formatCurrency(item.revenue)]);
+      });
+      rows.push([]);
+    }
+
+    // Section 4: Product Sales
+    if (analyticsData.productSales.length > 0) {
+      rows.push(["=== VENDAS POR PRODUTO ==="]);
+      rows.push(["Produto", "Quantidade", "Receita"]);
+      analyticsData.productSales.forEach((item) => {
+        rows.push([item.product, String(item.quantity), formatCurrency(item.revenue)]);
+      });
+      rows.push([]);
+    }
+
+    // Section 5: Expenses by Category
+    if (analyticsData.expensesByCategory.length > 0) {
+      rows.push(["=== DESPESAS POR CATEGORIA ==="]);
+      rows.push(["Categoria", "Total"]);
+      analyticsData.expensesByCategory.forEach((item) => {
+        rows.push([item.category, formatCurrency(item.total)]);
+      });
+      rows.push([]);
+    }
+
+    // Section 6: Order Status
+    rows.push(["=== STATUS DOS PEDIDOS ==="]);
+    rows.push(["Status", "Quantidade"]);
+    rows.push(["Pendentes", String(analyticsData.ordersByStatus.pending)]);
+    rows.push(["Em Produção", String(analyticsData.ordersByStatus.inProgress)]);
+    rows.push(["Entregues", String(analyticsData.ordersByStatus.delivered)]);
+    rows.push(["Cancelados", String(analyticsData.ordersByStatus.cancelled)]);
+
+    const csvContent = rows.map((row) => row.map(escapeCSV).join(",")).join("\n");
+    // UTF-8 BOM for proper encoding in Excel
+    const bom = "\uFEFF";
+    const blob = new Blob([bom + csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `relatorios-${new Date().toISOString().split("T")[0]}.csv`;
+    link.download = `relatorio-santsapore-${new Date().toISOString().split("T")[0]}.csv`;
     link.click();
     URL.revokeObjectURL(url);
+    toast.success("Relatório exportado com sucesso!");
   };
 
   if (loading) {

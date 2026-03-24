@@ -421,13 +421,7 @@
 }
 
 /* ======== ESTADOS ESPECIAIS ======== */
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  margin-top: 220px;
-  justify-content: center;
-  align-items: center;
-}
+
 
 /* Estilos para os botões de ação */
 .actionsSection {
@@ -463,14 +457,31 @@
 }
 
 /* Botões com ícones */
-.botaocancelar,
-.botaoeditar,
+.botaocancelar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  padding: 4px 0;
+  color: #dc3545;
+}
+
+.botaoeditar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  padding: 4px 0;
+  color: #2e1c1c;
+}
+
 .botaonotafiscal {
   display: flex;
   align-items: center;
   gap: 6px;
   font-weight: 600;
   padding: 4px 0;
+  color: #442a27;
 }
 
 .editButton {
@@ -493,12 +504,49 @@
 .advancedFiltersContainer {
   background: white;
   border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(46, 28, 28, 0.06);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+}
+
+.filterModeToggle {
+  display: flex;
+  gap: 6px;
+  background: rgba(46, 28, 28, 0.04);
+  padding: 5px;
+  border-radius: 10px;
+  width: fit-content;
+}
+
+.modeBtn {
+  background: transparent;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-weight: 500;
+  color: #6b5a5a;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.modeBtn:hover {
+  background: rgba(247, 166, 184, 0.12);
+  color: #2e1c1c;
+}
+
+.activeMode {
+  background: linear-gradient(135deg, #2c5530 0%, #1e3f20 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(44, 85, 48, 0.18);
+}
+
+.activeMode:hover {
+  background: linear-gradient(135deg, #1e3f20 0%, #152c16 100%);
+  color: white;
 }
 
 .filterModeToggle {
@@ -522,17 +570,18 @@
 }
 
 .modeBtn:hover {
-  background: #e9ecef;
-  color: #495057;
+  background: rgba(247, 166, 184, 0.12);
+  color: #2e1c1c;
 }
 
 .activeMode {
-  background: #007bff;
+  background: linear-gradient(135deg, #2c5530 0%, #1e3f20 100%);
   color: white;
+  box-shadow: 0 2px 8px rgba(44, 85, 48, 0.18);
 }
 
 .activeMode:hover {
-  background: #0069d9;
+  background: linear-gradient(135deg, #1e3f20 0%, #152c16 100%);
   color: white;
 }
 
@@ -544,35 +593,37 @@
 
 .dateInput {
   padding: 8px 12px;
-  border: 1px solid #ced4da;
+  border: 1px solid rgba(46, 28, 28, 0.15);
   border-radius: 8px;
   font-family: inherit;
-  color: #495057;
+  color: #2e1c1c;
   outline: none;
+  font-size: 14px;
 }
 
 .dateInput:focus {
-  border-color: #007bff;
+  border-color: #d47b92;
+  box-shadow: 0 0 0 2px rgba(212, 123, 146, 0.15);
 }
 
 .navBtn {
   background: white;
-  border: 1px solid #ced4da;
+  border: 1px solid rgba(46, 28, 28, 0.15);
   border-radius: 8px;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #495057;
+  color: #2e1c1c;
   font-weight: bold;
   transition: all 0.2s;
 }
 
 .navBtn:hover {
-  background: #f8f9fa;
-  border-color: #adb5bd;
+  background: rgba(247, 166, 184, 0.1);
+  border-color: rgba(247, 166, 184, 0.3);
 }
 
 .weekLabel {
@@ -601,68 +652,69 @@
 }
 
 .monthBtn {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: rgba(255,255,255,0.8);
+  border: 1px solid rgba(46, 28, 28, 0.1);
   border-radius: 20px;
-  padding: 6px 16px;
+  padding: 5px 14px;
   font-size: 13px;
   font-weight: 500;
-  color: #64748b;
+  color: #6b5a5a;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .monthBtn:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
+  background: rgba(247, 166, 184, 0.12);
+  border-color: rgba(247, 166, 184, 0.3);
 }
 
 .activeMonthBtn {
-  background: #007bff;
+  background: linear-gradient(135deg, #2c5530 0%, #1e3f20 100%);
   color: white;
-  border-color: #007bff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(44, 85, 48, 0.2);
 }
 
 .activeMonthBtn:hover {
-  background: #0069d9;
-  border-color: #0069d9;
+  background: linear-gradient(135deg, #1e3f20 0%, #152c16 100%);
+  border-color: transparent;
 }
 
 .weekSubSelector {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   padding: 8px;
-  background: #f8f9fa;
+  background: rgba(46, 28, 28, 0.03);
   border-radius: 8px;
-  border: 1px solid #e9ecef;
+  border: 1px solid rgba(46, 28, 28, 0.06);
 }
 
 .weekBtn {
   background: white;
-  border: 1px solid #dee2e6;
+  border: 1px solid rgba(46, 28, 28, 0.12);
   border-radius: 6px;
-  padding: 6px 12px;
+  padding: 5px 10px;
   font-size: 12px;
   font-weight: 600;
-  color: #6c757d;
+  color: #6b5a5a;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .weekBtn:hover {
-  background: #e9ecef;
-  color: #495057;
+  background: rgba(247, 166, 184, 0.1);
+  color: #2e1c1c;
 }
 
 .activeWeekBtn {
-  background: #6c757d;
+  background: #442a27;
   color: white;
-  border-color: #6c757d;
+  border-color: #442a27;
 }
 
 .activeWeekBtn:hover {
-  background: #5a6268;
-  border-color: #5a6268;
+  background: #5a3a36;
+  border-color: #5a3a36;
 }

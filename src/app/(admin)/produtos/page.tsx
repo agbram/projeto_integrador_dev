@@ -194,7 +194,7 @@ export default function ProdutosPage() {
     <>
       <div className={styles.containerPrincipal}>
         {produtosFiltrados.length === 0 ? (
-          <div className={styles.emptyState}>
+          <div className="emptyStateStandard">
             <h3>
               {activeFilter === "disabled"
                 ? "Nenhum produto desativado"

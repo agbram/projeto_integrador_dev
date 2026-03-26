@@ -29,19 +29,14 @@
   padding: 0 16px;
 }
 
-/* ===== FILTRO DE MESES ===== */
 .monthSelector {
   display: flex;
-  overflow-x: auto;
-  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
-  padding: 6px 2px;
-  margin-bottom: 6px;
-  scrollbar-width: none; 
-}
-
-.monthSelector::-webkit-scrollbar {
-  display: none;
+  padding: 8px 0;
+  margin-bottom: 16px;
 }
 
 .monthBtn {
@@ -458,26 +453,32 @@
 }
 
 .monthlySummaryCard {
-  background: linear-gradient(135deg, #2c5530 0%, #1e3f20 100%);
-  color: white;
-  padding: 0.75rem 1.25rem;
-  border-radius: 10px;
-  margin-bottom: 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+  padding: 0.5rem 1.25rem;
+  border-radius: 20px;
+  margin-bottom: 24px;
   display: flex;
-  justify-content: space-between;
+  gap: 12px;
+  justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 16px rgba(44, 85, 48, 0.18);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  width: fit-content;
 }
 
 .monthlySummaryCard h4 {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 500;
-  opacity: 0.9;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .monthlyValue {
   margin: 0;
-  font-size: 1.6rem;
+  font-size: 1.1rem;
   font-weight: 700;
+  color: #2c5530;
 }

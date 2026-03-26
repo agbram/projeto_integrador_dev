@@ -847,11 +847,12 @@ export default function PrecificacaoPage() {
       onHide={() => setModalAddIngredientShow(false)}
       size="lg"
       centered
+      className={styles.modalPrecificacao}
     >
-      <Modal.Header closeButton>
-        <Modal.Title>Adicionar Ingrediente</Modal.Title>
+      <Modal.Header closeButton className={styles.modalPrecificacaoHeader}>
+        <Modal.Title className={styles.modalPrecificacaoTitle}>Adicionar Ingrediente</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body className={styles.modalPrecificacaoBody}>
         <div className={styles.addIngredientModalContent}>
           <div className={styles.searchBox}>
             <MagnifyingGlassIcon size={20} />
@@ -868,10 +869,11 @@ export default function PrecificacaoPage() {
               className={styles.searchInput}
             />
           </div>
-          {searchIngredient && (
-            <div className={styles.searchResults}>
-              {ingredients.length === 0 ? (
-                <p>Nenhum ingrediente encontrado.</p>
+          <div className={styles.searchResults}>
+            {searchIngredient === "" ? (
+              // Mostrar todos os ingredientes quando a busca está vazia
+              ingredients.length === 0 ? (
+                <p className={styles.noResults}>Nenhum ingrediente cadastrado.</p>
               ) : (
                 ingredients.map((ing) => (
                   <div
@@ -892,9 +894,34 @@ export default function PrecificacaoPage() {
                     </div>
                   </div>
                 ))
-              )}
-            </div>
-          )}
+              )
+            ) : (
+              // Mostrar resultados da busca
+              ingredients.length === 0 ? (
+                <p className={styles.noResults}>Nenhum ingrediente encontrado para "{searchIngredient}".</p>
+              ) : (
+                ingredients.map((ing) => (
+                  <div
+                    key={ing.id}
+                    className={`${styles.ingredientOption} ${
+                      selectedIngredient?.id === ing.id ? styles.selected : ""
+                    }`}
+                    onClick={() => setSelectedIngredient(ing)}
+                  >
+                    <div>
+                      <strong>{ing.name}</strong>
+                      <small>
+                        {ing.category} • {ing.supplier || "Sem fornecedor"}
+                      </small>
+                    </div>
+                    <div>
+                      R$ {ing.unitCost.toFixed(2)}/{ing.unit}
+                    </div>
+                  </div>
+                ))
+              )
+            )}
+          </div>
           {selectedIngredient && (
             <div className={styles.ingredientForm}>
               <div className={styles.formGroup}>
@@ -971,11 +998,12 @@ export default function PrecificacaoPage() {
       }}
       size="lg"
       centered
+      className={styles.modalPrecificacao}
     >
-      <Modal.Header closeButton>
-        <Modal.Title>Editar Ingrediente</Modal.Title>
+      <Modal.Header closeButton className={styles.modalPrecificacaoHeader}>
+        <Modal.Title className={styles.modalPrecificacaoTitle}>Editar Ingrediente</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body className={styles.modalPrecificacaoBody}>
         {editingProductIngredient && (
           <div className={styles.editIngredientForm}>
             <p>
@@ -1033,11 +1061,12 @@ export default function PrecificacaoPage() {
       onHide={() => setModalCreateIngredientShow(false)}
       size="lg"
       centered
+      className={styles.modalPrecificacao}
     >
-      <Modal.Header closeButton>
-        <Modal.Title>Cadastrar Novo Insumo</Modal.Title>
+      <Modal.Header closeButton className={styles.modalPrecificacaoHeader}>
+        <Modal.Title className={styles.modalPrecificacaoTitle}>Cadastrar Novo Insumo</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body className={styles.modalPrecificacaoBody}>
         <div className={styles.newIngredientForm}>
           <div className={styles.formGroup}>
             <label>Nome *</label>

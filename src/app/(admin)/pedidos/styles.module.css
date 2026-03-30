@@ -530,7 +530,6 @@
   color: #6b5a5a;
   cursor: pointer;
   font-size: 13px;
-  transition: all 0.2s ease;
 }
 
 .modeBtn:hover {
@@ -566,7 +565,6 @@
   font-weight: 500;
   color: #6c757d;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .modeBtn:hover {
@@ -618,7 +616,6 @@
   cursor: pointer;
   color: #2e1c1c;
   font-weight: bold;
-  transition: all 0.2s;
 }
 
 .navBtn:hover {
@@ -660,7 +657,6 @@
   font-weight: 500;
   color: #6b5a5a;
   cursor: pointer;
-  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
@@ -700,7 +696,6 @@
   font-weight: 600;
   color: #6b5a5a;
   cursor: pointer;
-  transition: all 0.2s;
 }
 
 .weekBtn:hover {

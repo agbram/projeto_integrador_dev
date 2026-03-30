@@ -286,8 +286,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* Alinha o conteúdo no topo */
   min-height: 400px;
+  grid-column: 1 / -1;
+  padding-top: 1rem; /* Distância controlada do menu de abas */
 }
 
 /* Cabeçalho centralizado */
@@ -341,7 +343,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
+  align-items: stretch; /* Garante que os cards tenham a mesma altura na linha se possível */
   gap: 1.5rem;
   width: 100%;
   max-width: 1200px;
@@ -356,11 +358,11 @@
   box-shadow: var(--precificacao-shadow-sm);
   overflow: hidden;
   transition: all var(--precificacao-transition-normal);
-  width: 350px;
-  min-height: 200px;
+  width: 320px; /* Reduzido levemente para caber melhor em mais telas */
+  min-height: 220px;
   display: flex;
   flex-direction: column;
-  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: none; /* Removida animação de surgimento */
 }
 
 .ingredientItemCard:hover {

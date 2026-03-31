@@ -118,17 +118,10 @@
   padding-right: 2.5rem;
 }
 
-/* Informações adicionais */
+/* Informações adicionais - sem wrapper visual extra */
 .additionalInfo {
   width: 100%;
-  margin: 0.5rem 0;
-  padding: 1rem;
-  background-color: #f8fafc;
-  border-radius: 8px;
-  border-left: 3px solid #e5e7eb;
-  font-size: 0.875rem;
-  color: #4b5563;
-  line-height: 1.5;
+  margin: 0.25rem 0 0.5rem;
 }
 
 /* Container dos botões - ajustado para modal */

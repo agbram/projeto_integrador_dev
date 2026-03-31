@@ -16,15 +16,24 @@ api.interceptors.request.use(function (config) {
   return config;
 });
 
-// Se a resposta for 401/403, faz logout e redireciona
+// Se a resposta for 401/403, toma a decisão de deslogar ou não
 api.interceptors.response.use(
   function (response) {
     return response;
   },
   function (error) {
     if (error.response?.status === 401 || error.response?.status === 403) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      if (!error.config?.url?.includes('/users/login')) {
+        const msg = error.response?.data?.error || error.response?.data?.erro;
+        
+        if (msg === "Usuário não autorizado") {
+          // Apenas previne o deslogamento e propaga o erro para a página reagir
+          return Promise.reject(error);
+        } else {
+          localStorage.removeItem('token');
+          window.location.href = '/login';
+        }
+      }
     }
     return Promise.reject(error);
   }

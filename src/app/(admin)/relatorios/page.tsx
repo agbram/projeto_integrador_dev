@@ -105,6 +105,9 @@ export default function RelatoriosPage() {
   // Fetch only once on mount
   useEffect(() => {
     fetchData();
+    return () => {
+      toast.dismiss("page_error");
+    };
   }, []);
 
   // Re-process data when filters change, without re-fetching
@@ -154,9 +157,14 @@ export default function RelatoriosPage() {
       setCustomers(customersData);
       setProducts(productsData);
       setFixedExpenses(expensesData);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao buscar dados:", error);
-      toast.error("Erro ao carregar os dados. Tente novamente.");
+      const msg = error.response?.data?.error || error.response?.data?.erro;
+      if (msg === "Usuário não autorizado") {
+        toast.error("Você não tem permissão para visualizar Relatórios.", { id: "page_error" });
+      } else {
+        toast.error("Erro ao carregar os dados. Tente novamente.", { id: "page_error" });
+      }
     } finally {
       setLoading(false);
     }

@@ -172,7 +172,12 @@ export default function PrecificacaoPage() {
       const response = await api.get("/pricing/products/not-calculated");
       setProdutosParaCalcular(response.data);
     } catch (error: any) {
-      toast.error(error.response?.data?.error || "Erro ao carregar produtos");
+      const msg = error.response?.data?.error || error.response?.data?.erro;
+      if (msg === "Usuário não autorizado") {
+        toast.error("Você não tem permissão para Precificação.", { id: "page_error" });
+      } else {
+        toast.error(error.response?.data?.error || "Erro ao carregar produtos", { id: "page_error" });
+      }
     } finally {
       setLoading(false);
     }
@@ -183,7 +188,12 @@ export default function PrecificacaoPage() {
       const response = await api.get("/pricing/products/calculated");
       setProdutosCalculados(response.data);
     } catch (error: any) {
-      toast.error(error.response?.data?.error || "Erro ao carregar produtos calculados");
+      const msg = error.response?.data?.error || error.response?.data?.erro;
+      if (msg === "Usuário não autorizado") {
+        toast.error("Você não tem permissão para Precificação.", { id: "page_error" });
+      } else {
+        toast.error(error.response?.data?.error || "Erro ao carregar produtos calculados", { id: "page_error" });
+      }
     }
   }, []);
 
@@ -193,7 +203,12 @@ export default function PrecificacaoPage() {
       const response = await api.get("/pricing/ingredients", { params });
       setIngredients(response.data.ingredients || response.data);
     } catch (error: any) {
-      toast.error(error.response?.data?.error || "Erro ao buscar ingredientes");
+      const msg = error.response?.data?.error || error.response?.data?.erro;
+      if (msg === "Usuário não autorizado") {
+        toast.error("Você não tem permissão para Precificação.", { id: "page_error" });
+      } else {
+        toast.error(error.response?.data?.error || "Erro ao buscar ingredientes", { id: "page_error" });
+      }
     }
   }, []);
 
@@ -1151,6 +1166,7 @@ export default function PrecificacaoPage() {
     fetchInitialData();
     return () => {
       pageActions.setShowAddButton(true);
+      toast.dismiss("page_error");
     };
   }, []);
 

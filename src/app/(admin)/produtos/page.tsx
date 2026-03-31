@@ -81,9 +81,14 @@ export default function ProdutosPage() {
       setLoading(true);
       const response = await api.get("/products");
       setProdutos(response.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao buscar produtos:", error);
-      toast.error("Erro ao carregar os produtos cadastrados.");
+      const msg = error.response?.data?.error || error.response?.data?.erro;
+      if (msg === "Usuário não autorizado") {
+        toast.error("Você não tem permissão para visualizar Produtos.", { id: "page_error" });
+      } else {
+        toast.error("Erro ao carregar os produtos cadastrados.", { id: "page_error" });
+      }
     } finally {
       setLoading(false);
     }
@@ -91,6 +96,9 @@ export default function ProdutosPage() {
 
   useEffect(() => {
     fetchProdutos();
+    return () => {
+      toast.dismiss("page_error");
+    };
   }, []);
 
   const handleSubmit = async (data: FormData) => {

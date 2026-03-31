@@ -77,9 +77,14 @@ export default function ProductionPage() {
       console.log(" Dashboard response:", response.data);
       setTasks(response.data.tasks || []);
       setDashboardSummary(response.data.summary);
-    } catch (error) {
+    } catch (error: any) {
       console.error(" Erro ao buscar tarefas de produção:", error);
-      toast.error("Erro ao carregar as tarefas de produção.");
+      const msg = error.response?.data?.error || error.response?.data?.erro;
+      if (msg === "Usuário não autorizado") {
+        toast.error("O Dashboard de Produção está restrito.", { id: "page_error" });
+      } else {
+        toast.error("Erro ao carregar as tarefas de produção.", { id: "page_error" });
+      }
     } finally {
       setLoading(false);
     }
@@ -87,6 +92,9 @@ export default function ProductionPage() {
 
   useEffect(() => {
     fetchProductionDashboard();
+    return () => {
+      toast.dismiss("page_error");
+    };
   }, []);
 
   const handleForceRefresh = () => {

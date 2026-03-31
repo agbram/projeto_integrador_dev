@@ -95,9 +95,14 @@ export default function FixedExpensesPage() {
     try {
       const response = await api.get('/fixedExpenses');
       setExpenses(response.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao buscar despesas:', error);
-      toast.error('Erro ao carregar as despesas.');
+      const msg = error.response?.data?.error || error.response?.data?.erro;
+      if (msg === "Usuário não autorizado") {
+        toast.error("Você não tem permissão para visualizar Despesas.", { id: "page_error" });
+      } else {
+        toast.error('Erro ao carregar as despesas.', { id: "page_error" });
+      }
     } finally {
       setLoading(false);
     }
@@ -105,6 +110,9 @@ export default function FixedExpensesPage() {
 
   useEffect(() => {
     loadExpenses();
+    return () => {
+      toast.dismiss("page_error");
+    };
   }, [loadExpenses]);
 
   const handleAddSubmit = async (data: any) => {

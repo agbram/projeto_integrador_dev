@@ -133,9 +133,14 @@ export default function ClientesPage() {
     try {
       const response = await api.get("/customers");
       setClientes(response.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao buscar clientes:", error);
-      toast.error("Erro ao carregar os clientes cadastrados.");
+      const msg = error.response?.data?.error || error.response?.data?.erro;
+      if (msg === "Usuário não autorizado") {
+        toast.error("Você não tem permissão para visualizar Clientes.", { id: "page_error" });
+      } else {
+        toast.error("Erro ao carregar os clientes cadastrados.", { id: "page_error" });
+      }
     } finally {
       setLoading(false);
     }
@@ -143,6 +148,9 @@ export default function ClientesPage() {
 
   useEffect(() => {
     fetchClientes();
+    return () => {
+      toast.dismiss("page_error");
+    };
   }, []);
 
   const verificarDocumento = async (data: any) => {

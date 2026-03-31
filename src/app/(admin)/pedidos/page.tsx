@@ -402,8 +402,14 @@ export default function PedidosPage() {
       const response = await api.get("/orders");
       const sortedOrders = response.data.sort((a: Order, b: Order) => b.id - a.id);
       setPedidos(sortedOrders);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao buscar pedidos:", error);
+      const msg = error.response?.data?.error || error.response?.data?.erro;
+      if (msg === "Usuário não autorizado") {
+        toast.error("Você não tem permissão para visualizar Pedidos.", { id: "page_error" });
+      } else {
+        toast.error("Erro ao carregar os pedidos cadastrados.", { id: "page_error" });
+      }
     } finally {
       setLoading(false);
     }
@@ -621,8 +627,12 @@ export default function PedidosPage() {
     try {
       const response = await api.get("/customers");
       setCustomers(response.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao carregar clientes:", error);
+      const msg = error.response?.data?.error || error.response?.data?.erro;
+      if (msg === "Usuário não autorizado") {
+        toast.error("Acesso restrito a clientes.", { id: "page_error" });
+      }
     }
   };
 
@@ -634,8 +644,12 @@ export default function PedidosPage() {
         salePrice: product.salePrice || 0,
       }));
       setProducts(normalizedProducts);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao carregar produtos:", error);
+      const msg = error.response?.data?.error || error.response?.data?.erro;
+      if (msg === "Usuário não autorizado") {
+        toast.error("Acesso restrito a produtos.", { id: "page_error" });
+      }
     }
   };
 
@@ -643,6 +657,9 @@ export default function PedidosPage() {
     fetchOrders();
     fetchCustomers();
     fetchProducts();
+    return () => {
+      toast.dismiss("page_error");
+    };
   }, []);
 
   const handleCloseModal = () => {

@@ -239,13 +239,10 @@ export default function FixedExpensesPage() {
       </div>
 
       {/* Modal de adicionar */}
-      <Modal show={modalAddShow} onHide={() => setModalAddShow(false)} size="lg" centered className={styles.modalExpense}>
-        <Modal.Header closeButton className={styles.modalExpenseHeader}>
-          <Modal.Title className={styles.modalExpenseTitle}>Nova Despesa Fixa</Modal.Title>
-        </Modal.Header>
+      <Modal show={modalAddShow} onHide={() => setModalAddShow(false)} size="lg" centered className={styles.modalExpense} contentClassName="globalModalContentRounded">
         <Modal.Body className={styles.modalExpenseBody}>
           <Card
-            title=""
+            title="Nova Despesa Fixa"
             fields={[
               { name: 'description', label: 'Descrição', type: 'text' },
               { name: 'value', label: 'Valor (R$)', type: 'number', step: '0.01' },
@@ -278,14 +275,12 @@ export default function FixedExpensesPage() {
         size="lg"
         centered
         className={styles.modalExpense}
+        contentClassName="globalModalContentRounded"
       >
-        <Modal.Header closeButton className={styles.modalExpenseHeader}>
-          <Modal.Title className={styles.modalExpenseTitle}>Editar Despesa</Modal.Title>
-        </Modal.Header>
         <Modal.Body className={styles.modalBodyEdit}>
           <Card
             key={selectedExpense?.id}
-            title=""
+            title="Editar Despesa"
             fields={[
               { name: 'description', value: selectedExpense?.description || '', label: 'Descrição', type: 'text' },
               { name: 'value', value: selectedExpense?.value || '', label: 'Valor (R$)', type: 'number', step: '0.01' },

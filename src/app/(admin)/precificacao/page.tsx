@@ -565,16 +565,15 @@ export default function PrecificacaoPage() {
         size="xl"
         centered
         className={styles.modalPrecificacao}
+        contentClassName="globalModalContentRounded"
       >
-        <Modal.Header closeButton className={styles.modalPrecificacaoHeader}>
-          <Modal.Title className={styles.modalPrecificacaoTitle}>
+        <Modal.Body className={styles.modalPrecificacaoBody}>
+          <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>
             {selectProduto.name}
             {selectProduto.priceStatus === "CALCULATED" && (
               <span className={styles.badgeCalculatedInline}>Preço Calculado</span>
             )}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body className={styles.modalPrecificacaoBody}>
+          </h2>
           <Tabs
             activeKey={activeTabInterna}
             onSelect={(k) => k && setActiveTabInterna(k)}
@@ -863,11 +862,10 @@ export default function PrecificacaoPage() {
       size="lg"
       centered
       className={styles.modalPrecificacao}
+      contentClassName="globalModalContentRounded"
     >
-      <Modal.Header closeButton className={styles.modalPrecificacaoHeader}>
-        <Modal.Title className={styles.modalPrecificacaoTitle}>Adicionar Ingrediente</Modal.Title>
-      </Modal.Header>
       <Modal.Body className={styles.modalPrecificacaoBody}>
+        <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>Adicionar Ingrediente</h2>
         <div className={styles.addIngredientModalContent}>
           <div className={styles.searchBox}>
             <MagnifyingGlassIcon size={20} />
@@ -1014,11 +1012,10 @@ export default function PrecificacaoPage() {
       size="lg"
       centered
       className={styles.modalPrecificacao}
+      contentClassName="globalModalContentRounded"
     >
-      <Modal.Header closeButton className={styles.modalPrecificacaoHeader}>
-        <Modal.Title className={styles.modalPrecificacaoTitle}>Editar Ingrediente</Modal.Title>
-      </Modal.Header>
       <Modal.Body className={styles.modalPrecificacaoBody}>
+        <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>Editar Ingrediente</h2>
         {editingProductIngredient && (
           <div className={styles.editIngredientForm}>
             <p>
@@ -1077,11 +1074,10 @@ export default function PrecificacaoPage() {
       size="lg"
       centered
       className={styles.modalPrecificacao}
+      contentClassName="globalModalContentRounded"
     >
-      <Modal.Header closeButton className={styles.modalPrecificacaoHeader}>
-        <Modal.Title className={styles.modalPrecificacaoTitle}>Cadastrar Novo Insumo</Modal.Title>
-      </Modal.Header>
       <Modal.Body className={styles.modalPrecificacaoBody}>
+        <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>Cadastrar Novo Insumo</h2>
         <div className={styles.newIngredientForm}>
           <div className={styles.formGroup}>
             <label>Nome *</label>

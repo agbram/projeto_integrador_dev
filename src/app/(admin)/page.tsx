@@ -488,14 +488,12 @@ export default function ProductionPage() {
         size="lg"
         centered
         className={styles.productionSyncWarningModal}
+        contentClassName="globalModalContentRounded"
       >
-        <Modal.Header closeButton className={styles.productionSyncWarningHeader}>
-          <Modal.Title className={styles.productionModalTitle}>
-            Confirmação de Sincronização Completa
-          </Modal.Title>
-        </Modal.Header>
-        
         <Modal.Body className={styles.productionSyncWarningBody}>
+          <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>
+            Confirmação de Sincronização Completa
+          </h2>
           <div className={styles.warningIconContainer}>
             <span className={styles.warningIcon}>⚠</span>
           </div>
@@ -567,13 +565,12 @@ export default function ProductionPage() {
         size="lg"
         centered
         className={styles.productionModal}
+        contentClassName="globalModalContentRounded"
       >
-        <Modal.Header closeButton className={styles.productionModalHeader}>
-          <Modal.Title className={styles.productionModalTitle}>
-            {selectedTask ? `Produção - ${selectedTask.product.name}` : 'Detalhes da Tarefa'}
-          </Modal.Title>
-        </Modal.Header>
         <Modal.Body className={styles.productionModalBody}>
+          <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>
+            {selectedTask ? `Produção - ${selectedTask.product.name}` : 'Detalhes da Tarefa'}
+          </h2>
           {selectedTask && (
             <Card
               title=""

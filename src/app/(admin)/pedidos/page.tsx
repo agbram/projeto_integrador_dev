@@ -15,6 +15,8 @@ import {
   ReceiptIcon,
   ReceiptXIcon,
   CheckCircleIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
 } from "@phosphor-icons/react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
@@ -1034,26 +1036,27 @@ export default function PedidosPage() {
       </div>
 
       {/* MODAL PRINCIPAL - CRIAR PEDIDO */}
-      <Modal show={modalShow} onHide={handleCloseModal} size="lg" centered>
+      <Modal show={modalShow} onHide={handleCloseModal} size="xl" centered contentClassName={styles.modalContentRounded}>
         <Modal.Body className={styles.modalPedidosBody}>
           {formStep === "checkCustomer" && (
             <div className={styles.stepContainer}>
-              <h4 className={styles.stepTitle}>Selecione um cliente</h4>
+              <h4 className={styles.stepTitle}>Selecione o Cliente</h4>
+              <p className={styles.stepSubtitle}>Busque e selecione o cliente para o qual deseja criar este pedido.</p>
               <div className={styles.searchWrapper}>
                 <MagnifyingGlassIcon className={styles.searchIcon} width={18} />
                 <input
                   type="text"
                   className={styles.searchInput}
-                  placeholder="Buscar cliente..."
+                  placeholder="Buscar cliente pelo nome..."
                   value={customerSearchTerm}
                   onChange={(e) => setCustomerSearchTerm(e.target.value)}
                 />
               </div>
-              <div className={styles.listContainer}>
+              <div className={styles.listContainerFixedModal}>
                 {customers
                   .filter((c) => c.name.toLowerCase().includes(customerSearchTerm.toLowerCase()))
                   .length === 0 ? (
-                  <div className={styles.noResults}>Nenhum cliente encontrado</div>
+                  <div className={styles.noResults}>Nenhum cliente encontrado com este nome.</div>
                 ) : (
                   customers
                     .filter((c) => c.name.toLowerCase().includes(customerSearchTerm.toLowerCase()))
@@ -1068,102 +1071,133 @@ export default function PedidosPage() {
                         }}
                       >
                         <span className={styles.listItemName}>{c.name}</span>
+                        <div className={styles.listItemRight}>
+                          <span className={styles.selectText}>Selecionar</span>
+                        </div>
                       </div>
                     ))
                 )}
+              </div>
+              <div className={styles.productsActions}>
+                <button
+                  type="button"
+                  className={styles.actionBtnBack}
+                  onClick={handleCloseModal}
+                >
+                  Cancelar
+                </button>
               </div>
             </div>
           )}
 
           {formStep === "selectProducts" && selectedCustomer && (
             <div className={styles.stepContainer}>
-              <h4 className={styles.stepTitle}>Produtos para <span className={styles.stepTitleAccent}>{selectedCustomer.name}</span></h4>
+              <h4 className={styles.stepTitle}>
+                Produtos para <span className={styles.stepTitleAccent}>{selectedCustomer.name}</span>
+              </h4>
+              <p className={styles.stepSubtitle}>Adicione produtos e defina a quantidade desejada.</p>
 
-              {/* Busca + lista de produtos */}
-              <div className={styles.searchWrapper}>
-                <MagnifyingGlassIcon className={styles.searchIcon} width={18} />
-                <input
-                  type="text"
-                  className={styles.searchInput}
-                  placeholder="Buscar produto..."
-                  value={productSearchTerm}
-                  onChange={(e) => setProductSearchTerm(e.target.value)}
-                />
-              </div>
-              <div className={styles.listContainer}>
-                {filteredProducts.length === 0 ? (
-                  <div className={styles.noResults}>Nenhum produto encontrado</div>
-                ) : (
-                  filteredProducts
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                    .map((product) => (
-                      <div
-                        key={product.id}
-                        className={styles.listItem}
-                        onClick={() => handleAddProduct(product)}
-                      >
-                        <span className={styles.listItemName}>{product.name}</span>
-                        <div className={styles.listItemRight}>
-                          <span className={styles.listItemPrice}>R$ {product.salePrice ? product.salePrice.toFixed(2) : "0,00"}</span>
-                          <PlusIcon size={16} className={styles.listItemIcon} />
+              {/* Layout Dividido para Produtos e Resumo */}
+              <div className={styles.productsSplitLayout}>
+                <div className={styles.productsLeft}>
+                  <div className={styles.searchWrapper}>
+                    <MagnifyingGlassIcon className={styles.searchIcon} width={18} />
+                    <input
+                      type="text"
+                      className={styles.searchInput}
+                      placeholder="Buscar produto..."
+                      value={productSearchTerm}
+                      onChange={(e) => setProductSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <div className={styles.listContainerFixedProduct}>
+                    {filteredProducts.length === 0 ? (
+                      <div className={styles.noResults}>Nenhum produto encontrado.</div>
+                    ) : (
+                      filteredProducts
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((product) => (
+                          <div
+                            key={product.id}
+                            className={styles.listItem}
+                            onClick={() => handleAddProduct(product)}
+                          >
+                            <span className={styles.listItemName}>{product.name}</span>
+                            <div className={styles.listItemRight}>
+                              <span className={styles.listItemPrice}>R$ {product.salePrice ? product.salePrice.toFixed(2) : "0,00"}</span>
+                              <PlusIcon size={16} className={styles.listItemIcon} />
+                            </div>
+                          </div>
+                        ))
+                    )}
+                  </div>
+                </div>
+
+                <div className={styles.productsRight}>
+                  <div className={styles.selectedSectionFixed}>
+                    <div className={styles.selectedSectionHeader}>
+                      <span className={styles.selectedSectionTitle}>Itens do Pedido</span>
+                      <span className={styles.selectedCount}>{orderItems.length} itens</span>
+                    </div>
+                    
+                    <div className={styles.selectedItemsScroll}>
+                      {orderItems.length === 0 ? (
+                        <div className={styles.noResultsItems}>
+                          <p>Nenhum produto adicionado.</p>
+                          <span>Clique no "+" ao lado dos produtos na lista para adicionar.</span>
+                        </div>
+                      ) : (
+                        orderItems.map((item) => (
+                          <div key={item.productId} className={styles.selectedProductItemCompact}>
+                            <div className={styles.productInfoCompact}>
+                              <span className={styles.productName}>{item.productName}</span>
+                              <span className={styles.productPrice}>R$ {item.unitPrice ? item.unitPrice.toFixed(2) : '0.00'}</span>
+                            </div>
+                            <div className={styles.quantityControlsCompact}>
+                              <button className={styles.btnQuantityCompact} onClick={() => handleRemoveQuantity(item.productId)}>
+                                <MinusIcon size={12} weight="bold" />
+                              </button>
+                              <span className={styles.quantityValueCompact}>{item.quantity}</span>
+                              <button className={styles.btnQuantityCompact} onClick={() => handleAddQuantity(item.productId)}>
+                                <PlusIcon size={12} weight="bold" />
+                              </button>
+                            </div>
+                            <div className={styles.itemTotalCompact}>
+                              R$ {((item.unitPrice || 0) * item.quantity).toFixed(2)}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+
+                    <div className={styles.orderTotalsBarCompact}>
+                      <div className={styles.totalsGroupCompact}>
+                        <div className={styles.totalsRow}>
+                          <span className={styles.totalsLabel}>Subtotal</span>
+                          <span className={styles.totalsValue}>R$ {calculateSubtotal().toFixed(2)}</span>
+                        </div>
+                        <div className={styles.totalsRow}>
+                          <span className={styles.totalsLabel}>Desconto (R$)</span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            max={calculateSubtotal()}
+                            value={discount || ""}
+                            onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
+                            className={styles.discountInputCompact}
+                            placeholder="0.00"
+                          />
+                        </div>
+                        <div className={styles.totalsRowFinal}>
+                          <span className={styles.totalsLabelFinal}>Total</span>
+                          <span className={styles.totalsValueFinal}>R$ {calculateTotal().toFixed(2)}</span>
                         </div>
                       </div>
-                    ))
-                )}
-              </div>
-
-              {/* Produtos selecionados */}
-              {orderItems.length > 0 && (
-                <div className={styles.selectedSection}>
-                  <p className={styles.selectedSectionTitle}>Itens do Pedido</p>
-                  {orderItems.map((item) => (
-                    <div key={item.productId} className={styles.selectedProductItem}>
-                      <div className={styles.productInfo}>
-                        <span className={styles.productName}>{item.productName}</span>
-                        <span className={styles.productPrice}>
-                          R$ {item.unitPrice ? item.unitPrice.toFixed(2) : '0.00'}
-                        </span>
-                      </div>
-                      <div className={styles.quantityControls}>
-                        <button className={styles.btnQuantity} onClick={() => handleRemoveQuantity(item.productId)}>
-                          <MinusIcon size={14} />
-                        </button>
-                        <span className={styles.quantityValue}>{item.quantity}</span>
-                        <button className={styles.btnQuantity} onClick={() => handleAddQuantity(item.productId)}>
-                          <PlusIcon size={14} />
-                        </button>
-                      </div>
-                      <div className={styles.itemTotal}>
-                        R$ {((item.unitPrice || 0) * item.quantity).toFixed(2)}
-                      </div>
-                    </div>
-                  ))}
-
-                  {/* Desconto + Totais em linha compacta */}
-                  <div className={styles.orderTotalsBar}>
-                    <div className={styles.discountInline}>
-                      <label className={styles.discountInlineLabel}>Desconto&nbsp;(R$)</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        max={calculateSubtotal()}
-                        value={discount || ""}
-                        onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
-                        className={styles.discountInlineInput}
-                        placeholder="0,00"
-                      />
-                    </div>
-                    <div className={styles.totalsGroup}>
-                      <span className={styles.totalsMuted}>Subtotal: <strong>R$ {calculateSubtotal().toFixed(2)}</strong></span>
-                      {discount > 0 && (
-                        <span className={styles.totalsDiscount}>− R$ {discount.toFixed(2)}</span>
-                      )}
-                      <span className={styles.totalsFinal}>Total: <strong>R$ {calculateTotal().toFixed(2)}</strong></span>
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
 
               <div className={styles.productsActions}>
                 <button
@@ -1171,6 +1205,7 @@ export default function PedidosPage() {
                   className={styles.actionBtnBack}
                   onClick={() => { setFormStep("checkCustomer"); setSelectedCustomer(null); setOrderItems([]); setDiscount(0); }}
                 >
+                  <ArrowLeftIcon size={18} weight="bold" />
                   Voltar
                 </button>
                 <button
@@ -1179,56 +1214,120 @@ export default function PedidosPage() {
                   onClick={() => setFormStep("order")}
                   disabled={orderItems.length === 0}
                 >
-                  Avançar
+                  Continuar
+                  <ArrowRightIcon size={18} weight="bold" />
                 </button>
               </div>
             </div>
           )}
 
           {formStep === "order" && selectedCustomer && (
-            <Card
-              title={`Cadastro de Pedido — ${selectedCustomer.name}`}
-              fields={[
-                { name: "orderDate", label: "Data do Pedido", type: "date", value: getLocalDateString(), readOnly: true },
-                { name: "deliveryDate", label: "Data de Entrega", type: "date", value: "", min: getLocalDateString() },
-                { name: "notes", label: "Observações", type: "text", value: "" },
-              ]}
-              onSubmit={handleSubmit}
-              submitLabel="Cadastrar Pedido"
-              loading={loading}
-              showCancel
-              onCancel={() => setFormStep("selectProducts")}
-              additionalInfo={
-                <div className={styles.orderSummaryStatic}>
-                  <p className={styles.orderSummaryStaticTitle}>Resumo do Pedido</p>
-                  <div className={styles.orderSummaryTable}>
-                    {orderItems.map((item) => (
-                      <div key={item.productId} className={styles.orderSummaryRow}>
-                        <span className={styles.orderSummaryProductName}>{item.productName}</span>
-                        <span className={styles.orderSummaryQty}>{item.quantity}x</span>
-                        <span className={styles.orderSummaryPrice}>R$ {((item.unitPrice || 0) * item.quantity).toFixed(2)}</span>
-                      </div>
-                    ))}
+            <div className={styles.stepContainerFinal}>
+              <h4 className={styles.stepTitle}>Finalizar Pedido</h4>
+              <p className={styles.stepSubtitle}>Confirme os dados e informe as datas do pedido.</p>
+              
+              <div className={styles.finalStepLayout}>
+                {/* Lado Esquerdo: Formulário */}
+                <form 
+                  className={`${styles.finalFormCol} ${styles.finalFormGrow}`} 
+                  onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+                    e.preventDefault();
+                    const formElement = e.currentTarget;
+                    const formData = new window.FormData(formElement);
+                    handleSubmit({
+                      orderDate: formData.get("orderDate") as string,
+                      deliveryDate: formData.get("deliveryDate") as string,
+                      notes: formData.get("notes") as string,
+                    });
+                  }}
+                  id="finalOrderForm"
+                >
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.fieldLabel}>Data do Pedido</label>
+                    <input 
+                      type="date" 
+                      name="orderDate" 
+                      defaultValue={getLocalDateString()} 
+                      readOnly 
+                      className={styles.fieldInputReadOnly}
+                    />
                   </div>
-                  <div className={styles.orderSummaryFooter}>
-                    <div className={styles.orderSummaryFooterRow}>
-                      <span>Subtotal</span>
-                      <span>R$ {calculateSubtotal().toFixed(2)}</span>
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.fieldLabel}>Data de Entrega</label>
+                    <input 
+                      type="date" 
+                      name="deliveryDate" 
+                      min={getLocalDateString()} 
+                      className={styles.fieldInput} 
+                      required
+                    />
+                  </div>
+                  <div className={`${styles.fieldGroup} ${styles.fieldGroupFull}`}>
+                    <label className={styles.fieldLabel}>Observações (opcional)</label>
+                    <textarea 
+                      name="notes" 
+                      className={`${styles.fieldTextarea} ${styles.fieldTextareaFull}`} 
+                      placeholder="Instruções especiais..."
+                    />
+                  </div>
+                </form>
+
+                {/* Lado Direito: Resumo Visível sempre */}
+                <div className={styles.finalSummaryCol}>
+                  <div className={styles.orderSummaryPanel}>
+                    <div className={styles.selectedSectionHeader}>
+                      <span className={styles.selectedSectionTitle}>Resumo do Pedido</span>
                     </div>
-                    {discount > 0 && (
-                      <div className={`${styles.orderSummaryFooterRow} ${styles.orderSummaryFooterDiscount}`}>
-                        <span>Desconto</span>
-                        <span>− R$ {discount.toFixed(2)}</span>
+                    <div className={styles.finalSummaryScroll}>
+                      {orderItems.map((item) => (
+                        <div key={item.productId} className={styles.orderSummaryRowFinal}>
+                          <span className={styles.orderSummaryQtyFinal}>{item.quantity}x</span>
+                          <span className={styles.orderSummaryProductNameFinal}>{item.productName}</span>
+                          <span className={styles.orderSummaryPriceFinal}>R$ {((item.unitPrice || 0) * item.quantity).toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className={styles.orderSummaryFooterFinal}>
+                      <div className={styles.summaryFooterRow}>
+                        <span>Subtotal</span>
+                        <span>R$ {calculateSubtotal().toFixed(2)}</span>
                       </div>
-                    )}
-                    <div className={`${styles.orderSummaryFooterRow} ${styles.orderSummaryFooterTotal}`}>
-                      <span>Total</span>
-                      <span>R$ {calculateTotal().toFixed(2)}</span>
+                      {discount > 0 && (
+                        <div className={`${styles.summaryFooterRow} ${styles.summaryFooterDiscount}`}>
+                          <span>Desconto</span>
+                          <span>− R$ {discount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className={styles.summaryFooterTotal}>
+                        <span>Total a Pagar</span>
+                        <span>R$ {calculateTotal().toFixed(2)}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              }
-            />
+              </div>
+
+              <div className={styles.productsActions}>
+                <button
+                  type="button"
+                  className={styles.actionBtnBack}
+                  onClick={() => setFormStep("selectProducts")}
+                  disabled={loading}
+                >
+                  <ArrowLeftIcon size={18} weight="bold" />
+                  Voltar
+                </button>
+                <button
+                  type="submit"
+                  form="finalOrderForm"
+                  className={`${styles.actionBtnNext} ${styles.actionBtnSubmit}`}
+                  disabled={loading}
+                >
+                  {loading ? "Cadastrando..." : "Confirmar e Cadastrar"}
+                  {!loading && <CheckCircleIcon size={18} weight="bold" />}
+                </button>
+              </div>
+            </div>
           )}
         </Modal.Body>
       </Modal>

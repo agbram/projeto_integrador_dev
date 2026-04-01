@@ -310,14 +310,12 @@ export default function ClientesPage() {
         centered
         size="lg"
         className={styles.modalClientes}
+        contentClassName="globalModalContentRounded"
       >
-        <Modal.Header closeButton className={styles.modalClientesHeader}>
-          <Modal.Title className={styles.modalClientesTitle}>Editar Cliente</Modal.Title>
-        </Modal.Header>
         <Modal.Body className={styles.modalBodyEdit}>
           <Card
             key={selectCliente?.id}
-            title=""
+            title="Editar Cliente"
             fields={[
               { name: "name", value: selectCliente?.name || "", label: "Nome" },
               { name: "contact", value: selectCliente?.contact || "", label: "Contato" },
@@ -349,16 +347,12 @@ export default function ClientesPage() {
         size="lg"
         centered
         className={styles.modalClientes}
+        contentClassName="globalModalContentRounded"
       >
-        <Modal.Header closeButton className={styles.modalClientesHeader}>
-          <Modal.Title className={styles.modalClientesTitle}>
-            {formStep === "check" ? "Verificar CPF ou CNPJ" : "Cadastro de Cliente"}
-          </Modal.Title>
-        </Modal.Header>
         <Modal.Body className={styles.modalClientesBody}>
           {formStep === "check" && (
             <Card
-              title=""
+              title="Verificar CPF ou CNPJ"
               fields={[
                 {
                   name: "document",
@@ -382,7 +376,7 @@ export default function ClientesPage() {
 
           {formStep === "register" && (
             <Card
-              title=""
+              title="Cadastro de Cliente"
               fields={[
                 { name: "name", label: "Nome" },
                 { name: "contact", label: "Contato" },

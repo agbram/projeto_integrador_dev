@@ -297,13 +297,10 @@ export default function ProdutosPage() {
         size="lg"
         centered
         className={styles.modalProdutos}
+        contentClassName="globalModalContentRounded"
       >
-        <Modal.Header closeButton className={styles.modalProdutosHeader}>
-          <Modal.Title className={styles.modalProdutosTitle}>
-            Cadastro de Produto
-          </Modal.Title>
-        </Modal.Header>
         <Modal.Body className={styles.modalProdutosBody}>
+          <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>Cadastro de Produto</h2>
           <div className={styles.instructionBox}>
             <p><strong>Como funciona o cadastro:</strong></p>
             <ol>
@@ -339,13 +336,10 @@ export default function ProdutosPage() {
         centered
         size="lg"
         className={styles.modalProdutos}
+        contentClassName="globalModalContentRounded"
       >
-        <Modal.Header closeButton className={styles.modalProdutosHeader}>
-          <Modal.Title className={styles.modalProdutosTitle}>
-            Editar Produto
-          </Modal.Title>
-        </Modal.Header>
         <Modal.Body className={styles.modalBodyEdit}>
+          <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>Editar Produto</h2>
           {selectProduto && (
             <>
               <div className={styles.productStatusInfo}>

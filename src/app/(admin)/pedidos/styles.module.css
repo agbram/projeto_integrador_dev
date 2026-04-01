@@ -992,4 +992,466 @@
   font-weight: 700;
   color: var(--color-primary, #2e1c1c);
   border-top: 1.5px solid var(--color-border, #e4dcdc);
+}
+
+/* ======================================
+   NEW MODAL LAYOUT & CLASSES
+   ====================================== */
+.stepSubtitle {
+  font-size: 15px;
+  color: var(--color-text-light, #6b5a5a);
+  margin: -2px 0 16px;
+  line-height: 1.4;
+}
+
+.listContainerFixedModal {
+  width: 100%;
+  border: 1.5px solid var(--color-border, #e4dcdc);
+  border-radius: 10px;
+  background: var(--color-bg, #fff);
+  height: 480px;
+  overflow-y: auto;
+  box-shadow: 0 2px 8px rgba(46, 28, 28, 0.06);
+}
+.listContainerFixedModal::-webkit-scrollbar { width: 5px; }
+.listContainerFixedModal::-webkit-scrollbar-thumb { background: var(--color-border, #e4dcdc); border-radius: 4px; }
+
+.selectText {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-accent-dark, #d47b92);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.listItem:hover .selectText {
+  opacity: 1;
+}
+
+/* Split Layout para Produtos */
+.productsSplitLayout {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+  align-items: flex-start;
+}
+.productsLeft, .productsRight {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.listContainerFixedProduct {
+  width: 100%;
+  border: 1.5px solid var(--color-border, #e4dcdc);
+  border-radius: 10px;
+  background: var(--color-bg, #fff);
+  height: 480px;
+  overflow-y: auto;
+}
+.listContainerFixedProduct::-webkit-scrollbar { width: 5px; }
+.listContainerFixedProduct::-webkit-scrollbar-thumb { background: var(--color-border, #e4dcdc); border-radius: 4px; }
+
+.selectedSectionFixed {
+  width: 100%;
+  border: 1.5px solid var(--color-border, #e4dcdc);
+  border-radius: 10px;
+  background: var(--color-bg, #fff);
+  display: flex;
+  flex-direction: column;
+  height: 528px; /* Ocupa altura igual ao input+lista do lado esquerdo */
+  overflow: hidden;
+}
+.selectedSectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(46, 28, 28, 0.03);
+  border-bottom: 1.5px solid var(--color-border, #e4dcdc);
+}
+.selectedSectionTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-primary, #2e1c1c);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.selectedCount {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-accent-dark, #d47b92);
+  background: rgba(212, 123, 146, 0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+.selectedItemsScroll {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+.selectedItemsScroll::-webkit-scrollbar { width: 5px; }
+.selectedItemsScroll::-webkit-scrollbar-thumb { background: var(--color-border, #e4dcdc); border-radius: 4px; }
+
+.noResultsItems {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-light, #6b5a5a);
+  font-size: 15px;
+  text-align: center;
+  padding: 24px;
+}
+.noResultsItems p { margin: 0 0 4px; font-weight: 500; color: var(--color-text, #3a2b2b); }
+.noResultsItems span { font-size: 14px; opacity: 0.8; }
+
+.selectedProductItemCompact {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(46, 28, 28, 0.05);
+  gap: 8px;
+}
+.selectedProductItemCompact:last-child { border-bottom: none; }
+
+.productInfoCompact {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.productName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text, #3a2b2b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.productPrice {
+  font-size: 13px;
+  color: var(--color-text-light, #6b5a5a);
+}
+
+.quantityControlsCompact {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.btnQuantityCompact {
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid var(--color-border, #e4dcdc);
+  border-radius: 6px;
+  background: var(--color-bg, #fff);
+  color: var(--color-primary, #2e1c1c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btnQuantityCompact:hover {
+  background: rgba(212, 123, 146, 0.12);
+  border-color: var(--color-accent-dark, #d47b92);
+  color: var(--color-accent-dark, #d47b92);
+}
+.quantityValueCompact {
+  font-size: 14px;
+  font-weight: 600;
+  width: 20px;
+  text-align: center;
+}
+
+.itemTotalCompact {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-primary, #2e1c1c);
+  text-align: right;
+  min-width: 65px;
+}
+
+.orderTotalsBarCompact {
+  border-top: 1.5px solid var(--color-border, #e4dcdc);
+  background: rgba(46, 28, 28, 0.02);
+  padding: 16px 20px;
+}
+.totalsGroupCompact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.totalsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+.totalsLabel {
+  color: var(--color-text-light, #6b5a5a);
+  font-weight: 600;
+}
+.totalsValue {
+  color: var(--color-text, #3a2b2b);
+  font-weight: 600;
+}
+.discountInputCompact {
+  width: 90px;
+  padding: 3px 8px;
+  border: 1.5px solid var(--color-border, #e4dcdc);
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: right;
+  outline: none;
+}
+.discountInputCompact:focus { border-color: var(--color-accent-dark, #d47b92); }
+
+.totalsRowFinal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--color-border, #e4dcdc);
+}
+.totalsLabelFinal {
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-primary, #2e1c1c);
+}
+.totalsValueFinal {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-primary, #2e1c1c);
+}
+
+/* Step Final: Resumo sem Card */
+.stepContainerFinal {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 16px 20px;
+}
+.finalStepLayout {
+  display: flex;
+  gap: 20px;
+  margin-top: 8px;
+}
+.finalFormCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.finalSummaryCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.fieldLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary, #2e1c1c);
+}
+.fieldInput, .fieldInputReadOnly, .fieldTextarea {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1.5px solid var(--color-border, #e4dcdc);
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--color-text, #3a2b2b);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.fieldInput:focus, .fieldTextarea:focus {
+  border-color: var(--color-accent-dark, #d47b92);
+}
+.fieldTextarea { 
+  resize: none; 
+  min-height: 110px; 
+}
+.fieldInputReadOnly {
+  background: rgba(46, 28, 28, 0.03);
+  color: var(--color-text-light, #6b5a5a);
+  cursor: not-allowed;
+}
+
+.orderSummaryPanel {
+  width: 100%;
+  border: 1.5px solid var(--color-border, #e4dcdc);
+  border-radius: 10px;
+  background: var(--color-bg, #fff);
+  display: flex;
+  flex-direction: column;
+  height: 480px;
+}
+.finalSummaryScroll {
+  flex: 1;
+  overflow-y: auto;
+}
+.orderSummaryRowFinal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(46, 28, 28, 0.05);
+}
+.orderSummaryRowFinal:last-child {
+  border-bottom: none;
+}
+.orderSummaryQtyFinal {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-accent-dark, #d47b92);
+  min-width: 28px;
+}
+.orderSummaryProductNameFinal {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text, #3a2b2b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.orderSummaryPriceFinal {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-primary, #2e1c1c);
+}
+
+.orderSummaryFooterFinal {
+  border-top: 1.5px solid var(--color-border, #e4dcdc);
+  background: rgba(46, 28, 28, 0.02);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.summaryFooterRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--color-text-light, #6b5a5a);
+}
+.summaryFooterDiscount {
+  color: #c0392b;
+  font-weight: 600;
+}
+.summaryFooterTotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-primary, #2e1c1c);
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--color-border, #e4dcdc);
+}
+
+/* Botões de Ação com Setas / Premium */
+.actionBtnBack {
+  background: transparent;
+  color: var(--color-text-light, #6b5a5a);
+  border: 2px solid var(--color-border, #e4dcdc);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+.actionBtnBack:hover {
+  background: rgba(46, 28, 28, 0.04);
+  color: var(--color-primary, #2e1c1c);
+  border-color: var(--color-text-light, #6b5a5a);
+}
+
+.actionBtnNext {
+  background: var(--color-primary, #2e1c1c);
+  color: #fff;
+  border: 2px solid var(--color-primary, #2e1c1c);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(46, 28, 28, 0.15);
+  transition: all 0.2s;
+}
+.actionBtnNext:hover:not(:disabled) {
+  background: #442a27;
+  border-color: #442a27;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(46, 28, 28, 0.25);
+}
+.actionBtnNext:disabled {
+  background: rgba(46, 28, 28, 0.3);
+  border-color: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.actionBtnSubmit {
+  background: #10b981;
+  border-color: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+.actionBtnSubmit:hover:not(:disabled) {
+  background: #059669;
+  border-color: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+}
+
+@media (max-width: 768px) {
+  .productsSplitLayout, .finalStepLayout {
+    flex-direction: column;
+  }
+}
+
+.modalContentRounded {
+  border-radius: 10px !important;
+  overflow: hidden;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+}
+
+.finalFormGrow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 480px; /* Igual ao orderSummaryPanel */
+}
+
+.fieldGroupFull {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldTextareaFull {
+  flex: 1;
+  resize: none !important;
+  min-height: 200px;
 }

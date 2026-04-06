@@ -24,6 +24,14 @@ type PageActionsType = {
   // Controle de visibilidade do botão adicionar
   showAddButton: boolean;
   setShowAddButton: (show: boolean) => void;
+
+  // Controle de visibilidade da barra de busca
+  showSearchBar: boolean;
+  setShowSearchBar: (show: boolean) => void;
+
+  // Search query
+  searchQuery: string;
+  setSearchQuery: (q: string) => void;
 };
 
 export const PageActions = createContext<PageActionsType>({} as PageActionsType);
@@ -35,9 +43,9 @@ export function PageActionProvider({ children }: Props) {
   const [handleFilter, setHandleFilterState] = useState<HandleFilterType>(() => () => {});
   const [showAddButton, setShowAddButton] = useState(true);
   const [showFilterButton, setShowFilterButton] = useState(false);
-  const [filterOptions, setFilterOptionsState] = useState<FilterOption[]>([])
-
-  
+  const [filterOptions, setFilterOptionsState] = useState<FilterOption[]>([]);
+  const [showSearchBar, setShowSearchBar] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Wrappers estáveis
   const setHandleAdd = useCallback((fn: HandleAddType) => {
@@ -49,21 +57,25 @@ export function PageActionProvider({ children }: Props) {
   }, []);
 
   const setFilterOptions = useCallback((opts: FilterOption[]) => {
-  setFilterOptionsState(opts);
-}, []);
+    setFilterOptionsState(opts);
+  }, []);
 
-const value = useMemo(() => ({
+  const value = useMemo(() => ({
     handleAdd,
     setHandleAdd,
     handleFilter,
     setHandleFilter,
     showAddButton,
     setShowAddButton,
+    showSearchBar,
+    setShowSearchBar,
     setFilterOptions,
-   setShowFilterButton,
-   showFilterButton,   
-   filterOptions,       
-}), [handleAdd, handleFilter, showAddButton, showFilterButton, filterOptions]);
+    setShowFilterButton,
+    showFilterButton,   
+    filterOptions,
+    searchQuery,
+    setSearchQuery,
+  }), [handleAdd, handleFilter, showAddButton, showFilterButton, filterOptions, searchQuery, showSearchBar]);
 
   return <PageActions.Provider value={value}>{children}</PageActions.Provider>;
 }

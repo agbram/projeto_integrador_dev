@@ -57,7 +57,15 @@ export default function PedidosPage() {
 
   const searchParams = useSearchParams();
   const highlightOrderId = searchParams.get("highlight");
-  const { setShowAddButton, setHandleAdd, setShowFilterButton, setFilterOptions, setHandleFilter } = useContext(PageActions);
+  const { 
+    setShowAddButton, 
+    setHandleAdd, 
+    setShowFilterButton, 
+    setFilterOptions, 
+    setHandleFilter,
+    searchQuery,
+    setSearchQuery
+  } = useContext(PageActions);
   const [activeFilter, setActiveFilter] = useState<string>("all");
 
   // Advanced Date Filters States
@@ -113,6 +121,18 @@ export default function PedidosPage() {
 
   // Computa a lista filtrada
   const pedidosFiltrados = pedidos.filter((p) => {
+    // 0. Filtro de Texto (Busca) - Busca pelo nome do cliente, ID do pedido ou itens do pedido
+    if (searchQuery) {
+      const search = searchQuery.toLowerCase();
+      const matchesCustomer = p.customer?.name.toLowerCase().includes(search);
+      const matchesId = p.id.toString().includes(search);
+      const matchesItems = p.items?.some(item => 
+        item.product?.name.toLowerCase().includes(search)
+      );
+      
+      if (!matchesCustomer && !matchesId && !matchesItems) return false;
+    }
+
     // 1. Filtro por Status
     if (activeFilter !== "all" && p.status !== activeFilter) {
       return false;
@@ -202,6 +222,7 @@ export default function PedidosPage() {
     return () => {
       setShowFilterButton(false);
       setFilterOptions([]);
+      setSearchQuery("");
       setHandleAdd(() => () => {});
     };
   }, []);

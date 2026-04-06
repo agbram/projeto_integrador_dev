@@ -113,7 +113,11 @@ export default function PrecificacaoPage() {
     supplier: "",
   });
 
-  const pageActions = useContext(PageActions);
+  const {
+    setShowAddButton,
+    searchQuery,
+    setSearchQuery
+  } = useContext(PageActions);
   const API_URL = api;
 
   // ==================== FUNÇÕES AUXILIARES (conversão, cálculo) ====================
@@ -423,7 +427,9 @@ export default function PrecificacaoPage() {
 
   // ==================== RENDERIZAÇÃO DAS LISTAS PRINCIPAIS ====================
   const renderProdutosParaCalcular = useMemo(() => {
-    return produtosParaCalcular.map((produto) => (
+    return produtosParaCalcular
+      .filter(p => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+      .map((produto) => (
       <div key={produto.id} className={styles.productCard}>
         <div className={styles.productCardHeader}>
           {produto.fotoUrl && (
@@ -460,10 +466,12 @@ export default function PrecificacaoPage() {
         </div>
       </div>
     ));
-  }, [produtosParaCalcular, loading]);
+  }, [produtosParaCalcular, loading, searchQuery]);
 
   const renderProdutosCalculados = useMemo(() => {
-    return produtosCalculados.map((produto) => (
+    return produtosCalculados
+      .filter(p => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+      .map((produto) => (
       <div key={produto.id} className={styles.productCard}>
         <div className={styles.productCardHeader}>
           {produto.fotoUrl && (
@@ -512,7 +520,7 @@ export default function PrecificacaoPage() {
         </div>
       </div>
     ));
-  }, [produtosCalculados]);
+  }, [produtosCalculados, searchQuery]);
 
   const renderIngredientsList = useMemo(() => {
     return ingredients.map((ingredient) => (
@@ -1144,7 +1152,7 @@ export default function PrecificacaoPage() {
 
   // ==================== EFEITOS INICIAIS ====================
   useEffect(() => {
-    pageActions.setShowAddButton(false);
+    setShowAddButton(false);
     const fetchInitialData = async () => {
       setLoading(true);
       try {
@@ -1161,16 +1169,20 @@ export default function PrecificacaoPage() {
     };
     fetchInitialData();
     return () => {
-      pageActions.setShowAddButton(true);
+      setShowAddButton(true);
+      setSearchQuery("");
       toast.dismiss("page_error");
     };
-  }, []);
+  }, [setShowAddButton, setSearchQuery]);
 
+  // Sincroniza busca global com a aba de insumos ou filtros locais
   useEffect(() => {
-    return () => {
+    if (activeTab === "insumos") {
       if (searchTimeout) clearTimeout(searchTimeout);
-    };
-  }, [searchTimeout]);
+      const timeout = setTimeout(() => fetchIngredients(searchQuery), 300);
+      setSearchTimeout(timeout);
+    }
+  }, [searchQuery, activeTab, fetchIngredients]);
 
   // ==================== RENDER PRINCIPAL ====================
   return (

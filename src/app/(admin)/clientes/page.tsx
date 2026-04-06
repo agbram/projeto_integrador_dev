@@ -90,11 +90,33 @@ export default function ClientesPage() {
   const [clientes, setClientes] = useState<Customer[]>([]);
   const [selectCliente, setSelectCliente] = useState<Customer>();
   const [documentValue, setDocumentValue] = useState("");
-  const { setShowFilterButton, setFilterOptions, setHandleFilter, setShowAddButton, setHandleAdd } = useContext(PageActions);
+  const { 
+    setShowFilterButton, 
+    setFilterOptions, 
+    setHandleFilter, 
+    setShowAddButton, 
+    setHandleAdd,
+    searchQuery,
+    setSearchQuery
+  } = useContext(PageActions);
   const [activeFilter, setActiveFilter] = useState<string>("all");
 
   // Computa a lista filtrada a partir do estado completo
   const clientesFiltrados = clientes.filter((c) => {
+    // 1. Filtro de Texto (Busca)
+    if (searchQuery) {
+      const search = searchQuery.toLowerCase();
+      const searchDoc = search.replace(/\D/g, "");
+      const matchesName = c.name.toLowerCase().includes(search);
+      const matchesDoc = searchDoc !== "" && c.document.replace(/\D/g, "").includes(searchDoc);
+      const matchesContact = c.contact?.toLowerCase().includes(search);
+      const matchesEmail = c.email?.toLowerCase().includes(search);
+      const matchesAddress = c.address?.toLowerCase().includes(search);
+      
+      if (!matchesName && !matchesDoc && !matchesContact && !matchesEmail && !matchesAddress) return false;
+    }
+
+    // 2. Filtro de Modalidade/Status
     if (activeFilter === "disabled") return c.isActive === false;
     if (activeFilter === "all") return c.isActive !== false;
     // filtros de modalidade — só entre ativos
@@ -119,6 +141,7 @@ export default function ClientesPage() {
     return () => {
       setShowFilterButton(false);
       setFilterOptions([]);
+      setSearchQuery("");
       setHandleAdd(() => () => {});
     };
   }, []);

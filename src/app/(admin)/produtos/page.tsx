@@ -11,7 +11,7 @@ import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 import fileToBase64 from "@/utils/fileToBase64";
 import Product from "@/models/Product";
 import { PageActions } from "@/contexts/PageActions";
-import { CalculatorIcon } from "@phosphor-icons/react";
+import { CalculatorIcon, ImagesIcon, PencilSimpleIcon } from "@phosphor-icons/react";
 import toast from "react-hot-toast"; // <-- importação adicionada
 export default function ProdutosPage() {
   const [modalShow, setModalShow] = useState(false);
@@ -20,7 +20,15 @@ export default function ProdutosPage() {
   const [produtos, setProdutos] = useState<Product[]>([]);
   const [selectProduto, setSelectProduto] = useState<Product>();
   const [warningDeleteModalShow, setWarningDeleteModalShow] = useState(false);
-  const { setShowAddButton, setHandleAdd, setShowFilterButton, setFilterOptions, setHandleFilter } = useContext(PageActions);
+  const { 
+    setShowAddButton, 
+    setHandleAdd, 
+    setShowFilterButton, 
+    setFilterOptions, 
+    setHandleFilter,
+    searchQuery,
+    setSearchQuery 
+  } = useContext(PageActions);
   const [activeFilter, setActiveFilter] = useState<string>("all");
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -38,11 +46,18 @@ export default function ProdutosPage() {
 
   // Computa a lista filtrada
   const produtosFiltrados = produtos.filter((p) => {
+    // 1. Filtro de Texto (Busca)
+    if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+
+    // 2. Filtro de Categoria/Status
     if (activeFilter === "disabled") return p.isActive === false;
     if (activeFilter === "calculated") return p.isActive !== false && p.priceStatus === "CALCULATED";
     if (activeFilter === "not_calculated") return p.isActive !== false && p.priceStatus !== "CALCULATED";
     if (activeFilter === "BOLOS") return p.isActive !== false && p.category === "BOLOS";
     if (activeFilter === "DOCINHOS") return p.isActive !== false && p.category === "DOCINHOS";
+    
     // "all" — só ativos
     return p.isActive !== false;
   });
@@ -67,6 +82,7 @@ export default function ProdutosPage() {
     return () => {
       setShowFilterButton(false);
       setFilterOptions([]);
+      setSearchQuery("");
       setHandleAdd(() => () => {});
     };
   }, []);
@@ -135,7 +151,7 @@ export default function ProdutosPage() {
         description: data.description || null,
         category: data.category,
         isActive: true,
-        yield: data.yield ? parseFloat(data.yield) : null,
+        yield: (data.yield !== "" && data.yield !== null && data.yield !== undefined) ? Number(data.yield) : null,
         fotoData: data.fotoData ? await fileToBase64(data.fotoData as File) : undefined,
       };
 
@@ -221,66 +237,83 @@ export default function ProdutosPage() {
             {produtosFiltrados.map((produto) => (
               <div key={produto.id} className={styles.productCard}>
                 <div className={styles.productCardHeader}>
-                  {produto.fotoUrl && (
-                    <img
-                      src={getImageUrl(produto.fotoUrl)}
-                      alt={produto.name}
-                      className={styles.productImage}
-                      onError={(e) => {
-                        e.currentTarget.src = 'https://via.placeholder.com/150?text=Erro';
-                      }}
-                    />
-                  )}
-                  <h4>{produto.name}</h4>
+                  <div className={styles.categoryBadge}>{produto.category}</div>
+                  
                   <span className={`${styles.priceStatusBadge} ${
                     produto.priceStatus === 'CALCULATED' ? styles.calculated : styles.notCalculated
                   }`}>
-                    {produto.priceStatus === 'CALCULATED' ? '✓ Preço calculado' : '⚡ Precificar'}
+                    {produto.priceStatus === 'CALCULATED' ? '✓ Precificado' : '⚡ Precificar'}
                   </span>
+
+                  <div className={styles.productImageContainer}>
+                    {produto.fotoUrl ? (
+                      <img
+                        src={getImageUrl(produto.fotoUrl)}
+                        alt={produto.name}
+                        className={styles.productImage}
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://via.placeholder.com/300x200?text=Indisponível';
+                        }}
+                      />
+                    ) : (
+                      <div className={styles.noImagePlaceholder}>
+                        <ImagesIcon size={48} weight="light" />
+                        <span>Sem imagem</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
                 <div className={styles.productCardBody}>
-                  <p className={styles.productCategory}>{produto.category}</p>
-                  <p className={styles.productDescription}>{produto.description}</p>
+                  <h4>{produto.name}</h4>
+                  <p className={styles.productDescription}>{produto.description || "Sem descrição disponível para este produto."}</p>
                   
-                  {produto.priceStatus === 'CALCULATED' && (
-                    <div className={styles.priceInfo}>
-                      <div className={styles.priceItem}>
-                        <span>Custo:</span>
-                        <strong>R$ {produto.costPrice?.toFixed(2) || '0,00'}</strong>
+                  <div className={styles.priceInfoContainer}>
+                    {produto.priceStatus === 'CALCULATED' ? (
+                      <div className={styles.priceGrid}>
+                        <div className={styles.priceBox}>
+                          <span className={styles.priceLabel}>Custo</span>
+                          <span className={styles.priceValue}>R$ {produto.costPrice?.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                        <div className={styles.priceBox}>
+                          <span className={styles.priceLabel}>Venda</span>
+                          <span className={`${styles.priceValue} ${styles.salePriceValue}`}>R$ {produto.salePrice?.toFixed(2).replace('.', ',')}</span>
+                        </div>
                       </div>
-                      <div className={styles.priceItem}>
-                        <span>Venda:</span>
-                        <strong className={styles.salePrice}>
-                          R$ {produto.salePrice?.toFixed(2) || '0,00'}
-                        </strong>
+                    ) : (
+                      <div className={styles.notCalculatedPlaceholder}>
+                        Aguardando precificação...
                       </div>
-                    </div>
-                  )}
-                  
-                  <div className={styles.productInfo}>
-                    {produto.yield && <span>Rendimento: {produto.yield} un</span>}
+                    )}
+                    
+                    <span className={styles.productYield}>
+                      Rendimento: {produto.yield && produto.yield > 0 
+                        ? `${produto.yield} ${produto.category === 'DOCINHOS' ? 'unidades' : 'porção'}`
+                        : "Indefinido"
+                      }
+                    </span>
                   </div>
                 </div>
                 
                 <div className={styles.productCardFooter}>
                   <button
-                    className={styles.btnEditar}
+                    className={`${styles.btnAction} ${styles.btnEditar}`}
                     onClick={() => {
                       setSelectProduto(produto);
                       setModalEditShow(true);
                     }}
                   >
+                    <PencilSimpleIcon size={18} />
                     Editar
                   </button>
                   
                   <button
-                    className={`${styles.btnPrecificar} ${
+                    className={`${styles.btnAction} ${styles.btnPrecificar} ${
                       produto.priceStatus === 'CALCULATED' ? styles.btnRecalcular : ''
                     }`}
                     onClick={() => goToPricing(produto.id)}
                   >
-                    <CalculatorIcon size={16} />
+                    <CalculatorIcon size={18} weight="bold" />
                     {produto.priceStatus === 'CALCULATED' ? 'Recalcular' : 'Precificar'}
                   </button>
                 </div>
@@ -354,8 +387,15 @@ export default function ProdutosPage() {
                 
                 {selectProduto.priceStatus === 'CALCULATED' && (
                   <div className={styles.currentPriceInfo}>
-                    <p><strong>Preço atual:</strong> R$ {selectProduto.salePrice?.toFixed(2)}</p>
-                    <p><strong>Custo atual:</strong> R$ {selectProduto.costPrice?.toFixed(2)}</p>
+                    <p>
+                      Preço de Venda
+                      <strong>R$ {selectProduto.salePrice?.toFixed(2)}</strong>
+                    </p>
+                    <p>
+                      Custo Estimado
+                      <strong>R$ {selectProduto.costPrice?.toFixed(2)}</strong>
+                    </p>
+                    
                     <button 
                       className={styles.btnGoToPricing}
                       onClick={() => {
@@ -363,8 +403,8 @@ export default function ProdutosPage() {
                         goToPricing(selectProduto.id);
                       }}
                     >
-                      <CalculatorIcon size={16} />
-                      Ir para Precificação
+                      <CalculatorIcon size={16} weight="bold" />
+                      Acessar Matriz de Precificação
                     </button>
                   </div>
                 )}

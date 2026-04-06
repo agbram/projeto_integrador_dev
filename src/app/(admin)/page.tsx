@@ -64,18 +64,26 @@ export default function ProductionPage() {
   const [syncLoading, setSyncLoading] = useState(false);
   const [progressLoading, setProgressLoading] = useState(false);
   const [confirmFullSyncModalShow, setConfirmFullSyncModalShow] = useState(false);
-  const pageActions = useContext(PageActions);
+  const {
+    setShowAddButton,
+    searchQuery,
+    setSearchQuery
+  } = useContext(PageActions);
 
   useEffect(() => {
-    pageActions.setShowAddButton(false);
-  }, []);
+    setShowAddButton(false);
+    return () => {
+      setSearchQuery("");
+    };
+  }, [setShowAddButton, setSearchQuery]);
 
   const fetchProductionDashboard = async () => {
     try {
       setLoading(true);
       const response = await api.get("/task/dashboard");
       console.log(" Dashboard response:", response.data);
-      setTasks(response.data.tasks || []);
+      const allTasks = response.data.tasks || [];
+      setTasks(allTasks);
       setDashboardSummary(response.data.summary);
     } catch (error: any) {
       console.error(" Erro ao buscar tarefas de produção:", error);
@@ -269,6 +277,13 @@ export default function ProductionPage() {
     return statusMap[status] || status;
   };
 
+  const tasksFiltradas = tasks.filter(task => {
+    if (searchQuery && !task.product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+    return true;
+  });
+
   return (
     <div className={styles.container}>
       {dashboardSummary && (
@@ -352,14 +367,18 @@ export default function ProductionPage() {
             <div className={styles.spinner}></div>
             <p>Carregando tarefas de produção...</p>
           </div>
-        ) : tasks.length === 0 ? (
+        ) : tasksFiltradas.length === 0 ? (
           <div className="emptyStateStandard">
             <GearIcon size={48} />
             <h3>Nenhuma tarefa de produção encontrada</h3>
-            <p>Clique em "Sincronizar Pedidos" para gerar tarefas a partir dos pedidos.</p>
+            <p>
+              {searchQuery 
+                ? "Nenhum produto corresponde à sua busca" 
+                : "Clique em \"Sincronizar Pedidos\" para gerar tarefas a partir dos pedidos."}
+            </p>
           </div>
         ) : (
-          tasks.map((task) => (
+          tasksFiltradas.map((task) => (
             <div key={task.id} className={styles.taskCardContainer}>
               <div 
                 className={styles.taskCard}

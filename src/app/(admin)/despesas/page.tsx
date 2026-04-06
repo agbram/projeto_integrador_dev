@@ -36,7 +36,15 @@ export default function FixedExpensesPage() {
   const [monthlyTotal, setMonthlyTotal] = useState<number>(0);
 
   // Extrai as funções necessárias (estáveis)
-  const { setShowAddButton, setHandleAdd, setShowFilterButton, setFilterOptions, setHandleFilter } = useContext(PageActions);
+  const { 
+    setShowAddButton, 
+    setHandleAdd, 
+    setShowFilterButton, 
+    setFilterOptions, 
+    setHandleFilter,
+    searchQuery,
+    setSearchQuery
+  } = useContext(PageActions);
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth());
 
@@ -57,8 +65,14 @@ export default function FixedExpensesPage() {
     }
   });
 
-  // 2. Aplica o filtro selecionado no TopBar (Todas/Recorrentes/Únicas)
+  // 2. Aplica o filtro selecionado no TopBar (Todas/Recorrentes/Únicas) e a busca por texto
   const despesasFiltradas = despesasDoMes.filter((e) => {
+    // 1. Filtro de Texto (Busca)
+    if (searchQuery && !e.description.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+
+    // 2. Filtro de Tipo
     if (activeFilter === "recurring") return e.recurring === true;
     if (activeFilter === "unique") return e.recurring === false;
     return true; // "all"
@@ -85,6 +99,7 @@ export default function FixedExpensesPage() {
     return () => {
       setShowFilterButton(false);
       setFilterOptions([]);
+      setSearchQuery("");
       setHandleAdd(() => {}); // limpa ao desmontar
     };
   }, [setShowAddButton, setHandleAdd, setShowFilterButton, setFilterOptions, setHandleFilter]); // dependências estáveis → executa apenas uma vez

@@ -1,6 +1,6 @@
 // ActionBar.tsx
 "use client";
-import { JSX, useContext, useState } from "react";
+import { JSX, useContext, useEffect, useState } from "react";
 import { Dropdown, Button } from "react-bootstrap";
 import FAB from "@/components/FAB";
 import {
@@ -32,6 +32,13 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
   const pathname = rawPath ?? "/";
   
   const pageAction = useContext(PageActions);
+  const { setSearchQuery } = pageAction;
+
+  // Reseta busca ao trocar de página
+  useEffect(() => {
+    setQ("");
+    setSearchQuery("");
+  }, [pathname, setSearchQuery]);
 
   function getPageTitle() {
     if (title) return title;
@@ -77,25 +84,31 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
     <div className={styles.actionBar}>
       <h2 className={styles.pageTitle}>{getPageTitle()}</h2>
       <div className={styles.actionsRow}>
-        <form className={styles.searchBox} onSubmit={submitSearch}>
-          <input
-            className={styles.searchInput}
-            placeholder="Procurar"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            aria-label="Procurar"
-          />
-          
-          <button
-            type="button"
-            aria-label="Pesquisar"
-            className={styles.iconBtn}
-            onClick={() => pageAction.handleFilter(q)}
-          >
-            <MagnifyingGlassIcon size={16} />
-          </button>
-         
-        </form>
+        {pageAction.showSearchBar && (
+          <form className={styles.searchBox} onSubmit={submitSearch}>
+            <input
+              className={styles.searchInput}
+              placeholder="Procurar"
+              value={q}
+              onChange={(e) => {
+                const val = e.target.value;
+                setQ(val);
+                setSearchQuery(val);
+              }}
+              aria-label="Procurar"
+            />
+            
+            <button
+              type="button"
+              aria-label="Pesquisar"
+              className={styles.iconBtn}
+              onClick={() => setSearchQuery(q)}
+            >
+              <MagnifyingGlassIcon size={16} />
+            </button>
+           
+          </form>
+        )}
 
         {pageAction.showFilterButton && pageAction.filterOptions.length > 0 && (
           <Dropdown className={styles.filterDropdown}>

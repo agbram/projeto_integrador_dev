@@ -1,242 +1,264 @@
 /* ===== CONTAINER PRINCIPAL E CARDS ===== */
 
 .containerPrincipal {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: start;
-  flex-wrap: wrap;
-  gap: 20px;
   width: 100%;
-  max-width: 1200px;
-  margin: 10px auto;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 /* Nova grid para produtos */
 .productsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
   width: 100%;
-  padding: 20px 0;
 }
 
 /* Estilos para os cards de produto */
 .productCard {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid rgba(231, 231, 231, 0.8);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
   overflow: hidden;
-  transition: all 0.3s ease;
-  border: 1px solid #e9ecef;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   display: flex;
   flex-direction: column;
-  height: 100%; /* Garante que todos os cards na mesma linha tenham o mesmo tamanho */
-  min-height: 480px; /* Altura mínima fixa para comportar tudo */
+  height: 480px; /* Altura total fixa */
+  position: relative;
 }
 
 .productCard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(46, 28, 28, 0.08);
+  border-color: rgba(212, 123, 146, 0.3);
 }
 
 .productCardHeader {
-  padding: 15px;
-  border-bottom: 1px solid #eee;
   position: relative;
-  height: 230px; /* Altura fixa para o header (imagem + título) */
-  display: flex;
-  flex-direction: column;
+  height: 200px; /* Altura fixa para a área da imagem */
+  background: #fdfafb;
+  overflow: hidden;
 }
 
-.productCardHeader h4 {
-  text-align: center;
-  margin-top: 10px;
+.productImageContainer {
   width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fdfafb 0%, #f5ecef 100%);
 }
 
 .productImage {
   width: 100%;
-  height: 150px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  background-color: #f8f9fa;
+  transition: transform 0.6s ease;
 }
 
-.priceStatusBadge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  margin-left: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.productCard:hover .productImage {
+  transform: scale(1.08);
 }
 
-.priceStatusBadge.calculated {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.priceStatusBadge.notCalculated {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeaa7;
-}
-
-.productCardBody {
-  padding: 15px;
-  flex: 1; /* Faz o corpo expandir e empurrar o footer para o final */
+.noImagePlaceholder {
   display: flex;
   flex-direction: column;
-}
-
-.productCategory {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 10px;
-  font-weight: 500;
-}
-
-.productDescription {
-  color: #333;
-  font-size: 14px;
-  margin-bottom: 15px;
-  line-height: 1.4;
-  height: 60px; /* Altura fixa para descrição */
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-
-.priceInfo {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  border: 1px solid #dee2e6;
-  height: 70px; /* Altura fixa para o bloco de preço */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.priceItem {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  padding-bottom: 4px;
-  border-bottom: 1px dashed #dee2e6;
-}
-
-.priceItem:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
-}
-
-.priceItem span {
-  color: #495057;
-  font-size: 14px;
-}
-
-.priceItem strong {
-  color: #212529;
-  font-size: 15px;
-}
-
-.salePrice {
-  color: #28a745 !important;
-  font-weight: 700 !important;
-}
-
-.productInfo {
-  display: flex;
-  gap: 15px;
-  font-size: 13px;
-  color: #666;
-  margin-top: 10px;
-}
-
-.productInfo span {
-  background: #f1f3f5;
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: 1px solid #e9ecef;
-}
-
-.productCardFooter {
-  padding: 15px;
-  border-top: 1px solid #eee;
-  display: flex;
-  gap: 10px;
-  background: #f8f9fa;
-}
-
-.btnEditar {
-  flex: 1;
-  padding: 10px 15px;
-  background: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 500;
-  font-size: 14px;
-}
-
-.btnEditar:hover {
-  background: #5a6268;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
-}
-
-.btnPrecificar {
-  flex: 1;
-  padding: 10px 15px;
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 500;
-  font-size: 14px;
-  display: flex;
   align-items: center;
   justify-content: center;
+  color: #d47b92;
+  opacity: 0.6;
   gap: 8px;
 }
 
-.btnPrecificar:hover {
-  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+.priceStatusBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 2;
 }
 
-.btnPrecificar.btnRecalcular {
-  background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+.priceStatusBadge.calculated {
+  background: rgba(212, 123, 146, 0.9);
+  color: white;
 }
 
-.btnPrecificar.btnRecalcular:hover {
-  background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
-  box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
+.priceStatusBadge.notCalculated {
+  background: rgba(46, 28, 28, 0.85);
+  color: white;
 }
 
-/* Caixa de instruções */
-.instructionBox {
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-  border-left: 4px solid #1976d2;
-  padding: 20px;
-  margin-bottom: 25px;
+.categoryBadge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #2e1c1c;
+  padding: 4px 10px;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(25, 118, 210, 0.1);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 2;
+}
+
+.productCardBody {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.productCardBody h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2e1c1c;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.productDescription {
+  font-size: 13px;
+  color: #6c757d;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  height: 40px; /* Duas linhas fixas */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.priceInfoContainer {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid #f1f3f5;
+  height: 100px; /* Altura fixa para garantir que o Rendimento não saia do lugar */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.priceGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.priceBox {
+  display: flex;
+  flex-direction: column;
+}
+
+.priceLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #adb5bd;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.priceValue {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2e1c1c;
+}
+
+.salePriceValue {
+  color: #d47b92;
+  font-size: 18px;
+}
+
+.notCalculatedPlaceholder {
+  color: #adb5bd;
+  font-style: italic;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  height: 48px; /* Altura equivalente à grade de preços */
+}
+
+.productYield {
+  font-size: 11px;
+  color: #adb5bd;
+  margin-top: auto; /* Empurra para o fundo do container de preço */
+  display: block;
+}
+
+.productCardFooter {
+  padding: 16px 20px;
+  background: #fcfcfc;
+  border-top: 1px solid #f1f3f5;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.btnAction {
+  border: none;
+  border-radius: 12px;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btnEditar {
+  background: #f8f9fa;
+  color: #2e1c1c;
+}
+
+.btnEditar:hover {
+  background: #e9ecef;
+}
+
+.btnPrecificar {
+  background: #2e1c1c;
+  color: white;
+}
+
+.btnPrecificar:hover {
+  background: #4a2d2d;
+  box-shadow: 0 4px 12px rgba(46, 28, 28, 0.2);
+}
+
+.btnRecalcular {
+  background: #f5ecef;
+  color: #d47b92;
+}
+
+.btnRecalcular:hover {
+  background: #ebd9de;
+}
+
+/* Caixa de instruções - Ajustada para o novo estilo */
+.instructionBox {
+  background: #fff;
+  border: 1px solid #ffd8e4;
+  border-left: 4px solid #d47b92;
+  padding: 20px;
+  margin-bottom: 30px;
+  border-radius: 16px;
 }
 
 .instructionBox p {
@@ -257,73 +279,84 @@
   color: #37474f;
 }
 
-/* Informações de status do produto */
+/* Informações de status do produto no modal */
 .productStatusInfo {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 25px;
-  border: 1px solid #dee2e6;
+  background: #fdfafb;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(212, 123, 146, 0.2);
+}
+
+.productStatusInfo p {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #4b3d3d;
 }
 
 .statusBadge {
   display: inline-block;
-  padding: 6px 14px;
+  padding: 4px 10px;
   border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
-  margin-left: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: 8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .statusBadge.calculated {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+  background-color: #d47b92;
+  color: white;
 }
 
 .statusBadge.pending {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeaa7;
+  background-color: #2e1c1c;
+  color: white;
 }
 
 .currentPriceInfo {
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 2px dashed #dee2e6;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(212, 123, 146, 0.3);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
 .currentPriceInfo p {
-  margin: 8px 0;
-  font-size: 14px;
+  margin: 0;
+  font-size: 13px;
+  color: #6c757d;
 }
 
 .currentPriceInfo strong {
-  color: #495057;
+  display: block;
+  color: #2e1c1c;
+  font-size: 16px;
 }
 
 .btnGoToPricing {
+  grid-column: span 2;
   margin-top: 12px;
-  padding: 8px 16px;
-  background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+  padding: 10px;
+  background: #2e1c1c;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   transition: all 0.2s ease;
 }
 
 .btnGoToPricing:hover {
-  background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
+  background: #4a2d2d;
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
 }
 
 /* Nota de aviso */

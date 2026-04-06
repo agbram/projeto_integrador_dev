@@ -2,7 +2,6 @@
 
 import React, { useContext, useEffect, useState } from "react";
 import api from "@/services/api";
-import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
 import {
   CurrencyDollarIcon,
@@ -13,6 +12,12 @@ import {
   ShoppingCartIcon,
   StarIcon,
   ExportIcon,
+  ChartLineUpIcon,
+  WarningCircleIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  FactoryIcon,
+  CrownIcon,
 } from "@phosphor-icons/react";
 
 // Importações do Chart.js
@@ -84,6 +89,16 @@ interface AnalyticsData {
   totalExpenses: number;
   monthlyExpenses: { month: string; total: number }[];
   expensesByCategory: { category: string; total: number }[];
+  // === NOVOS CAMPOS ===
+  grossProfit: number;
+  profitMarginPercent: number;
+  ticketMedio: number;
+  ordersInProduction: number;
+  overdueOrders: number;
+  deliveryRate: number;
+  cancellationRate: number;
+  revenueVsExpenses: { month: string; revenue: number; expenses: number; profit: number }[];
+  productProfitability: { product: string; quantitySold: number; revenue: number; cost: number; profit: number }[];
 }
 
 export default function RelatoriosPage() {
@@ -326,6 +341,82 @@ export default function RelatoriosPage() {
       .map(([category, total]) => ({ category, total }))
       .sort((a, b) => b.total - a.total);
 
+    // === NOVOS CÁLCULOS: Saúde Financeira ===
+    const grossProfit = totalRevenue - totalExpenses;
+    const profitMarginPercent = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
+    const ticketMedio = deliveredOrders.length > 0 ? totalRevenue / deliveredOrders.length : 0;
+
+    // === NOVOS CÁLCULOS: Painel de Produção ===
+    const ordersInProduction = filteredOrders.filter(
+      (o) => o.status === "IN_PRODUCTION" || o.status === "IN_PROGRESS"
+    ).length;
+
+    const now = new Date();
+    const overdueOrders = filteredOrders.filter((o) => {
+      if (o.status === "DELIVERED" || o.status === "CANCELLED") return false;
+      if (!o.deliveryDate) return false;
+      return new Date(o.deliveryDate.toString()) < now;
+    }).length;
+
+    const deliveryRate = totalOrders > 0
+      ? (ordersByStatus.delivered / totalOrders) * 100
+      : 0;
+    const cancellationRate = totalOrders > 0
+      ? (ordersByStatus.cancelled / totalOrders) * 100
+      : 0;
+
+    // === NOVO GRÁFICO: Receita vs Despesas (por mês) ===
+    const monthsArr = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    const revByMonth: Record<string, number> = {};
+    const expByMonth: Record<string, number> = {};
+
+    deliveredOrders.forEach((order) => {
+      const d = new Date(order.orderDate ? order.orderDate.toString() : "");
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      revByMonth[key] = (revByMonth[key] || 0) + (order.total || 0);
+    });
+
+    filteredExpenses.forEach((exp) => {
+      const d = new Date(exp.date);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      expByMonth[key] = (expByMonth[key] || 0) + exp.value;
+    });
+
+    const allMonthKeys = Array.from(new Set([...Object.keys(revByMonth), ...Object.keys(expByMonth)])).sort();
+    const revenueVsExpenses = allMonthKeys.slice(-6).map((key) => {
+      const rev = revByMonth[key] || 0;
+      const exp = expByMonth[key] || 0;
+      const [, monthIdx] = key.split("-");
+      return {
+        month: monthsArr[parseInt(monthIdx)],
+        revenue: parseFloat(rev.toFixed(2)),
+        expenses: parseFloat(exp.toFixed(2)),
+        profit: parseFloat((rev - exp).toFixed(2)),
+      };
+    });
+
+    // === NOVO RANKING: Lucratividade por Produto ===
+    const productProfitability = Object.entries(productSales)
+      .map(([productId, data]) => {
+        const product = products.find((p) => p.id === parseInt(productId));
+        if (!product) return null;
+        const costPerUnit = product.costPrice || 0;
+        const salePerUnit = product.salePrice || 0;
+        const totalCost = costPerUnit * data.quantity;
+        const totalRevenue = salePerUnit * data.quantity;
+        const profit = totalRevenue - totalCost;
+        return {
+          product: product.name,
+          quantitySold: data.quantity,
+          revenue: parseFloat(totalRevenue.toFixed(2)),
+          cost: parseFloat(totalCost.toFixed(2)),
+          profit: parseFloat(profit.toFixed(2)),
+        };
+      })
+      .filter(Boolean) as { product: string; quantitySold: number; revenue: number; cost: number; profit: number }[];
+
+    productProfitability.sort((a, b) => b.profit - a.profit);
+
     return {
       totalRevenue,
       totalOrders,
@@ -343,6 +434,16 @@ export default function RelatoriosPage() {
       totalExpenses,
       monthlyExpenses,
       expensesByCategory,
+      // === NOVOS ===
+      grossProfit,
+      profitMarginPercent,
+      ticketMedio,
+      ordersInProduction,
+      overdueOrders,
+      deliveryRate,
+      cancellationRate,
+      revenueVsExpenses,
+      productProfitability: productProfitability.slice(0, 10),
     };
   };
 
@@ -593,6 +694,61 @@ export default function RelatoriosPage() {
     ],
   };
 
+  // === NOVOS GRÁFICOS ===
+  const revenueVsExpensesOptions = {
+    responsive: true,
+    plugins: {
+      legend: { position: "top" as const },
+      title: { display: true, text: "Receita vs Despesas" },
+    },
+  };
+
+  const revenueVsExpensesData = {
+    labels: analyticsData?.revenueVsExpenses.map((item) => item.month) || [],
+    datasets: [
+      {
+        label: "Receita (R$)",
+        data: analyticsData?.revenueVsExpenses.map((item) => item.revenue) || [],
+        backgroundColor: "rgba(44, 85, 48, 0.6)",
+        borderColor: "rgb(44, 85, 48)",
+        borderWidth: 1,
+      },
+      {
+        label: "Despesas (R$)",
+        data: analyticsData?.revenueVsExpenses.map((item) => item.expenses) || [],
+        backgroundColor: "rgba(255, 99, 132, 0.6)",
+        borderColor: "rgb(255, 99, 132)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const profitabilityOptions = {
+    responsive: true,
+    indexAxis: "y" as const,
+    plugins: {
+      legend: { position: "top" as const },
+      title: { display: true, text: "Lucratividade por Produto (Top 10)" },
+    },
+  };
+
+  const profitabilityData = {
+    labels: analyticsData?.productProfitability.map((item) => item.product) || [],
+    datasets: [
+      {
+        label: "Lucro (R$)",
+        data: analyticsData?.productProfitability.map((item) => item.profit) || [],
+        backgroundColor: analyticsData?.productProfitability.map((item) =>
+          item.profit >= 0 ? "rgba(44, 85, 48, 0.6)" : "rgba(220, 53, 69, 0.6)"
+        ) || [],
+        borderColor: analyticsData?.productProfitability.map((item) =>
+          item.profit >= 0 ? "rgb(44, 85, 48)" : "rgb(220, 53, 69)"
+        ) || [],
+        borderWidth: 1,
+      },
+    ],
+  };
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
   };
@@ -670,6 +826,34 @@ export default function RelatoriosPage() {
     rows.push(["Em Produção", String(analyticsData.ordersByStatus.inProgress)]);
     rows.push(["Entregues", String(analyticsData.ordersByStatus.delivered)]);
     rows.push(["Cancelados", String(analyticsData.ordersByStatus.cancelled)]);
+    rows.push([]);
+
+    // Section 7 (NOVO): Saúde Financeira
+    rows.push(["=== SAÚDE FINANCEIRA ==="]);
+    rows.push(["Métrica", "Valor"]);
+    rows.push(["Lucro Bruto", formatCurrency(analyticsData.grossProfit)]);
+    rows.push(["Margem de Lucro", `${analyticsData.profitMarginPercent.toFixed(1)}%`]);
+    rows.push(["Ticket Médio", formatCurrency(analyticsData.ticketMedio)]);
+    rows.push([]);
+
+    // Section 8 (NOVO): Painel Operacional
+    rows.push(["=== PAINEL OPERACIONAL ==="]);
+    rows.push(["Métrica", "Valor"]);
+    rows.push(["Pedidos em Produção", String(analyticsData.ordersInProduction)]);
+    rows.push(["Pedidos Atrasados", String(analyticsData.overdueOrders)]);
+    rows.push(["Taxa de Entrega", `${analyticsData.deliveryRate.toFixed(1)}%`]);
+    rows.push(["Taxa de Cancelamento", `${analyticsData.cancellationRate.toFixed(1)}%`]);
+    rows.push([]);
+
+    // Section 9 (NOVO): Lucratividade por Produto
+    if (analyticsData.productProfitability.length > 0) {
+      rows.push(["=== LUCRATIVIDADE POR PRODUTO ==="]);
+      rows.push(["Produto", "Qtd Vendida", "Receita", "Custo", "Lucro"]);
+      analyticsData.productProfitability.forEach((item) => {
+        rows.push([item.product, String(item.quantitySold), formatCurrency(item.revenue), formatCurrency(item.cost), formatCurrency(item.profit)]);
+      });
+      rows.push([]);
+    }
 
     const csvContent = rows.map((row) => row.map(escapeCSV).join(",")).join("\n");
     // UTF-8 BOM for proper encoding in Excel
@@ -782,6 +966,69 @@ export default function RelatoriosPage() {
         </div>
       </div>
 
+      {/* === NOVOS CARDS: Saúde Financeira === */}
+      <div className={styles.financialHighlight}>
+        <div className={`${styles.highlightCard} ${analyticsData.grossProfit >= 0 ? styles.highlightPositive : styles.highlightNegative}`}>
+          <div className={styles.highlightIcon}>
+            <CurrencyDollarIcon size={28} weight="bold" />
+          </div>
+          <div className={styles.highlightInfo}>
+            <span className={styles.highlightLabel}>Lucro Bruto</span>
+            <span className={styles.highlightValue}>{formatCurrency(analyticsData.grossProfit)}</span>
+          </div>
+        </div>
+        <div className={`${styles.highlightCard} ${analyticsData.profitMarginPercent >= 20 ? styles.highlightPositive : analyticsData.profitMarginPercent >= 10 ? styles.highlightWarning : styles.highlightNegative}`}>
+          <div className={styles.highlightIcon}>
+            <ChartLineUpIcon size={28} weight="bold" />
+          </div>
+          <div className={styles.highlightInfo}>
+            <span className={styles.highlightLabel}>Margem de Lucro</span>
+            <span className={styles.highlightValue}>{analyticsData.profitMarginPercent.toFixed(1)}%</span>
+          </div>
+        </div>
+        <div className={`${styles.highlightCard} ${styles.highlightNeutral}`}>
+          <div className={styles.highlightIcon}>
+            <ShoppingCartIcon size={28} weight="bold" />
+          </div>
+          <div className={styles.highlightInfo}>
+            <span className={styles.highlightLabel}>Ticket Médio</span>
+            <span className={styles.highlightValue}>{formatCurrency(analyticsData.ticketMedio)}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* === NOVOS CARDS: Painel Operacional === */}
+      <div className={styles.operationalGrid}>
+        <div className={styles.opCard}>
+          <FactoryIcon size={22} className={styles.opIconBlue} />
+          <div className={styles.opInfo}>
+            <span className={styles.opValue}>{analyticsData.ordersInProduction}</span>
+            <span className={styles.opLabel}>Em Produção</span>
+          </div>
+        </div>
+        <div className={`${styles.opCard} ${analyticsData.overdueOrders > 0 ? styles.opCardAlert : ''}`}>
+          <WarningCircleIcon size={22} className={analyticsData.overdueOrders > 0 ? styles.opIconRed : styles.opIconGray} />
+          <div className={styles.opInfo}>
+            <span className={styles.opValue}>{analyticsData.overdueOrders}</span>
+            <span className={styles.opLabel}>Atrasados</span>
+          </div>
+        </div>
+        <div className={styles.opCard}>
+          <CheckCircleIcon size={22} className={styles.opIconGreen} />
+          <div className={styles.opInfo}>
+            <span className={styles.opValue}>{analyticsData.deliveryRate.toFixed(1)}%</span>
+            <span className={styles.opLabel}>Taxa de Entrega</span>
+          </div>
+        </div>
+        <div className={styles.opCard}>
+          <XCircleIcon size={22} className={analyticsData.cancellationRate > 10 ? styles.opIconRed : styles.opIconGray} />
+          <div className={styles.opInfo}>
+            <span className={styles.opValue}>{analyticsData.cancellationRate.toFixed(1)}%</span>
+            <span className={styles.opLabel}>Taxa de Cancelamento</span>
+          </div>
+        </div>
+      </div>
+
       {/* Grid de Gráficos */}
       <div className={styles.chartsGrid}>
         {/* Receita Mensal */}
@@ -826,7 +1073,53 @@ export default function RelatoriosPage() {
             <Pie options={categoryChartOptions} data={categoryChartData} />
           </div>
         </div>
+        {/* NOVO: Receita vs Despesas */}
+        <div className={styles.chartCard}>
+          <div className={styles.chartHeader}><h3>Receita vs Despesas</h3></div>
+          <div className={styles.chartContainer}>
+            <Bar options={revenueVsExpensesOptions} data={revenueVsExpensesData} />
+          </div>
+        </div>
+        {/* NOVO: Lucratividade por Produto */}
+        <div className={styles.chartCard}>
+          <div className={styles.chartHeader}><h3>Lucratividade por Produto</h3></div>
+          <div className={styles.chartContainer}>
+            <Bar options={profitabilityOptions} data={profitabilityData} />
+          </div>
+        </div>
       </div>
+
+      {/* === NOVO: Ranking de Produtos por Lucro === */}
+      {analyticsData.productProfitability.length > 0 && (
+        <div className={styles.rankingSection}>
+          <h3 className={styles.rankingTitle}>
+            <CrownIcon size={22} weight="fill" className={styles.crownIcon} />
+            Ranking de Produtos por Lucro
+          </h3>
+          <div className={styles.rankingTable}>
+            <div className={styles.rankingHeader}>
+              <span>#</span>
+              <span>Produto</span>
+              <span>Qtd Vendida</span>
+              <span>Receita</span>
+              <span>Custo</span>
+              <span>Lucro</span>
+            </div>
+            {analyticsData.productProfitability.slice(0, 5).map((item, idx) => (
+              <div key={idx} className={`${styles.rankingRow} ${idx === 0 ? styles.rankingFirst : ''}`}>
+                <span className={styles.rankingPosition}>{idx + 1}º</span>
+                <span className={styles.rankingProduct}>{item.product}</span>
+                <span>{item.quantitySold} un</span>
+                <span>{formatCurrency(item.revenue)}</span>
+                <span>{formatCurrency(item.cost)}</span>
+                <span className={item.profit >= 0 ? styles.profitPositive : styles.profitNegative}>
+                  {formatCurrency(item.profit)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Análises Detalhadas */}
       <div className={styles.analyticsGrid}>

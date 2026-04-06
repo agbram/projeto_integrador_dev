@@ -542,3 +542,286 @@
   border-left-color: #2c5530;
   background: linear-gradient(135deg, #ffffff 0%, #f7fcf8 100%);
 }
+
+/* ============================================================== */
+/* === NOVOS ESTILOS: Saúde Financeira, Produção e Ranking ====== */
+/* ============================================================== */
+
+/* Bloco de Destaque Financeiro */
+.financialHighlight {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.highlightCard {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.highlightCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.highlightPositive {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-left: 5px solid #2e7d32;
+}
+
+.highlightPositive .highlightIcon {
+  color: #2e7d32;
+}
+
+.highlightNegative {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-left: 5px solid #c62828;
+}
+
+.highlightNegative .highlightIcon {
+  color: #c62828;
+}
+
+.highlightWarning {
+  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+  border-left: 5px solid #f9a825;
+}
+
+.highlightWarning .highlightIcon {
+  color: #f9a825;
+}
+
+.highlightNeutral {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-left: 5px solid #1565c0;
+}
+
+.highlightNeutral .highlightIcon {
+  color: #1565c0;
+}
+
+.highlightIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+}
+
+.highlightInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.highlightLabel {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.highlightValue {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  line-height: 1.1;
+}
+
+/* Painel Operacional */
+.operationalGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.opCard {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+}
+
+.opCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.opCardAlert {
+  border-color: #ef5350;
+  animation: pulseAlert 2s infinite;
+}
+
+@keyframes pulseAlert {
+  0%, 100% { box-shadow: 0 2px 8px rgba(239, 83, 80, 0.15); }
+  50% { box-shadow: 0 4px 20px rgba(239, 83, 80, 0.35); }
+}
+
+.opInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.opValue {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1.2;
+}
+
+.opLabel {
+  font-size: 0.78rem;
+  color: #888;
+  font-weight: 500;
+}
+
+.opIconBlue { color: #1976d2; }
+.opIconGreen { color: #2e7d32; }
+.opIconRed { color: #c62828; }
+.opIconGray { color: #9e9e9e; }
+
+/* Ranking de Produtos */
+.rankingSection {
+  background: white;
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.rankingTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2e1c1c;
+  margin: 0 0 1.25rem 0;
+}
+
+.crownIcon {
+  color: #f9a825;
+}
+
+.rankingTable {
+  width: 100%;
+}
+
+.rankingHeader {
+  display: grid;
+  grid-template-columns: 50px 2fr 1fr 1fr 1fr 1fr;
+  padding: 0.75rem 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: #6b5a5a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.rankingRow {
+  display: grid;
+  grid-template-columns: 50px 2fr 1fr 1fr 1fr 1fr;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #f1f3f4;
+  align-items: center;
+  font-size: 0.92rem;
+  transition: background 0.15s ease;
+}
+
+.rankingRow:hover {
+  background: #fafbfc;
+}
+
+.rankingRow:last-child {
+  border-bottom: none;
+}
+
+.rankingFirst {
+  background: linear-gradient(135deg, #fffde7 0%, #fff9c4 100%);
+  border-radius: 8px;
+  border-bottom: none;
+  margin-bottom: 0.25rem;
+}
+
+.rankingFirst:hover {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+}
+
+.rankingPosition {
+  font-weight: 700;
+  color: #2c5530;
+  font-size: 0.95rem;
+}
+
+.rankingProduct {
+  font-weight: 600;
+  color: #2e1c1c;
+}
+
+.profitPositive {
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.profitNegative {
+  color: #c62828;
+  font-weight: 700;
+}
+
+/* Responsividade dos novos blocos */
+@media (max-width: 1024px) {
+  .financialHighlight {
+    grid-template-columns: 1fr;
+  }
+  .operationalGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .operationalGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .rankingHeader,
+  .rankingRow {
+    grid-template-columns: 40px 1.5fr 0.8fr 1fr 1fr 1fr;
+    font-size: 0.8rem;
+    padding: 0.7rem 0.5rem;
+  }
+  .highlightValue {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .operationalGrid {
+    grid-template-columns: 1fr;
+  }
+  .rankingHeader {
+    display: none;
+  }
+  .rankingRow {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+    padding: 1rem 0.75rem;
+    border-bottom: 2px solid #f0f0f0;
+  }
+}

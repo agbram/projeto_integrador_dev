@@ -111,11 +111,21 @@ export default function RelatoriosPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [fixedExpenses, setFixedExpenses] = useState<FixedExpense[]>([]);
   const router = useRouter();
-  const pageActions = useContext(PageActions);
+  const { 
+    setShowAddButton, 
+    setShowSearchBar,
+    searchQuery, 
+    setSearchQuery 
+  } = useContext(PageActions);
 
   useEffect(() => {
-    pageActions.setShowAddButton(false);
-  }, [pageActions]);
+    setShowAddButton(false);
+    setShowSearchBar(false);
+    return () => {
+      setShowSearchBar(true);
+      setSearchQuery("");
+    };
+  }, [setShowAddButton, setShowSearchBar, setSearchQuery]);
 
   // Fetch only once on mount
   useEffect(() => {
@@ -312,13 +322,21 @@ export default function RelatoriosPage() {
     };
 
     // Pedidos recentes (últimos 5)
-    const recentOrders = filteredOrders
-      .sort(
-        (a, b) =>
-          new Date(b.orderDate ? new Date(b.orderDate.toString()).toISOString() : "").getTime() -
-          new Date(a.orderDate ? new Date(a.orderDate.toString()).toISOString() : "").getTime()
-      )
-      .slice(0, 5);
+    const recentOrdersRaw = [...filteredOrders].sort(
+      (a, b) =>
+        new Date(b.orderDate ? new Date(b.orderDate.toString()).toISOString() : "").getTime() -
+        new Date(a.orderDate ? new Date(a.orderDate.toString()).toISOString() : "").getTime()
+    );
+
+    // Aplicar busca aos pedidos recentes
+    const filteredRecentOrders = searchQuery 
+      ? recentOrdersRaw.filter(o => 
+          o.customer?.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+          o.id.toString().includes(searchQuery)
+        )
+      : recentOrdersRaw;
+
+    const recentOrders = filteredRecentOrders.slice(0, 5);
 
     // Dados para gráficos
     const monthlyRevenue = generateMonthlyRevenue(filteredOrders);
@@ -430,7 +448,10 @@ export default function RelatoriosPage() {
       recentOrders,
       monthlyRevenue,
       monthlyOrders,
-      productSales: productSalesArray.sort((a, b) => b.quantity - a.quantity).slice(0, 10),
+      productSales: productSalesArray
+        .filter(ps => !searchQuery || ps.product.toLowerCase().includes(searchQuery.toLowerCase()))
+        .sort((a, b) => b.quantity - a.quantity)
+        .slice(0, 10),
       totalExpenses,
       monthlyExpenses,
       expensesByCategory,

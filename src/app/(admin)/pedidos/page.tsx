@@ -15,6 +15,8 @@ import {
   ReceiptIcon,
   ReceiptXIcon,
   CheckCircleIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
 } from "@phosphor-icons/react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
@@ -45,8 +47,6 @@ export default function PedidosPage() {
 
   const [customerSearchTerm, setCustomerSearchTerm] = useState("");
   const [productSearchTerm, setProductSearchTerm] = useState("");
-  const [isCustomerSearchFocused, setIsCustomerSearchFocused] = useState(false);
-  const [isProductSearchFocused, setIsProductSearchFocused] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState<{ id: number; name: string; salePrice: number }[]>([]);
 
   const [products, setProducts] = useState<{ id: number; name: string; salePrice: number }[]>([]);
@@ -57,7 +57,15 @@ export default function PedidosPage() {
 
   const searchParams = useSearchParams();
   const highlightOrderId = searchParams.get("highlight");
-  const { setShowAddButton, setHandleAdd, setShowFilterButton, setFilterOptions, setHandleFilter } = useContext(PageActions);
+  const { 
+    setShowAddButton, 
+    setHandleAdd, 
+    setShowFilterButton, 
+    setFilterOptions, 
+    setHandleFilter,
+    searchQuery,
+    setSearchQuery
+  } = useContext(PageActions);
   const [activeFilter, setActiveFilter] = useState<string>("all");
 
   // Advanced Date Filters States
@@ -113,6 +121,18 @@ export default function PedidosPage() {
 
   // Computa a lista filtrada
   const pedidosFiltrados = pedidos.filter((p) => {
+    // 0. Filtro de Texto (Busca) - Busca pelo nome do cliente, ID do pedido ou itens do pedido
+    if (searchQuery) {
+      const search = searchQuery.toLowerCase();
+      const matchesCustomer = p.customer?.name.toLowerCase().includes(search);
+      const matchesId = p.id.toString().includes(search);
+      const matchesItems = p.items?.some(item => 
+        item.product?.name.toLowerCase().includes(search)
+      );
+      
+      if (!matchesCustomer && !matchesId && !matchesItems) return false;
+    }
+
     // 1. Filtro por Status
     if (activeFilter !== "all" && p.status !== activeFilter) {
       return false;
@@ -202,19 +222,16 @@ export default function PedidosPage() {
     return () => {
       setShowFilterButton(false);
       setFilterOptions([]);
+      setSearchQuery("");
       setHandleAdd(() => () => {});
     };
   }, []);
 
   useEffect(() => {
-    if (productSearchTerm) {
-      const filtered = products.filter((product) =>
-        product.name.toLowerCase().includes(productSearchTerm.toLowerCase())
-      );
-      setFilteredProducts(filtered.slice(0, 10));
-    } else {
-      setFilteredProducts([]);
-    }
+    const filtered = products.filter((product) =>
+      product.name.toLowerCase().includes(productSearchTerm.toLowerCase())
+    );
+    setFilteredProducts(filtered);
   }, [productSearchTerm, products]);
 
   const formatCurrency = (value: number): string => {
@@ -1040,209 +1057,298 @@ export default function PedidosPage() {
       </div>
 
       {/* MODAL PRINCIPAL - CRIAR PEDIDO */}
-      <Modal show={modalShow} onHide={handleCloseModal} size="lg" centered>
+      <Modal show={modalShow} onHide={handleCloseModal} size="xl" centered contentClassName={styles.modalContentRounded}>
         <Modal.Body className={styles.modalPedidosBody}>
           {formStep === "checkCustomer" && (
-            <div className={styles.searchContainer}>
-              <h4>Selecione um cliente</h4>
+            <div className={styles.stepContainer}>
+              <h4 className={styles.stepTitle}>Selecione o Cliente</h4>
+              <p className={styles.stepSubtitle}>Busque e selecione o cliente para o qual deseja criar este pedido.</p>
               <div className={styles.searchWrapper}>
-                <MagnifyingGlassIcon className={styles.searchIcon} width={20} />
+                <MagnifyingGlassIcon className={styles.searchIcon} width={18} />
                 <input
                   type="text"
                   className={styles.searchInput}
-                  placeholder="Buscar cliente..."
+                  placeholder="Buscar cliente pelo nome..."
                   value={customerSearchTerm}
                   onChange={(e) => setCustomerSearchTerm(e.target.value)}
-                  onFocus={() => setIsCustomerSearchFocused(true)}
-                  onBlur={() => setTimeout(() => setIsCustomerSearchFocused(false), 200)}
                 />
               </div>
-              {isCustomerSearchFocused && (
-                <div className={styles.containerResults}>
-                  {customers
+              <div className={styles.listContainerFixedModal}>
+                {customers
+                  .filter((c) => c.name.toLowerCase().includes(customerSearchTerm.toLowerCase()))
+                  .length === 0 ? (
+                  <div className={styles.noResults}>Nenhum cliente encontrado com este nome.</div>
+                ) : (
+                  customers
                     .filter((c) => c.name.toLowerCase().includes(customerSearchTerm.toLowerCase()))
-                    .slice(0, 10)
                     .map((c) => (
                       <div
                         key={c.id}
-                        className={styles.searchItem}
-                        onMouseDown={() => {
+                        className={styles.listItem}
+                        onClick={() => {
                           setSelectedCustomer(c);
                           setFormStep("selectProducts");
                           setCustomerSearchTerm("");
                         }}
                       >
-                        {c.name}
+                        <span className={styles.listItemName}>{c.name}</span>
+                        <div className={styles.listItemRight}>
+                          <span className={styles.selectText}>Selecionar</span>
+                        </div>
                       </div>
-                    ))}
-                </div>
-              )}
+                    ))
+                )}
+              </div>
+              <div className={styles.productsActions}>
+                <button
+                  type="button"
+                  className={styles.actionBtnBack}
+                  onClick={handleCloseModal}
+                >
+                  Cancelar
+                </button>
+              </div>
             </div>
           )}
 
           {formStep === "selectProducts" && selectedCustomer && (
-            <div className={styles.productSelectionContainer}>
-              <h4>Selecione os produtos para {selectedCustomer.name}</h4>
+            <div className={styles.stepContainer}>
+              <h4 className={styles.stepTitle}>
+                Produtos para <span className={styles.stepTitleAccent}>{selectedCustomer.name}</span>
+              </h4>
+              <p className={styles.stepSubtitle}>Adicione produtos e defina a quantidade desejada.</p>
 
-              <div className={styles.searchContainer}>
-                <div className={styles.searchWrapper}>
-                  <MagnifyingGlassIcon className={styles.searchIcon} width={20} />
-                  <input
-                    type="text"
-                    className={styles.searchInput}
-                    placeholder="Buscar produto..."
-                    value={productSearchTerm}
-                    onChange={(e) => setProductSearchTerm(e.target.value)}
-                    onFocus={() => setIsProductSearchFocused(true)}
-                    onBlur={() => setTimeout(() => setIsProductSearchFocused(false), 200)}
-                  />
-                </div>
-
-                {isProductSearchFocused && productSearchTerm && (
-                  <div className={styles.containerResults}>
-                    {filteredProducts
-                      .sort((a, b) => a.name.localeCompare(b.name))
-                      .slice(0, 5)
-                      .map((product) => (
-                        <div
-                          key={product.id}
-                          className={styles.searchItem}
-                          onMouseDown={() => handleAddProduct(product)}
-                        >
-                          <div className={styles.searchItemContent}>
-                            <div className={styles.productName}>{product.name}</div>
-                            <div className={styles.searchItemAdd}>
-                              <div className={styles.productPrice}>
-                                R$ {product.salePrice ? product.salePrice.toFixed(2) : "0.00"}
-                              </div>
-                              <PlusIcon size={20} className={styles.addIcon} />
+              {/* Layout Dividido para Produtos e Resumo */}
+              <div className={styles.productsSplitLayout}>
+                <div className={styles.productsLeft}>
+                  <div className={styles.searchWrapper}>
+                    <MagnifyingGlassIcon className={styles.searchIcon} width={18} />
+                    <input
+                      type="text"
+                      className={styles.searchInput}
+                      placeholder="Buscar produto..."
+                      value={productSearchTerm}
+                      onChange={(e) => setProductSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <div className={styles.listContainerFixedProduct}>
+                    {filteredProducts.length === 0 ? (
+                      <div className={styles.noResults}>Nenhum produto encontrado.</div>
+                    ) : (
+                      filteredProducts
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((product) => (
+                          <div
+                            key={product.id}
+                            className={styles.listItem}
+                            onClick={() => handleAddProduct(product)}
+                          >
+                            <span className={styles.listItemName}>{product.name}</span>
+                            <div className={styles.listItemRight}>
+                              <span className={styles.listItemPrice}>R$ {product.salePrice ? product.salePrice.toFixed(2) : "0,00"}</span>
+                              <PlusIcon size={16} className={styles.listItemIcon} />
                             </div>
                           </div>
+                        ))
+                    )}
+                  </div>
+                </div>
+
+                <div className={styles.productsRight}>
+                  <div className={styles.selectedSectionFixed}>
+                    <div className={styles.selectedSectionHeader}>
+                      <span className={styles.selectedSectionTitle}>Itens do Pedido</span>
+                      <span className={styles.selectedCount}>{orderItems.length} itens</span>
+                    </div>
+                    
+                    <div className={styles.selectedItemsScroll}>
+                      {orderItems.length === 0 ? (
+                        <div className={styles.noResultsItems}>
+                          <p>Nenhum produto adicionado.</p>
+                          <span>Clique no "+" ao lado dos produtos na lista para adicionar.</span>
                         </div>
-                      ))}
-                    {filteredProducts.length === 0 && productSearchTerm && (
-                      <div className={styles.noResults}>Nenhum produto encontrado</div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {orderItems.length > 0 && (
-                <div className={styles.selectedProducts}>
-                  <h5>Produtos Selecionados</h5>
-                  {orderItems.map((item) => (
-                    <div key={item.productId} className={styles.selectedProductItem}>
-                      <div className={styles.productInfo}>
-                        <span className={styles.productName}>{item.productName}</span>
-                        <span className={styles.productPrice}>
-                          R$ {item.unitPrice ? item.unitPrice.toFixed(2) : '0.00'}
-                        </span>
-                      </div>
-                      <div className={styles.quantityControls}>
-                        <button className={styles.btnQuantity} onClick={() => handleRemoveQuantity(item.productId)}>
-                          <MinusIcon size={16} />
-                        </button>
-                        <span className={styles.quantityValue}>{item.quantity}</span>
-                        <button className={styles.btnQuantity} onClick={() => handleAddQuantity(item.productId)}>
-                          <PlusIcon size={16} />
-                        </button>
-                      </div>
-                      <div className={styles.itemTotal}>
-                        R$ {((item.unitPrice || 0) * item.quantity).toFixed(2)}
-                      </div>
+                      ) : (
+                        orderItems.map((item) => (
+                          <div key={item.productId} className={styles.selectedProductItemCompact}>
+                            <div className={styles.productInfoCompact}>
+                              <span className={styles.productName}>{item.productName}</span>
+                              <span className={styles.productPrice}>R$ {item.unitPrice ? item.unitPrice.toFixed(2) : '0.00'}</span>
+                            </div>
+                            <div className={styles.quantityControlsCompact}>
+                              <button className={styles.btnQuantityCompact} onClick={() => handleRemoveQuantity(item.productId)}>
+                                <MinusIcon size={12} weight="bold" />
+                              </button>
+                              <span className={styles.quantityValueCompact}>{item.quantity}</span>
+                              <button className={styles.btnQuantityCompact} onClick={() => handleAddQuantity(item.productId)}>
+                                <PlusIcon size={12} weight="bold" />
+                              </button>
+                            </div>
+                            <div className={styles.itemTotalCompact}>
+                              R$ {((item.unitPrice || 0) * item.quantity).toFixed(2)}
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
-                  ))}
 
-                  <div className={styles.discountSection}>
-                    <label className={styles.discountLabel}>Desconto (Atacado):</label>
-                    <div className={styles.discountInputWrapper}>
-                      <span className={styles.currencySymbol}>R$</span>
-                      <input
-                        type="text"
-                        step="0.01"
-                        min="0"
-                        max={calculateSubtotal()}
-                        value={discount}
-                        onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
-                        className={styles.discountInput}
-                        placeholder="0,00"
-                      />
-                    </div>
-                  </div>
-
-                  <div className={styles.partialTotal}>
-                    <div className={styles.totalLine}>
-                      <span>Subtotal:</span>
-                      <span>R$ {calculateSubtotal().toFixed(2)}</span>
-                    </div>
-                    {discount > 0 && (
-                      <div className={styles.totalLine}>
-                        <span>Desconto:</span>
-                        <span className={styles.discountText}>- R$ {discount.toFixed(2)}</span>
+                    <div className={styles.orderTotalsBarCompact}>
+                      <div className={styles.totalsGroupCompact}>
+                        <div className={styles.totalsRow}>
+                          <span className={styles.totalsLabel}>Subtotal</span>
+                          <span className={styles.totalsValue}>R$ {calculateSubtotal().toFixed(2)}</span>
+                        </div>
+                        <div className={styles.totalsRow}>
+                          <span className={styles.totalsLabel}>Desconto (R$)</span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            max={calculateSubtotal()}
+                            value={discount || ""}
+                            onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
+                            className={styles.discountInputCompact}
+                            placeholder="0.00"
+                          />
+                        </div>
+                        <div className={styles.totalsRowFinal}>
+                          <span className={styles.totalsLabelFinal}>Total</span>
+                          <span className={styles.totalsValueFinal}>R$ {calculateTotal().toFixed(2)}</span>
+                        </div>
                       </div>
-                    )}
-                    <div className={styles.totalLine}>
-                      <strong>Total:</strong>
-                      <strong>R$ {calculateTotal().toFixed(2)}</strong>
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
 
               <div className={styles.productsActions}>
-                <Button variant="secondary" onClick={() => { setFormStep("checkCustomer"); setSelectedCustomer(null); setOrderItems([]); setDiscount(0); }}>
+                <button
+                  type="button"
+                  className={styles.actionBtnBack}
+                  onClick={() => { setFormStep("checkCustomer"); setSelectedCustomer(null); setOrderItems([]); setDiscount(0); }}
+                >
+                  <ArrowLeftIcon size={18} weight="bold" />
                   Voltar
-                </Button>
-                <Button variant="primary" onClick={() => setFormStep("order")} disabled={orderItems.length === 0}>
-                  Avançar
-                </Button>
+                </button>
+                <button
+                  type="button"
+                  className={styles.actionBtnNext}
+                  onClick={() => setFormStep("order")}
+                  disabled={orderItems.length === 0}
+                >
+                  Continuar
+                  <ArrowRightIcon size={18} weight="bold" />
+                </button>
               </div>
             </div>
           )}
 
           {formStep === "order" && selectedCustomer && (
-            <Card
-              title={`Cadastro de Pedido — ${selectedCustomer.name}`}
-              fields={[
-                { name: "orderDate", label: "Data do Pedido", type: "date", value: getLocalDateString(), readOnly: true },
-                { name: "deliveryDate", label: "Data de Entrega", type: "date", value: "", min: getLocalDateString() },
-                { name: "notes", label: "Observações", type: "text", value: "" },
-              ]}
-              onSubmit={handleSubmit}
-              submitLabel="Cadastrar Pedido"
-              loading={loading}
-              showCancel
-              onCancel={() => setFormStep("selectProducts")}
-              additionalInfo={
-                <div className={styles.orderSummaryContainer}>
-                  <button className={styles.orderSummaryToggle} type="button" onClick={() => setShowSummary((prev) => !prev)}>
-                    {showSummary ? "Ocultar Resumo do Pedido" : "Mostrar Resumo do Pedido"}
-                  </button>
-                  {showSummary && (
-                    <div className={styles.orderSummaryCard}>
-                      <h5>Resumo do Pedido</h5>
+            <div className={styles.stepContainerFinal}>
+              <h4 className={styles.stepTitle}>Finalizar Pedido</h4>
+              <p className={styles.stepSubtitle}>Confirme os dados e informe as datas do pedido.</p>
+              
+              <div className={styles.finalStepLayout}>
+                {/* Lado Esquerdo: Formulário */}
+                <form 
+                  className={`${styles.finalFormCol} ${styles.finalFormGrow}`} 
+                  onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+                    e.preventDefault();
+                    const formElement = e.currentTarget;
+                    const formData = new window.FormData(formElement);
+                    handleSubmit({
+                      orderDate: formData.get("orderDate") as string,
+                      deliveryDate: formData.get("deliveryDate") as string,
+                      notes: formData.get("notes") as string,
+                    });
+                  }}
+                  id="finalOrderForm"
+                >
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.fieldLabel}>Data do Pedido</label>
+                    <input 
+                      type="date" 
+                      name="orderDate" 
+                      defaultValue={getLocalDateString()} 
+                      readOnly 
+                      className={styles.fieldInputReadOnly}
+                    />
+                  </div>
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.fieldLabel}>Data de Entrega</label>
+                    <input 
+                      type="date" 
+                      name="deliveryDate" 
+                      min={getLocalDateString()} 
+                      className={styles.fieldInput} 
+                      required
+                    />
+                  </div>
+                  <div className={`${styles.fieldGroup} ${styles.fieldGroupFull}`}>
+                    <label className={styles.fieldLabel}>Observações (opcional)</label>
+                    <textarea 
+                      name="notes" 
+                      className={`${styles.fieldTextarea} ${styles.fieldTextareaFull}`} 
+                      placeholder="Instruções especiais..."
+                    />
+                  </div>
+                </form>
+
+                {/* Lado Direito: Resumo Visível sempre */}
+                <div className={styles.finalSummaryCol}>
+                  <div className={styles.orderSummaryPanel}>
+                    <div className={styles.selectedSectionHeader}>
+                      <span className={styles.selectedSectionTitle}>Resumo do Pedido</span>
+                    </div>
+                    <div className={styles.finalSummaryScroll}>
                       {orderItems.map((item) => (
-                        <div key={item.productId} className={styles.orderItem}>
-                          <span>{item.productName}</span> — <span> Qtd: {item.quantity}</span>
-                          <br />
-                          <span>R$ {(item.unitPrice || 0).toFixed(2)}</span>
+                        <div key={item.productId} className={styles.orderSummaryRowFinal}>
+                          <span className={styles.orderSummaryQtyFinal}>{item.quantity}x</span>
+                          <span className={styles.orderSummaryProductNameFinal}>{item.productName}</span>
+                          <span className={styles.orderSummaryPriceFinal}>R$ {((item.unitPrice || 0) * item.quantity).toFixed(2)}</span>
                         </div>
                       ))}
+                    </div>
+                    <div className={styles.orderSummaryFooterFinal}>
+                      <div className={styles.summaryFooterRow}>
+                        <span>Subtotal</span>
+                        <span>R$ {calculateSubtotal().toFixed(2)}</span>
+                      </div>
                       {discount > 0 && (
-                        <div className={styles.orderDiscount}>
-                          <span>Desconto aplicado:</span>
-                          <span>- R$ {discount.toFixed(2)}</span>
+                        <div className={`${styles.summaryFooterRow} ${styles.summaryFooterDiscount}`}>
+                          <span>Desconto</span>
+                          <span>− R$ {discount.toFixed(2)}</span>
                         </div>
                       )}
+                      <div className={styles.summaryFooterTotal}>
+                        <span>Total a Pagar</span>
+                        <span>R$ {calculateTotal().toFixed(2)}</span>
+                      </div>
                     </div>
-                  )}
-                  <br />
-                  <div className={styles.finalTotal}>
-                    <strong>Total: R$ {calculateTotal().toFixed(2)}</strong>
                   </div>
                 </div>
-              }
-            />
+              </div>
+
+              <div className={styles.productsActions}>
+                <button
+                  type="button"
+                  className={styles.actionBtnBack}
+                  onClick={() => setFormStep("selectProducts")}
+                  disabled={loading}
+                >
+                  <ArrowLeftIcon size={18} weight="bold" />
+                  Voltar
+                </button>
+                <button
+                  type="submit"
+                  form="finalOrderForm"
+                  className={`${styles.actionBtnNext} ${styles.actionBtnSubmit}`}
+                  disabled={loading}
+                >
+                  {loading ? "Cadastrando..." : "Confirmar e Cadastrar"}
+                  {!loading && <CheckCircleIcon size={18} weight="bold" />}
+                </button>
+              </div>
+            </div>
           )}
         </Modal.Body>
       </Modal>
@@ -1329,14 +1435,14 @@ export default function PedidosPage() {
                       <div className={styles.itensList}>
                         {selectPedido.items.map((item, index) => (
                           <div key={index} className={styles.itemRow}>
-                            <span className={styles.itemQuantity}>{item.quantity}x </span>
-                            <span className={styles.itemName}>{item.product?.name || "Produto não encontrado"} - </span>
-                            <span className={styles.itemPrice}>R$ {typeof item.unitPrice === "number" ? item.unitPrice.toFixed(2) : "0.00"}</span>
+                            <span className={styles.itemQuantity}>{item.quantity}x</span>
+                            <span className={styles.itemName}>{item.product?.name || "Produto não encontrado"}</span>
+                            <span className={styles.itemPrice}>R$ {typeof item.unitPrice === "number" ? (item.unitPrice * item.quantity).toFixed(2) : "0.00"}</span>
                           </div>
                         ))}
                       </div>
                       <div className={styles.totalPedido}>
-                        <strong>Total do Pedido: R$ {selectPedido.total?.toFixed(2) || "0.00"}</strong>
+                        <strong>Total: R$ {selectPedido.total?.toFixed(2) || "0.00"}</strong>
                       </div>
                     </div>
                   )}

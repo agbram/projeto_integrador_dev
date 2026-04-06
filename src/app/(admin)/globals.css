@@ -167,3 +167,10 @@
   line-height: 1.5;
 }
 
+/* ===== STANDARDIZED MODAL ======== */
+.globalModalContentRounded {
+  border-radius: 10px !important;
+  overflow: hidden;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+}

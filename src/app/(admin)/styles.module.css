@@ -17,7 +17,7 @@
   background: white;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   text-align: center;
   border-left: 4px solid #007bff;
 }
@@ -60,7 +60,8 @@
   align-items: center;
   gap: 8px;
   padding: 9px 20px;
-  background: linear-gradient(135deg, #2e1c1c 0%, #442a27 100%);
+  background: linear-gradient(135deg, #1f5f9e 0%, #2f74b8 100%);
+  transition: background 0.3s ease;
   color: #fff;
   border: none;
   font-weight: 600;
@@ -71,7 +72,7 @@
 }
 
 .smartSyncButton:hover:not(:disabled) {
-  background: linear-gradient(135deg, #442a27 0%, #5a3a36 100%);
+  background: linear-gradient(135deg, #2a6fb3 0%, #3f86cc 100%);
   transform: translateY(-1px);
   box-shadow: 0 4px 14px rgba(46, 28, 28, 0.28);
 }
@@ -83,7 +84,7 @@
   padding: 9px 18px;
   background: rgba(247, 166, 184, 0.12);
   border: 1px solid rgba(247, 166, 184, 0.3);
-  color: #2e1c1c;
+  color: #201c2e;
   border-radius: 10px;
   font-weight: 600;
   font-size: 14px;
@@ -138,15 +139,17 @@
 .taskCard {
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
   width: 100%;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .taskCard:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .taskHeader {
@@ -260,7 +263,7 @@
 .productionSuccessModal,
 .productionWarningModal,
 .productionSyncWarningModal {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Overlay do modal */
@@ -587,7 +590,7 @@
   transition: all 0.2s ease;
   padding: 0.5rem 1rem;
   border: 1px solid transparent;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .productionModal :global(.btn-primary) {
@@ -654,51 +657,51 @@
   .container {
     padding: 16px;
   }
-  
+
   .summaryContainer {
     grid-template-columns: 1fr 1fr;
   }
-  
+
   .containerPrincipal {
     grid-template-columns: 1fr;
   }
-  
+
   .taskHeader {
     flex-direction: column;
     gap: 8px;
   }
-  
+
   .statusBadges {
     flex-direction: row;
     width: 100%;
     justify-content: flex-start;
   }
-  
+
   .infoGrid {
     grid-template-columns: 1fr;
   }
-  
+
   .taskActions {
     justify-content: center;
   }
-  
+
   .syncButtons {
     flex-direction: column;
   }
-  
+
   .smartSyncButton,
   .fullSyncButton {
     width: 100%;
     justify-content: center;
   }
-  
+
   .productionModalBody,
   .productionSuccessModalBody,
   .productionWarningModalBody,
   .productionSyncWarningBody {
     padding: 1.5rem;
   }
-  
+
   .productionSuccessIcon,
   .productionWarningIcon,
   .warningIcon {
@@ -706,30 +709,30 @@
     height: 50px;
     font-size: 1.5rem;
   }
-  
+
   .productionModal :global(.modal-header),
   .productionSuccessModal :global(.modal-header),
   .productionWarningModal :global(.modal-header),
   .productionSyncWarningModal :global(.modal-header) {
     padding: 1rem 1.25rem;
   }
-  
+
   .productionSuccessModal :global(.modal-content),
   .productionWarningModal :global(.modal-content),
   .productionSyncWarningModal :global(.modal-content) {
     max-width: 90%;
     margin: 0 auto;
   }
-  
+
   .productionModalTitle {
     font-size: 1.1rem;
   }
-  
+
   .productionSyncWarningFooter {
     flex-direction: column;
     gap: 12px;
   }
-  
+
   .productionSuccessButton,
   .productionWarningButton,
   .confirmButton {
@@ -803,8 +806,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .spinning {

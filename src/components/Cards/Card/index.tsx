@@ -1,8 +1,10 @@
 'use client'
 
+import React from 'react';
 import { useState, useEffect } from "react"
 import styles from "./styles.module.css"
 import ButtonCancelar from "@/components/Buttons/ButtonCancel"
+import { ArrowLeft, CheckCircle, TrashSimple } from '@phosphor-icons/react';
 
 // Atualize o tipo FormData para aceitar number (primitivo)
 export type FormData = Record<string, string | File | Date | number | null | undefined>;
@@ -213,21 +215,28 @@ export default function Card({
         )}
 
         <div className={styles.buttonsRow}>
-          {showDelete && onDelete && (
-            <ButtonCancelar
-              CancelLabel="Desativar"
-              onClick={onDelete}
-              variant="outline"
-              disabled={loading || disabled}
-            />
-          )}
           {showCancel && onCancel && (
-            <ButtonCancelar
-              CancelLabel="Cancelar"
+            <button 
+              type="button" 
               onClick={onCancel}
-              variant="cancelLight"
-              disabled={loading}
-            />
+              disabled={loading || disabled}
+              className={styles.cancelButton}
+            >
+              <ArrowLeft size={20} weight="bold" />
+              Cancelar
+            </button>
+          )}
+
+          {showDelete && onDelete && (
+            <button
+              type="button"
+              onClick={onDelete}
+              disabled={loading || disabled}
+              className={styles.deleteButton}
+            >
+              <TrashSimple size={20} weight="bold" />
+              Desativar
+            </button>
           )}
           
           <button 
@@ -235,7 +244,8 @@ export default function Card({
             className={styles.submitButton}
             disabled={loading || disabled}
           >
-            {loading ? "Verificando..." : submitLabel}  
+            <span>{loading ? "Processando..." : submitLabel}</span>
+            <CheckCircle size={20} weight="bold" />
           </button>
         </div>
       </form>

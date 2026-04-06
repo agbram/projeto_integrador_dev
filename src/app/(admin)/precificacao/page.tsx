@@ -113,7 +113,11 @@ export default function PrecificacaoPage() {
     supplier: "",
   });
 
-  const pageActions = useContext(PageActions);
+  const {
+    setShowAddButton,
+    searchQuery,
+    setSearchQuery
+  } = useContext(PageActions);
   const API_URL = api;
 
   // ==================== FUNÇÕES AUXILIARES (conversão, cálculo) ====================
@@ -423,7 +427,9 @@ export default function PrecificacaoPage() {
 
   // ==================== RENDERIZAÇÃO DAS LISTAS PRINCIPAIS ====================
   const renderProdutosParaCalcular = useMemo(() => {
-    return produtosParaCalcular.map((produto) => (
+    return produtosParaCalcular
+      .filter(p => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+      .map((produto) => (
       <div key={produto.id} className={styles.productCard}>
         <div className={styles.productCardHeader}>
           {produto.fotoUrl && (
@@ -460,10 +466,12 @@ export default function PrecificacaoPage() {
         </div>
       </div>
     ));
-  }, [produtosParaCalcular, loading]);
+  }, [produtosParaCalcular, loading, searchQuery]);
 
   const renderProdutosCalculados = useMemo(() => {
-    return produtosCalculados.map((produto) => (
+    return produtosCalculados
+      .filter(p => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+      .map((produto) => (
       <div key={produto.id} className={styles.productCard}>
         <div className={styles.productCardHeader}>
           {produto.fotoUrl && (
@@ -512,7 +520,7 @@ export default function PrecificacaoPage() {
         </div>
       </div>
     ));
-  }, [produtosCalculados]);
+  }, [produtosCalculados, searchQuery]);
 
   const renderIngredientsList = useMemo(() => {
     return ingredients.map((ingredient) => (
@@ -565,16 +573,15 @@ export default function PrecificacaoPage() {
         size="xl"
         centered
         className={styles.modalPrecificacao}
+        contentClassName="globalModalContentRounded"
       >
-        <Modal.Header closeButton className={styles.modalPrecificacaoHeader}>
-          <Modal.Title className={styles.modalPrecificacaoTitle}>
+        <Modal.Body className={styles.modalPrecificacaoBody}>
+          <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>
             {selectProduto.name}
             {selectProduto.priceStatus === "CALCULATED" && (
               <span className={styles.badgeCalculatedInline}>Preço Calculado</span>
             )}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body className={styles.modalPrecificacaoBody}>
+          </h2>
           <Tabs
             activeKey={activeTabInterna}
             onSelect={(k) => k && setActiveTabInterna(k)}
@@ -863,11 +870,10 @@ export default function PrecificacaoPage() {
       size="lg"
       centered
       className={styles.modalPrecificacao}
+      contentClassName="globalModalContentRounded"
     >
-      <Modal.Header closeButton className={styles.modalPrecificacaoHeader}>
-        <Modal.Title className={styles.modalPrecificacaoTitle}>Adicionar Ingrediente</Modal.Title>
-      </Modal.Header>
       <Modal.Body className={styles.modalPrecificacaoBody}>
+        <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>Adicionar Ingrediente</h2>
         <div className={styles.addIngredientModalContent}>
           <div className={styles.searchBox}>
             <MagnifyingGlassIcon size={20} />
@@ -1014,11 +1020,10 @@ export default function PrecificacaoPage() {
       size="lg"
       centered
       className={styles.modalPrecificacao}
+      contentClassName="globalModalContentRounded"
     >
-      <Modal.Header closeButton className={styles.modalPrecificacaoHeader}>
-        <Modal.Title className={styles.modalPrecificacaoTitle}>Editar Ingrediente</Modal.Title>
-      </Modal.Header>
       <Modal.Body className={styles.modalPrecificacaoBody}>
+        <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>Editar Ingrediente</h2>
         {editingProductIngredient && (
           <div className={styles.editIngredientForm}>
             <p>
@@ -1077,11 +1082,10 @@ export default function PrecificacaoPage() {
       size="lg"
       centered
       className={styles.modalPrecificacao}
+      contentClassName="globalModalContentRounded"
     >
-      <Modal.Header closeButton className={styles.modalPrecificacaoHeader}>
-        <Modal.Title className={styles.modalPrecificacaoTitle}>Cadastrar Novo Insumo</Modal.Title>
-      </Modal.Header>
       <Modal.Body className={styles.modalPrecificacaoBody}>
+        <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>Cadastrar Novo Insumo</h2>
         <div className={styles.newIngredientForm}>
           <div className={styles.formGroup}>
             <label>Nome *</label>
@@ -1148,7 +1152,7 @@ export default function PrecificacaoPage() {
 
   // ==================== EFEITOS INICIAIS ====================
   useEffect(() => {
-    pageActions.setShowAddButton(false);
+    setShowAddButton(false);
     const fetchInitialData = async () => {
       setLoading(true);
       try {
@@ -1165,16 +1169,20 @@ export default function PrecificacaoPage() {
     };
     fetchInitialData();
     return () => {
-      pageActions.setShowAddButton(true);
+      setShowAddButton(true);
+      setSearchQuery("");
       toast.dismiss("page_error");
     };
-  }, []);
+  }, [setShowAddButton, setSearchQuery]);
 
+  // Sincroniza busca global com a aba de insumos ou filtros locais
   useEffect(() => {
-    return () => {
+    if (activeTab === "insumos") {
       if (searchTimeout) clearTimeout(searchTimeout);
-    };
-  }, [searchTimeout]);
+      const timeout = setTimeout(() => fetchIngredients(searchQuery), 300);
+      setSearchTimeout(timeout);
+    }
+  }, [searchQuery, activeTab, fetchIngredients]);
 
   // ==================== RENDER PRINCIPAL ====================
   return (

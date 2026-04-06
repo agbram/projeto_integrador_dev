@@ -12,6 +12,7 @@ import {
   PlusIcon,
   MinusIcon,
   PencilIcon,
+  PencilSimpleIcon,
   ReceiptIcon,
   ReceiptXIcon,
   CheckCircleIcon,
@@ -242,162 +243,174 @@ export default function PedidosPage() {
     const { default: jsPDF } = await import("jspdf");
     const doc = new jsPDF();
 
-    // Brand colors
-    const brandDark = [46, 28, 28] as const;   // #2e1c1c
-    const brandAccent = [212, 123, 146] as const; // #d47b92
-    const textDark = [33, 37, 41] as const;    // #212529
-    const textMuted = [108, 117, 125] as const; // #6c757d
-    const lineColor = [222, 226, 230] as const; // #dee2e6
+    // Font family - helvetica is safe
+    const brandPrimary = [46, 28, 28] as const;   // #2e1c1c (Dark Brown)
+    const brandAccent = [212, 123, 146] as const; // #d47b92 (Dusty Pink)
+    const textMain = [0, 0, 0] as const;          // Black for maximum clarity & ink save
+    const textGray = [80, 80, 80] as const;       // Dark gray for subtext
+    const lineLight = [200, 200, 200] as const;   // Light gray for lines
 
-    // Header band
-    doc.setFillColor(...brandDark);
-    doc.rect(0, 0, 210, 32, "F");
+    // HEADER - Clean and Minimal (Ink Saving)
+    doc.setDrawColor(...brandPrimary);
+    doc.setLineWidth(1);
+    doc.line(20, 15, 20, 35); // Accent vertical line
+
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(22);
-    doc.setTextColor(255, 255, 255);
-    doc.text("SANT'SAPORE", 20, 18);
-    doc.setFontSize(10);
+    doc.setFontSize(24);
+    doc.setTextColor(...brandPrimary);
+    doc.text("SANT'SAPORE", 26, 26);
+    
     doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
     doc.setTextColor(...brandAccent);
-    doc.text("Doces Sabor Confeitaria", 20, 26);
+    doc.text("CONFEITARIA ARTESANAL", 26, 33);
 
-    // RECIBO label
     doc.setFontSize(14);
-    doc.setTextColor(255, 255, 255);
-    doc.text("RECIBO", 190, 20, { align: "right" });
+    doc.setTextColor(...textMain);
+    doc.text("RECIBO DE PEDIDO", 190, 26, { align: "right" });
 
-    // Company info
-    doc.setFontSize(9);
-    doc.setTextColor(...textMuted);
-    doc.text("CNPJ: 26.378.162/0001-51  |  Rua Riachuelo, 795 - Centro  |  São Carlos - SP  |  (16) 99750-9099", 20, 40);
+    // Header divider
+    doc.setDrawColor(...lineLight);
+    doc.setLineWidth(0.2);
+    doc.line(20, 40, 190, 40);
 
-    // Divider
-    doc.setDrawColor(...lineColor);
-    doc.setLineWidth(0.5);
-    doc.line(20, 44, 190, 44);
+    // COMPANY INFO
+    doc.setFontSize(8);
+    doc.setTextColor(...textGray);
+    doc.text("CNPJ: 26.378.162/0001-51", 20, 46);
+    doc.text("Rua Riachuelo, 795 - Centro, São Carlos - SP", 20, 50);
+    doc.text("WhatsApp: (16) 99750-9099 | santsapore.com.br", 20, 54);
 
-    // Client + Order Info
-    doc.setFontSize(10);
+    // INFO SECTION - CLIENT & ORDER
+    doc.setDrawColor(...lineLight);
+    doc.line(20, 60, 190, 60);
+
+    // Client Info
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(...brandDark);
-    doc.text("CLIENTE", 20, 52);
-    doc.text("PEDIDO", 120, 52);
+    doc.setFontSize(10);
+    doc.setTextColor(...brandPrimary);
+    doc.text("DADOS DO CLIENTE", 20, 68);
+    
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...textMain);
+    doc.setFontSize(11);
+    doc.text(`${pedido.customer?.name || "Não informado"}`, 20, 75);
+    
+    doc.setFontSize(9);
+    doc.setTextColor(...textGray);
+    doc.text(`Contato: ${pedido.customer?.contact || "N/A"}`, 20, 80);
+    doc.text(`Endereço: ${pedido.customer?.address || "Não informado"}`, 20, 85);
+
+    // Order Info
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(...brandPrimary);
+    doc.text("DADOS DO PEDIDO", 120, 68);
 
     doc.setFont("helvetica", "normal");
+    doc.setTextColor(...textMain);
     doc.setFontSize(10);
-    doc.setTextColor(...textDark);
-    doc.text(`${pedido.customer?.name || "Não informado"}`, 20, 59);
+    doc.text(`Nº do Pedido: #${String(pedido.id).padStart(4, "0")}`, 120, 75);
+    doc.text(`Data: ${pedido.orderDate ? formatDateForDisplay(pedido.orderDate.toString()) : "N/A"}`, 120, 80);
+    doc.text(`Entrega: ${pedido.deliveryDate ? formatDateForDisplay(pedido.deliveryDate.toString()) : "N/A"}`, 120, 85);
 
-    doc.setFontSize(9);
-    doc.setTextColor(...textMuted);
-    doc.text(`Tel: ${pedido.customer?.contact || "Não informado"}`, 20, 65);
-    doc.text(`End: ${pedido.customer?.address || "Não informado"}`, 20, 71);
+    // TABLE HEADER
+    doc.setDrawColor(...textMain);
+    doc.setLineWidth(0.5);
+    doc.line(20, 95, 190, 95);
 
-    doc.setTextColor(...textDark);
-    doc.setFontSize(10);
-    doc.text(`Data: ${pedido.orderDate ? formatDateForDisplay(pedido.orderDate.toString()) : "A combinar"}`, 120, 59);
-    doc.text(`Entrega: ${pedido.deliveryDate ? formatDateForDisplay(pedido.deliveryDate.toString()) : "A combinar"}`, 120, 65);
-
-    // Divider
-    doc.line(20, 76, 190, 76);
-
-    // Items header
-    doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(...brandDark);
-    doc.text("ITENS DO PEDIDO", 20, 84);
-
-    // Table header
-    doc.setFillColor(248, 249, 250);
-    doc.rect(20, 88, 170, 8, "F");
     doc.setFontSize(9);
-    doc.setTextColor(...textMuted);
-    doc.text("Produto", 22, 93);
-    doc.text("Qtd", 130, 93);
-    doc.text("Unit.", 148, 93);
-    doc.text("Subtotal", 170, 93);
+    doc.setTextColor(...textMain);
+    doc.text("DESCRIÇÃO DO PRODUTO", 22, 100);
+    doc.text("QTD", 130, 100, { align: "center" });
+    doc.text("VALOR UN.", 155, 100, { align: "center" });
+    doc.text("SUBTOTAL", 190, 100, { align: "right" });
 
-    let yPosition = 101;
+    doc.line(20, 103, 190, 103);
 
-    const subtotalItens = pedido.items?.reduce((total, item) => total + (item.subtotal || 0), 0) || 0;
+    // TABLE ITEMS
+    let y = 110;
+    const subtotalItens = pedido.items?.reduce((total, item) => total + ((item.unitPrice || 0) * (item.quantity || 0)), 0) || 0;
     const desconto = pedido.discount || 0;
     const totalFinal = pedido.total || subtotalItens - desconto;
 
-    pedido.items?.forEach((item, index) => {
-      if (yPosition > 250) {
-        doc.addPage();
-        yPosition = 20;
-      }
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
 
-      if (index % 2 === 0) {
-        doc.setFillColor(252, 251, 250);
-        doc.rect(20, yPosition - 5, 170, 8, "F");
+    pedido.items?.forEach((item) => {
+      if (y > 260) {
+        doc.addPage();
+        y = 20;
       }
 
       const nome = item.product?.name || "Produto não encontrado";
       const qtd = item.quantity || 0;
       const unit = item.unitPrice || 0;
-      const sub = item.subtotal || qtd * unit;
+      const sub = (unit * qtd);
 
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.setTextColor(...textDark);
-      doc.text(nome, 22, yPosition);
-      doc.text(String(qtd), 133, yPosition, { align: "right" });
-      doc.text(formatCurrency(unit), 148, yPosition);
-      doc.text(formatCurrency(sub), 170, yPosition);
+      doc.setTextColor(...textMain);
+      doc.text(nome, 22, y);
+      doc.text(String(qtd), 130, y, { align: "center" });
+      doc.text(formatCurrency(unit), 155, y, { align: "center" });
+      doc.text(formatCurrency(sub), 190, y, { align: "right" });
 
-      yPosition += 8;
+      y += 8;
+      doc.setDrawColor(...lineLight);
+      doc.setLineWidth(0.1);
+      doc.line(20, y - 4, 190, y - 4);
     });
 
-    yPosition += 6;
-    doc.setDrawColor(...lineColor);
-    doc.line(120, yPosition, 190, yPosition);
+    // TOTALS SECTION
+    y += 4;
+    doc.setDrawColor(...textMain);
+    doc.setLineWidth(0.3);
+    doc.line(130, y, 190, y);
 
-    // Totals
+    y += 8;
     doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(...textDark);
-    doc.text("Subtotal:", 120, yPosition + 8);
-    doc.text(formatCurrency(subtotalItens), 170, yPosition + 8);
+    doc.text("Subtotal:", 130, y);
+    doc.text(formatCurrency(subtotalItens), 190, y, { align: "right" });
 
     if (desconto > 0) {
-      doc.setTextColor(220, 53, 69);
-      doc.text("Desconto:", 120, yPosition + 16);
-      doc.text(`- ${formatCurrency(desconto)}`, 170, yPosition + 16);
+      y += 6;
+      doc.setTextColor(200, 0, 0);
+      doc.text("Desconto:", 130, y);
+      doc.text(`- ${formatCurrency(desconto)}`, 190, y, { align: "right" });
     }
 
-    const totalY = desconto > 0 ? yPosition + 26 : yPosition + 18;
+    y += 10;
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
-    doc.setTextColor(...brandDark);
-    doc.text("TOTAL:", 120, totalY);
-    doc.text(formatCurrency(totalFinal), 170, totalY);
+    doc.setTextColor(...brandPrimary);
+    doc.text("VALOR TOTAL:", 130, y);
+    doc.text(formatCurrency(totalFinal), 190, y, { align: "right" });
 
-    // Notes
+    // OBSERVATIONS
     if (pedido.notes) {
-      const obsStart = totalY + 14;
-      doc.setFont("helvetica", "bold");
+      y += 20;
       doc.setFontSize(9);
-      doc.setTextColor(...brandDark);
-      doc.text("OBSERVAÇÕES:", 20, obsStart);
+      doc.setFont("helvetica", "bold");
+      doc.text("OBSERVAÇÕES:", 20, y);
       doc.setFont("helvetica", "normal");
-      doc.setTextColor(...textMuted);
+      doc.setTextColor(...textGray);
       const splitNotes = doc.splitTextToSize(pedido.notes, 170);
-      doc.text(splitNotes, 20, obsStart + 7);
+      doc.text(splitNotes, 20, y + 6);
     }
 
-    // Footer
-    const footerY = 280;
-    doc.setFillColor(...brandDark);
-    doc.rect(0, footerY - 12, 210, 20, "F");
+    // FOOTER - Simple & Elegant
+    doc.setDrawColor(...lineLight);
+    doc.setLineWidth(0.2);
+    doc.line(20, 275, 190, 275);
+    
     doc.setFontSize(8);
-    doc.setTextColor(...brandAccent);
-    doc.text("Agradecemos pela preferência!", 105, footerY - 3, { align: "center" });
-    doc.setTextColor(200, 200, 200);
-    doc.text("SANT'SAPORE — Doces Sabor Confeitaria  |  santsapore.com.br", 105, footerY + 4, { align: "center" });
+    doc.setTextColor(...textGray);
+    doc.setFont("helvetica", "italic");
+    doc.text("Agradecemos pela confiança em nosso trabalho!", 105, 282, { align: "center" });
+    doc.setFont("helvetica", "normal");
+    doc.text("Este documento não possui valor fiscal.", 105, 287, { align: "center" });
 
-    doc.save(`recibo-pedido-${pedido.id}.pdf`);
+    doc.save(`Recibo_Santsapore_Pedido_${pedido.id}.pdf`);
   };
 
   const getStatusText = (status: string) => {
@@ -1015,10 +1028,10 @@ export default function PedidosPage() {
                     ? [
                         {
                           label: (
-                            <div className={styles.botaoeditar}>
-                              <PencilIcon size={18} />
+                            <>
+                              <PencilSimpleIcon size={18} weight="bold" />
                               <span>Editar</span>
-                            </div>
+                            </>
                           ),
                           onClick: () => handleEditOrder(p),
                           variant: "edit",
@@ -1027,10 +1040,10 @@ export default function PedidosPage() {
                     : []),
                   {
                     label: (
-                      <div className={styles.botaonotafiscal}>
-                        <ReceiptIcon size={18} />
+                      <>
+                        <ReceiptIcon size={18} weight="bold" />
                         <span>Recibo</span>
-                      </div>
+                      </>
                     ),
                     onClick: () => gerarNotaFiscal(p),
                     variant: "notaFiscal",
@@ -1039,10 +1052,10 @@ export default function PedidosPage() {
                     ? [
                         {
                           label: (
-                            <div className={styles.botaocancelar}>
-                              <ReceiptXIcon size={18} />
-                              <span style={{ marginLeft: "4px" }}>Cancelar</span>
-                            </div>
+                            <>
+                              <ReceiptXIcon size={18} weight="bold" />
+                              <span>Cancelar</span>
+                            </>
                           ),
                           onClick: () => handleOpenCancelModal(p),
                           variant: "cancel",

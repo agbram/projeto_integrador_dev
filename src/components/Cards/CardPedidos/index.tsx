@@ -134,7 +134,7 @@ const formatDateTime = (dateString: string | null): string => {
     <div className={styles.card}>
       <div className={styles.cardHeader}>
         <h3 className={styles.cardTitle}>
-          Pedido #{String(order.id).padStart(4, "0")}
+          Pedido #{String(order.id).padStart(4, "0")}: {order.customer?.name || "Cliente"}
         </h3>
         <div 
           className={styles.statusBadge}

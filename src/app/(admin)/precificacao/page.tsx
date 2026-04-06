@@ -15,6 +15,8 @@ import {
   PencilIcon,
   TrashSimpleIcon,
   GearIcon,
+  ArrowLeftIcon,
+  CheckIcon,
 } from "@phosphor-icons/react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
@@ -118,13 +120,11 @@ export default function PrecificacaoPage() {
     searchQuery,
     setSearchQuery
   } = useContext(PageActions);
-  const API_URL = api;
-
-  // ==================== FUNÇÕES AUXILIARES (conversão, cálculo) ====================
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
   const getImageUrl = (fotoUrl: string | undefined | null): string => {
     if (!fotoUrl) return "/placeholder.png";
-    const nomeArquivo = fotoUrl.replace(/^\/?imagens\//, '');
-    return `${API_URL}/imagens/${nomeArquivo}`;
+    const nomeArquivo = fotoUrl.replace(/^.*[\\\/]/, '');
+    return `${API_BASE_URL}/imagens/${nomeArquivo}`;
   };
 
   const safeToFixed = (value: number | undefined | null, decimals: number = 2) => {
@@ -432,25 +432,26 @@ export default function PrecificacaoPage() {
       .map((produto) => (
       <div key={produto.id} className={styles.productCard}>
         <div className={styles.productCardHeader}>
-          {produto.fotoUrl && (
+          {produto.fotoUrl ? (
             <img
               src={getImageUrl(produto.fotoUrl)}
               alt={produto.name}
               className={styles.productImage}
-              loading="lazy"
               onError={(e) => (e.currentTarget.src = "/placeholder.png")}
             />
+          ) : (
+            <div className={styles.noImagePlaceholder}>
+              <ShoppingCartSimpleIcon size={48} weight="thin" />
+              <span>Sem Imagem</span>
+            </div>
           )}
-          <h4>{produto.name}</h4>
-          <span className={styles.badgeNotCalculated}>
-            <i>ainda não calculado</i>
-          </span>
+          <span className={styles.badgeNotCalculated}>Para Precificar</span>
         </div>
         <div className={styles.productCardBody}>
-          <p className={styles.productCategory}>{produto.category}</p>
+          <span className={styles.productCategory}>{produto.category}</span>
+          <h4>{produto.name}</h4>
           <p className={styles.productDescription}>{produto.description}</p>
           <div className={styles.productInfo}>
-            {produto.weight && <span>Peso: {produto.weight}kg</span>}
             {produto.yield && <span>Rendimento: {produto.yield} un</span>}
           </div>
         </div>
@@ -460,7 +461,7 @@ export default function PrecificacaoPage() {
             onClick={() => loadProdutoDetalhes(produto.id)}
             disabled={loading}
           >
-            <CalculatorIcon size={16} />
+            <CalculatorIcon size={18} weight="bold" />
             Precificar
           </button>
         </div>
@@ -474,19 +475,28 @@ export default function PrecificacaoPage() {
       .map((produto) => (
       <div key={produto.id} className={styles.productCard}>
         <div className={styles.productCardHeader}>
-          {produto.fotoUrl && (
+          {produto.fotoUrl ? (
             <img
               src={getImageUrl(produto.fotoUrl)}
               alt={produto.name}
               className={styles.productImage}
-              loading="lazy"
             />
+          ) : (
+            <div className={styles.noImagePlaceholder}>
+              <ShoppingCartSimpleIcon size={48} weight="thin" />
+              <span>Sem Imagem</span>
+            </div>
           )}
-          <h4>{produto.name}</h4>
-          <span className={styles.badgeCalculated}>✓ calculado</span>
+          <span className={styles.badgeCalculated}>✓ Calculado</span>
         </div>
         <div className={styles.productCardBody}>
-          <p className={styles.productCategory}>{produto.category}</p>
+          <span className={styles.productCategory}>{produto.category}</span>
+          <h4>{produto.name}</h4>
+          
+          <div className={styles.productInfo}>
+            {produto.yield && <span>Rendimento: {produto.yield} un</span>}
+          </div>
+
           <div className={styles.priceInfo}>
             <div className={styles.priceItem}>
               <span>Custo:</span>
@@ -503,9 +513,10 @@ export default function PrecificacaoPage() {
               <strong>{safeToFixed(produto.markupPercent, 1)}%</strong>
             </div>
           </div>
+
           {produto.updatedAt && (
             <div className={styles.lastUpdated}>
-              <small>Atualizado: {new Date(produto.updatedAt).toLocaleDateString()}</small>
+              {new Date(produto.updatedAt).toLocaleDateString()}
             </div>
           )}
         </div>
@@ -514,7 +525,7 @@ export default function PrecificacaoPage() {
             className={styles.btnEditar}
             onClick={() => loadProdutoDetalhes(produto.id)}
           >
-            <PencilIcon size={16} />
+            <PencilIcon size={18} weight="bold" />
             Editar Preço
           </button>
         </div>
@@ -572,27 +583,27 @@ export default function PrecificacaoPage() {
         }}
         size="xl"
         centered
-        className={styles.modalPrecificacao}
+        className={styles.modalPricing}
         contentClassName="globalModalContentRounded"
       >
-        <Modal.Body className={styles.modalPrecificacaoBody}>
-          <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>
-            {selectProduto.name}
-            {selectProduto.priceStatus === "CALCULATED" && (
-              <span className={styles.badgeCalculatedInline}>Preço Calculado</span>
-            )}
-          </h2>
-          <Tabs
-            activeKey={activeTabInterna}
-            onSelect={(k) => k && setActiveTabInterna(k)}
-            className={styles.modalTabs}
-            fill
-          >
-            {/* Aba 1: Ingredientes */}
-            <Tab eventKey="ingredientes" title="Ingredientes">
-              <div className={styles.tabContent}>
-                <div className={styles.ingredientsHeader}>
-                  <h5>Lista de Ingredientes</h5>
+        <Modal.Body className={styles.modalPricingBody}>
+          <div className={styles.stepHeader}>
+            <h2 className={styles.stepTitle}>
+              Precificação para <span style={{ color: "#d47b92" }}>{selectProduto.name}</span>
+            </h2>
+            <p className={styles.stepSubtitle}>
+              {selectProduto.priceStatus === "CALCULATED" 
+                ? "Edite os ingredientes ou parâmetros de simulação deste produto." 
+                : "Adicione os ingredientes e defina a margem desejada."}
+            </p>
+          </div>
+
+          <div className={styles.pricingSplitLayout}>
+            {/* Lado Esquerdo: Ingredientes */}
+            <div className={styles.pricingLeft}>
+              <div className={styles.ingredientsPanel}>
+                <div className={styles.ingredientsPanelHeader}>
+                  <span className={styles.ingredientsPanelTitle}>Lista de Ingredientes</span>
                   <button
                     className={styles.btnAddIngredient}
                     onClick={() => {
@@ -602,259 +613,177 @@ export default function PrecificacaoPage() {
                       setModalAddIngredientShow(true);
                     }}
                   >
-                    <PlusIcon size={16} /> Adicionar Ingrediente
+                    <PlusIcon size={16} weight="bold" /> Adicionar
                   </button>
                 </div>
 
-                {selectProduto.ingredients.length === 0 ? (
-                  <div className={styles.emptyIngredients}>
-                    <p>Nenhum ingrediente adicionado a este produto.</p>
-                  </div>
-                ) : (
-                  <>
-                    <div className={styles.ingredientsTable}>
-                      <table>
-                        <thead>
-                          <tr>
-                            <th>Ingrediente</th>
-                            <th>Quantidade</th>
-                            <th>Custo Unitário</th>
-                            <th>Custo Total</th>
-                            <th>Ações</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {selectProduto.ingredients.map((item) => (
-                            <tr key={item.id}>
-                              <td>
-                                <div className={styles.ingredientName}>
-                                  <strong>{item.ingredient.name}</strong>
-                                  <small>{item.ingredient.category}</small>
-                                </div>
-                              </td>
-                              <td>
-                                {item.quantity} {item.unit}
-                                {item.ingredient.unit !== item.unit && (
-                                  <div className={styles.unitConversion}>
-                                    <small>
-                                      (≈ {convertUnit(item.quantity, item.unit, item.ingredient.unit).toFixed(3)} {item.ingredient.unit})
-                                    </small>
-                                  </div>
-                                )}
-                              </td>
-                              <td>
-                                R$ {item.ingredient.unitCost.toFixed(2)}/{item.ingredient.unit}
-                                {item.ingredient.unit !== item.unit && (
-                                  <div className={styles.unitConversion}>
-                                    <small>
-                                      (R$ {(item.ingredient.unitCost * convertUnit(1, item.ingredient.unit, item.unit)).toFixed(4)}/{item.unit})
-                                    </small>
-                                  </div>
-                                )}
-                              </td>
-                              <td>
-                                <strong>R$ {getCalculatedCost(item).toFixed(2)}</strong>
-                              </td>
-                              <td>
-                                <div className={styles.ingredientActions}>
-                                  <button
-                                    className={styles.btnEdit}
-                                    onClick={() => handleEditProductIngredient(item)}
-                                    title="Editar"
-                                  >
-                                    <PencilIcon size={14} />
-                                  </button>
-                                  <button
-                                    className={styles.btnRemove}
-                                    onClick={() => handleRemoveIngredient(item.ingredientId)}
-                                    title="Remover"
-                                  >
-                                    <TrashSimpleIcon size={14} />
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                <div className={styles.ingredientsScroll}>
+                  {selectProduto.ingredients.length === 0 ? (
+                    <div className={styles.emptyIngredients}>
+                      <p style={{ textAlign: "center", padding: "40px", color: "#adb5bd" }}>
+                        Nenhum ingrediente adicionado.
+                      </p>
                     </div>
-                    <div className={styles.costSummary}>
-                      <div className={styles.costItem}>
-                        <span>Custo Total Ingredientes:</span>
-                        <strong>R$ {totalCost.toFixed(2)}</strong>
+                  ) : (
+                    selectProduto.ingredients.map((item) => (
+                      <div key={item.id} className={styles.modalIngredientRow}>
+                        <div className={styles.modalIngredientInfo}>
+                          <span className={styles.modalIngredientName}>{item.ingredient.name}</span>
+                          <span className={styles.modalIngredientSub}>
+                            {item.quantity} {item.unit} • R$ {getCalculatedCost(item).toFixed(2)}
+                          </span>
+                        </div>
+                        <div className={styles.modalIngredientActions}>
+                          <button
+                            className={styles.btnEdit}
+                            onClick={() => handleEditProductIngredient(item)}
+                            title="Editar"
+                          >
+                            <PencilIcon size={14} />
+                          </button>
+                          <button
+                            className={styles.btnRemove}
+                            onClick={() => handleRemoveIngredient(item.ingredientId)}
+                            title="Remover"
+                          >
+                            <TrashSimpleIcon size={14} />
+                          </button>
+                        </div>
                       </div>
-                      {selectProduto.yield && selectProduto.yield > 0 && (
-                        <>
-                          <div className={styles.costItem}>
-                            <span>Rendimento:</span>
-                            <strong>{selectProduto.yield} unidades</strong>
-                          </div>
-                          <div className={styles.costItem}>
-                            <span>Custo por Unidade:</span>
-                            <strong>R$ {costPerUnit.toFixed(2)}</strong>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </>
-                )}
+                    ))
+                  )}
+                </div>
               </div>
-            </Tab>
-
-            {/* Aba 2: Simular Preço */}
-            <Tab eventKey="simular" title="Simular Preço">
-              <div className={styles.tabContent}>
-                <Card
-                  title=""
-                  fields={[
-                    {
-                      name: "strategy",
-                      label: "Estratégia",
-                      type: "select",
-                      options: [
-                        { value: "markup", label: "Markup sobre custo" },
-                        { value: "margin", label: "Margem de lucro" },
-                      ],
-                    },
-                    {
-                      name: "markupPercent",
-                      label: "Markup (%)",
-                      type: "number",
-                      placeholder: "Ex: 50",
-                      condition: (data: any) => data.strategy === "markup",
-                      step: "0.1",
-                    },
-                    {
-                      name: "profitPercent",
-                      label: "Margem de Lucro (%)",
-                      type: "number",
-                      placeholder: "Ex: 30",
-                      condition: (data: any) => data.strategy === "margin",
-                      step: "0.1",
-                    },
-                    {
-                      name: "expensePercent",
-                      label: "Despesas Operacionais (%)",
-                      type: "number",
-                      step: "0.1",
-                    },
-                    {
-                      name: "taxPercent",
-                      label: "Impostos (%)",
-                      type: "number",
-                      step: "0.1",
-                    },
-                    {
-                      name: "minProfit",
-                      label: "Lucro Mínimo (R$)",
-                      type: "number",
-                      placeholder: "Ex: 5.00",
-                      step: "0.01",
-                    },
-                  ]}
-                  onSubmit={handleSimulatePrice}
-                  submitLabel="Simular"
-                  loading={loading}
-                  showCancel={false}
-                />
-              </div>
-            </Tab>
-
-            {/* Aba 3: Resultado (desabilitada se não houver resultado) */}
-            <Tab
-              eventKey="resultado"
-              title="Resultado"
-              disabled={!calculationResult}
-            >
-              <div className={styles.tabContent}>
-                {calculationResult ? (
-                  <div className={styles.resultContainer}>
-                    <div className={styles.resultHeader}>
-                      <ScalesIcon size={24} />
-                      <h5>Resultado da Simulação</h5>
-                    </div>
-                    <div className={styles.resultGrid}>
-                      <div className={styles.resultItem}>
-                        <span>Custo dos Ingredientes:</span>
-                        <strong>R$ {calculationResult.ingredientCost.toFixed(2)}</strong>
-                      </div>
-                      <div className={styles.resultItem}>
-                        <span>Custo por Unidade:</span>
-                        <strong>R$ {calculationResult.costPerUnit.toFixed(2)}</strong>
-                      </div>
-                      <div className={styles.resultItem}>
-                        <span>Preço de Venda Sugerido:</span>
-                        <strong className={styles.salePriceResult}>
-                          R$ {calculationResult.salePrice.toFixed(2)}
-                        </strong>
-                      </div>
-                      <div className={styles.resultItem}>
-                        <span>Lucro Unitário:</span>
-                        <strong>R$ {calculationResult.profit.toFixed(2)}</strong>
-                      </div>
-                      <div className={styles.resultItem}>
-                        <span>Margem de Lucro:</span>
-                        <strong>{calculationResult.profitMargin.toFixed(1)}%</strong>
-                      </div>
-                      <div className={styles.resultItem}>
-                        <span>Markup Aplicado:</span>
-                        <strong>{calculationResult.markup.toFixed(1)}%</strong>
-                      </div>
-                    </div>
-                    {calculationResult.breakdown && (
-                      <div className={styles.breakdown}>
-                        <h6>Detalhamento:</h6>
-                        <div>Ingredientes: R$ {calculationResult.breakdown.ingredients?.toFixed(2)}</div>
-                        <div>Despesas: R$ {calculationResult.breakdown.expenses?.toFixed(2)}</div>
-                        <div>Impostos: R$ {calculationResult.breakdown.taxes?.toFixed(2)}</div>
-                      </div>
-                    )}
-                    <div className={styles.resultActions}>
-                      <button
-                        className={styles.btnSaveCalculation}
-                        onClick={handleCalculateFromSimulation}
-                        disabled={loading}
-                      >
-                        <ScalesIcon size={16} />
-                        {selectProduto?.priceStatus === "CALCULATED"
-                          ? "Atualizar Preço"
-                          : "Salvar Preço"}
-                      </button>
-                      <button
-                        className={styles.btnNewSimulation}
-                        onClick={() => {
-                          setCalculationResult(null);
-                          setActiveTabInterna("simular");
-                        }}
-                      >
-                        <CalculatorIcon size={16} />
-                        Nova Simulação
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="emptyStateStandard">
-                    <p>Faça uma simulação primeiro.</p>
-                    <button
-                      className={styles.btnNewSimulation}
-                      onClick={() => setActiveTabInterna("simular")}
-                    >
-                      Ir para Simular
-                    </button>
-                  </div>
-                )}
-              </div>
-            </Tab>
-          </Tabs>
-
-          {/* Botão de reset para produtos já calculados (fora das abas) */}
-          {selectProduto?.priceStatus === "CALCULATED" && (
-            <div className={styles.calculatedActionsFooter}>
-              <button className={styles.btnReset} onClick={handleResetPrice} disabled={loading}>
-                <XIcon size={16} /> Resetar Preço
-              </button>
             </div>
-          )}
+
+            {/* Lado Direito: Resumo e Simulação */}
+            <div className={styles.pricingRight}>
+              <div className={styles.summaryPanelFixed}>
+                <div className={styles.summaryHeader}>
+                  <span className={styles.summaryTitle}>Resumo de Custos</span>
+                  {selectProduto.yield && (
+                    <span className={styles.selectedCount}>{selectProduto.yield} unidades</span>
+                  )}
+                </div>
+
+                <div className={styles.summaryContentScroll}>
+                  <div style={{ marginBottom: "24px" }}>
+                    <Card
+                      title=""
+                      fields={[
+                        {
+                          name: "strategy",
+                          label: "Estratégia",
+                          type: "select",
+                          options: [
+                            { value: "markup", label: "Markup sobre custo" },
+                            { value: "margin", label: "Margem de lucro" },
+                          ],
+                        },
+                        {
+                          name: "markupPercent",
+                          label: "Markup (%)",
+                          type: "number",
+                          placeholder: "Ex: 50",
+                          condition: (data: any) => data.strategy === "markup",
+                          step: "0.1",
+                        },
+                        {
+                          name: "profitPercent",
+                          label: "Margem de Lucro (%)",
+                          type: "number",
+                          placeholder: "Ex: 30",
+                          condition: (data: any) => data.strategy === "margin",
+                          step: "0.1",
+                        },
+                        {
+                          name: "expensePercent",
+                          label: "Despesas Operacionais (%)",
+                          type: "number",
+                          step: "0.1",
+                        },
+                        {
+                          name: "taxPercent",
+                          label: "Impostos (%)",
+                          type: "number",
+                          step: "0.1",
+                        },
+                        {
+                          name: "minProfit",
+                          label: "Lucro Mínimo (R$)",
+                          type: "number",
+                          placeholder: "Ex: 5.00",
+                          step: "0.01",
+                        },
+                      ]}
+                      onSubmit={handleSimulatePrice}
+                      submitLabel="Simular"
+                      loading={loading}
+                      showCancel={false}
+                    />
+                  </div>
+
+                  {calculationResult && (
+                    <div className={styles.resultSummary}>
+                      <div className={styles.summaryRow}>
+                        <span className={styles.summaryLabel}>Markup</span>
+                        <span className={styles.summaryValue}>{calculationResult.markup.toFixed(1)}%</span>
+                      </div>
+                      <div className={styles.summaryRow}>
+                        <span className={styles.summaryLabel}>Margem</span>
+                        <span className={styles.summaryValue}>{calculationResult.profitMargin.toFixed(1)}%</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.summaryFooterPanel}>
+                  <div className={styles.summaryTotals}>
+                    <div className={styles.summaryRow}>
+                      <span className={styles.summaryLabel}>Custo Total</span>
+                      <span className={styles.summaryValue}>R$ {totalCost.toFixed(2)}</span>
+                    </div>
+                    <div className={styles.summaryRow}>
+                      <span className={styles.summaryLabel}>Custo Unitário</span>
+                      <span className={styles.summaryValue}>R$ {costPerUnit.toFixed(2)}</span>
+                    </div>
+                    
+                    <div className={styles.summaryRowFinal}>
+                      <span className={styles.summaryLabelFinal}>Venda Sugerida</span>
+                      <span className={styles.summaryValueFinal}>
+                        R$ {calculationResult ? calculationResult.salePrice.toFixed(2) : (selectProduto.salePrice || 0).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.modalPricingActions}>
+            <button
+              className={styles.btnActionBack}
+              onClick={() => {
+                if (selectProduto.priceStatus === "CALCULATED") {
+                   handleResetPrice();
+                } else {
+                   setModalShow(false);
+                }
+              }}
+            >
+              <ArrowLeftIcon size={18} weight="bold" />
+              {selectProduto.priceStatus === "CALCULATED" ? "Resetar Preço" : "Cancelar"}
+            </button>
+            
+            <button
+              className={styles.btnActionNext}
+              onClick={handleCalculateFromSimulation}
+              disabled={!calculationResult || loading}
+            >
+              Salvar Precificação
+              <CheckIcon size={18} weight="bold" />
+            </button>
+          </div>
         </Modal.Body>
       </Modal>
     );

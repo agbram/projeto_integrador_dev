@@ -55,6 +55,8 @@ export default function ActionBar({ onSearch, onFilter, onAdd, title }: Props) {
         return "Despesas";
       case "/pedidos":
         return "Pedidos";
+      case "/precificacao":
+        return "Precificação";
       default:
         if (pathname.length > 1)
           return pathname.charAt(1).toUpperCase() + pathname.slice(2);

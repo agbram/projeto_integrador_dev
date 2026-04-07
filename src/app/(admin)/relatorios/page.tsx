@@ -18,6 +18,7 @@ import {
   XCircleIcon,
   FactoryIcon,
   CrownIcon,
+  CalendarBlankIcon,
 } from "@phosphor-icons/react";
 
 // Importações do Chart.js
@@ -110,6 +111,7 @@ export default function RelatoriosPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [fixedExpenses, setFixedExpenses] = useState<FixedExpense[]>([]);
+  const [activeTab, setActiveTab] = useState<"geral" | "financeiro" | "producao" | "produtos">("geral");
   const router = useRouter();
   const { 
     setShowAddButton, 
@@ -891,8 +893,8 @@ export default function RelatoriosPage() {
 
   if (loading) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner}></div>
+      <div className={styles.loadingState}>
+        <div className={styles.loadingSpinner} />
         <p>Carregando relatórios...</p>
       </div>
     );
@@ -900,343 +902,352 @@ export default function RelatoriosPage() {
 
   if (!analyticsData) {
     return (
-      <div className={styles.errorContainer}>
-        <p>Erro ao carregar dados. Tente novamente.</p>
-        <button onClick={fetchData} className={styles.retryButton}>Tentar Novamente</button>
+      <div className={styles.loadingState}>
+        <p>Erro ao carregar dados.</p>
+        <button onClick={fetchData} className={styles.retryBtn}>Tentar Novamente</button>
       </div>
     );
   }
 
   return (
-    <div className={styles.container}>
-      {/* Cabeçalho */}
-      <div className={styles.header}>
-        <div className={styles.headerActions}>
-          <div className={styles.filterSection}>
-            <div className={styles.timeFilter}>
+    <div className={styles.dashboard}>
+      {/* === CABEÇALHO E CONTROLES === */}
+      <header className={styles.headerArea}>
+        <div className={styles.headerTop}>
+          <div>
+            <h1 className={styles.pageTitle}>Dashboard de Análises</h1>
+            <p className={styles.pageSubtitle}>Acompanhe a saúde financeira e operacional em tempo real.</p>
+          </div>
+          <button onClick={exportToCSV} className={styles.exportBtn}>
+            <ExportIcon size={18} /> Exportar CSV
+          </button>
+        </div>
+
+        <div className={styles.controlsRow}>
+          {/* TABS DE NAVEGAÇÃO */}
+          <nav className={styles.tabs} aria-label="Abas de categorias">
+            {([
+              { key: "geral", label: "Visão Geral", icon: "📊" },
+              { key: "financeiro", label: "Financeiro", icon: "💰" },
+              { key: "producao", label: "Produção", icon: "🏭" },
+              { key: "produtos", label: "Produtos", icon: "📦" },
+            ] as const).map((tab) => (
               <button
-                className={`${styles.timeButton} ${timeRange === "week" && selectedMonth === null ? styles.active : ""}`}
-                onClick={() => { setTimeRange("week"); setSelectedMonth(null); }}
-              >Semana</button>
-              <button
-                className={`${styles.timeButton} ${timeRange === "month" && selectedMonth === null ? styles.active : ""}`}
-                onClick={() => { setTimeRange("month"); setSelectedMonth(null); }}
-              >Mês Atual</button>
-              <button
-                className={`${styles.timeButton} ${timeRange === "year" && selectedMonth === null ? styles.active : ""}`}
-                onClick={() => { setTimeRange("year"); setSelectedMonth(null); }}
-              >Ano Atual</button>
-            </div>
-            
-            <div className={styles.monthSelector}>
-              {["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"].map((m, i) => (
-                <button 
-                  key={i} 
-                  className={`${styles.monthBtn} ${selectedMonth === i ? styles.monthBtnActive : ''}`}
-                  onClick={() => setSelectedMonth(i)}
+                key={tab.key}
+                className={`${styles.tab} ${activeTab === tab.key ? styles.tabActive : ""}`}
+                onClick={() => setActiveTab(tab.key)}
+              >
+                <span className={styles.tabIcon}>{tab.icon}</span>
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+
+          {/* BARRA DE FILTROS PREMIUM */}
+          <div className={styles.filtersGroup}>
+            {/* 1. Controles Rápidos (Segmented Pill) */}
+            <div className={styles.segmentedControl}>
+              {(["week", "month", "year"] as const).map((range) => (
+                <button
+                  key={range}
+                  className={`${styles.segmentBtn} ${timeRange === range && selectedMonth === null ? styles.segmentActive : ""}`}
+                  onClick={() => { setTimeRange(range); setSelectedMonth(null); }}
                 >
-                  {m}
+                  {range === "week" ? "7 Dias" : range === "month" ? "Mês Atual" : "Ano Todo"}
                 </button>
               ))}
             </div>
-          </div>
-          <button onClick={exportToCSV} className={styles.exportButton}>
-            <ExportIcon size={20} />
-            Exportar CSV
-          </button>
-        </div>
-      </div>
 
-      {/* Métricas Principais */}
-      <div className={styles.metricsGrid}>
-        <div className={styles.metricCard}>
-          <div className={styles.metricHeader}>
-            <CurrencyDollarIcon size={24} className={styles.metricIcon} />
-            <span className={styles.metricTitle}>Receita Total</span>
-          </div>
-          <div className={styles.metricValue}>{formatCurrency(analyticsData.totalRevenue)}</div>
-        </div>
-        <div className={styles.metricCard}>
-          <div className={styles.metricHeader}>
-            <ShoppingCartIcon size={24} className={styles.metricIcon} />
-            <span className={styles.metricTitle}>Total de Pedidos</span>
-          </div>
-          <div className={styles.metricValue}>{analyticsData.totalOrders}</div>
-        </div>
-        <div className={styles.metricCard}>
-          <div className={styles.metricHeader}>
-            <UsersIcon size={24} className={styles.metricIcon} />
-            <span className={styles.metricTitle}>Clientes</span>
-          </div>
-          <div className={styles.metricValue}>{analyticsData.totalCustomers}</div>
-        </div>
-        <div className={styles.metricCard}>
-          <div className={styles.metricHeader}>
-            <PackageIcon size={24} className={styles.metricIcon} />
-            <span className={styles.metricTitle}>Produtos</span>
-          </div>
-          <div className={styles.metricValue}>{analyticsData.totalProducts}</div>
-        </div>
-        {/* NOVO: Card de Despesas */}
-        <div className={styles.metricCard}>
-          <div className={styles.metricHeader}>
-            <CurrencyDollarIcon size={24} className={styles.metricIcon} />
-            <span className={styles.metricTitle}>Despesas no Período</span>
-          </div>
-          <div className={styles.metricValue}>{formatCurrency(analyticsData.totalExpenses)}</div>
-        </div>
-      </div>
+            <div className={styles.filterDivider} />
 
-      {/* === NOVOS CARDS: Saúde Financeira === */}
-      <div className={styles.financialHighlight}>
-        <div className={`${styles.highlightCard} ${analyticsData.grossProfit >= 0 ? styles.highlightPositive : styles.highlightNegative}`}>
-          <div className={styles.highlightIcon}>
-            <CurrencyDollarIcon size={28} weight="bold" />
-          </div>
-          <div className={styles.highlightInfo}>
-            <span className={styles.highlightLabel}>Lucro Bruto</span>
-            <span className={styles.highlightValue}>{formatCurrency(analyticsData.grossProfit)}</span>
-          </div>
-        </div>
-        <div className={`${styles.highlightCard} ${analyticsData.profitMarginPercent >= 20 ? styles.highlightPositive : analyticsData.profitMarginPercent >= 10 ? styles.highlightWarning : styles.highlightNegative}`}>
-          <div className={styles.highlightIcon}>
-            <ChartLineUpIcon size={28} weight="bold" />
-          </div>
-          <div className={styles.highlightInfo}>
-            <span className={styles.highlightLabel}>Margem de Lucro</span>
-            <span className={styles.highlightValue}>{analyticsData.profitMarginPercent.toFixed(1)}%</span>
-          </div>
-        </div>
-        <div className={`${styles.highlightCard} ${styles.highlightNeutral}`}>
-          <div className={styles.highlightIcon}>
-            <ShoppingCartIcon size={28} weight="bold" />
-          </div>
-          <div className={styles.highlightInfo}>
-            <span className={styles.highlightLabel}>Ticket Médio</span>
-            <span className={styles.highlightValue}>{formatCurrency(analyticsData.ticketMedio)}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* === NOVOS CARDS: Painel Operacional === */}
-      <div className={styles.operationalGrid}>
-        <div className={styles.opCard}>
-          <FactoryIcon size={22} className={styles.opIconBlue} />
-          <div className={styles.opInfo}>
-            <span className={styles.opValue}>{analyticsData.ordersInProduction}</span>
-            <span className={styles.opLabel}>Em Produção</span>
-          </div>
-        </div>
-        <div className={`${styles.opCard} ${analyticsData.overdueOrders > 0 ? styles.opCardAlert : ''}`}>
-          <WarningCircleIcon size={22} className={analyticsData.overdueOrders > 0 ? styles.opIconRed : styles.opIconGray} />
-          <div className={styles.opInfo}>
-            <span className={styles.opValue}>{analyticsData.overdueOrders}</span>
-            <span className={styles.opLabel}>Atrasados</span>
-          </div>
-        </div>
-        <div className={styles.opCard}>
-          <CheckCircleIcon size={22} className={styles.opIconGreen} />
-          <div className={styles.opInfo}>
-            <span className={styles.opValue}>{analyticsData.deliveryRate.toFixed(1)}%</span>
-            <span className={styles.opLabel}>Taxa de Entrega</span>
-          </div>
-        </div>
-        <div className={styles.opCard}>
-          <XCircleIcon size={22} className={analyticsData.cancellationRate > 10 ? styles.opIconRed : styles.opIconGray} />
-          <div className={styles.opInfo}>
-            <span className={styles.opValue}>{analyticsData.cancellationRate.toFixed(1)}%</span>
-            <span className={styles.opLabel}>Taxa de Cancelamento</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Grid de Gráficos */}
-      <div className={styles.chartsGrid}>
-        {/* Receita Mensal */}
-        <div className={styles.chartCard}>
-          <div className={styles.chartHeader}><h3>Receita Mensal</h3></div>
-          <div className={styles.chartContainer}>
-            <Line options={revenueChartOptions} data={revenueChartData} />
-          </div>
-        </div>
-        {/* Status dos Pedidos */}
-        <div className={styles.chartCard}>
-          <div className={styles.chartHeader}><h3>Status dos Pedidos</h3></div>
-          <div className={styles.chartContainer}>
-            <Doughnut options={statusChartOptions} data={statusChartData} />
-          </div>
-        </div>
-        {/* Pedidos Mensais */}
-        <div className={styles.chartCard}>
-          <div className={styles.chartHeader}><h3>Pedidos Mensais</h3></div>
-          <div className={styles.chartContainer}>
-            <Bar options={ordersChartOptions} data={ordersChartData} />
-          </div>
-        </div>
-        {/* Produtos Mais Vendidos */}
-        <div className={styles.chartCard}>
-          <div className={styles.chartHeader}><h3>Produtos Mais Vendidos</h3></div>
-          <div className={styles.chartContainer}>
-            <Bar options={productsChartOptions} data={productsChartData} />
-          </div>
-        </div>
-        {/* NOVO: Despesas Mensais */}
-        <div className={styles.chartCard}>
-          <div className={styles.chartHeader}><h3>Despesas Mensais</h3></div>
-          <div className={styles.chartContainer}>
-            <Line options={expensesChartOptions} data={expensesChartData} />
-          </div>
-        </div>
-        {/* NOVO: Despesas por Categoria */}
-        <div className={styles.chartCard}>
-          <div className={styles.chartHeader}><h3>Despesas por Categoria</h3></div>
-          <div className={styles.chartContainer}>
-            <Pie options={categoryChartOptions} data={categoryChartData} />
-          </div>
-        </div>
-        {/* NOVO: Receita vs Despesas */}
-        <div className={styles.chartCard}>
-          <div className={styles.chartHeader}><h3>Receita vs Despesas</h3></div>
-          <div className={styles.chartContainer}>
-            <Bar options={revenueVsExpensesOptions} data={revenueVsExpensesData} />
-          </div>
-        </div>
-        {/* NOVO: Lucratividade por Produto */}
-        <div className={styles.chartCard}>
-          <div className={styles.chartHeader}><h3>Lucratividade por Produto</h3></div>
-          <div className={styles.chartContainer}>
-            <Bar options={profitabilityOptions} data={profitabilityData} />
-          </div>
-        </div>
-      </div>
-
-      {/* === NOVO: Ranking de Produtos por Lucro === */}
-      {analyticsData.productProfitability.length > 0 && (
-        <div className={styles.rankingSection}>
-          <h3 className={styles.rankingTitle}>
-            <CrownIcon size={22} weight="fill" className={styles.crownIcon} />
-            Ranking de Produtos por Lucro
-          </h3>
-          <div className={styles.rankingTable}>
-            <div className={styles.rankingHeader}>
-              <span>#</span>
-              <span>Produto</span>
-              <span>Qtd Vendida</span>
-              <span>Receita</span>
-              <span>Custo</span>
-              <span>Lucro</span>
+            {/* 2. Seletor de Mês Específico (Com Ícone) */}
+            <div className={styles.monthPicker}>
+              <CalendarBlankIcon size={16} className={styles.calendarIcon} />
+              <select
+                className={styles.monthSelectPro}
+                value={selectedMonth !== null ? selectedMonth : ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "") {
+                    setSelectedMonth(null);
+                  } else {
+                    setSelectedMonth(parseInt(val, 10));
+                  }
+                }}
+              >
+                <option value="">Filtrar Mês...</option>
+                {["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"].map((m, i) => (
+                  <option key={i} value={i}>{m}</option>
+                ))}
+              </select>
             </div>
-            {analyticsData.productProfitability.slice(0, 5).map((item, idx) => (
-              <div key={idx} className={`${styles.rankingRow} ${idx === 0 ? styles.rankingFirst : ''}`}>
-                <span className={styles.rankingPosition}>{idx + 1}º</span>
-                <span className={styles.rankingProduct}>{item.product}</span>
-                <span>{item.quantitySold} un</span>
-                <span>{formatCurrency(item.revenue)}</span>
-                <span>{formatCurrency(item.cost)}</span>
-                <span className={item.profit >= 0 ? styles.profitPositive : styles.profitNegative}>
-                  {formatCurrency(item.profit)}
-                </span>
-              </div>
-            ))}
           </div>
         </div>
+      </header>
+
+      {/* ============ VISÃO GERAL ============ */}
+      {activeTab === "geral" && (
+        <>
+          {/* KPI Row */}
+          <div className={styles.kpiRow}>
+            <div className={`${styles.kpi} ${styles.kpiGreen}`}>
+              <div className={styles.kpiLabel}>Receita</div>
+              <div className={styles.kpiValue}>{formatCurrency(analyticsData.totalRevenue)}</div>
+              <div className={styles.kpiSub}>{analyticsData.ordersByStatus.delivered} pedidos entregues</div>
+            </div>
+            <div className={`${styles.kpi} ${styles.kpiRed}`}>
+              <div className={styles.kpiLabel}>Despesas</div>
+              <div className={styles.kpiValue}>{formatCurrency(analyticsData.totalExpenses)}</div>
+              <div className={styles.kpiSub}>{analyticsData.expensesByCategory.length} categorias</div>
+            </div>
+            <div className={`${styles.kpi} ${analyticsData.grossProfit >= 0 ? styles.kpiGreen : styles.kpiRed}`}>
+              <div className={styles.kpiLabel}>Lucro Bruto</div>
+              <div className={styles.kpiValue}>{formatCurrency(analyticsData.grossProfit)}</div>
+              <div className={styles.kpiSub}>Margem {analyticsData.profitMarginPercent.toFixed(1)}%</div>
+            </div>
+            <div className={`${styles.kpi} ${styles.kpiBlue}`}>
+              <div className={styles.kpiLabel}>Ticket Médio</div>
+              <div className={styles.kpiValue}>{formatCurrency(analyticsData.ticketMedio)}</div>
+              <div className={styles.kpiSub}>{analyticsData.totalOrders} pedidos no período</div>
+            </div>
+          </div>
+
+          {/* Quick Stats */}
+          <div className={styles.quickStats}>
+            <div className={styles.qStat}>
+              <UsersIcon size={20} />
+              <span className={styles.qVal}>{analyticsData.totalCustomers}</span>
+              <span className={styles.qLabel}>Clientes</span>
+            </div>
+            <div className={styles.qStat}>
+              <PackageIcon size={20} />
+              <span className={styles.qVal}>{analyticsData.totalProducts}</span>
+              <span className={styles.qLabel}>Produtos</span>
+            </div>
+            <div className={styles.qStat}>
+              <FactoryIcon size={20} />
+              <span className={styles.qVal}>{analyticsData.ordersInProduction}</span>
+              <span className={styles.qLabel}>Em Produção</span>
+            </div>
+            <div className={`${styles.qStat} ${analyticsData.overdueOrders > 0 ? styles.qStatAlert : ""}`}>
+              <WarningCircleIcon size={20} />
+              <span className={styles.qVal}>{analyticsData.overdueOrders}</span>
+              <span className={styles.qLabel}>Atrasados</span>
+            </div>
+            <div className={styles.qStat}>
+              <CheckCircleIcon size={20} />
+              <span className={styles.qVal}>{analyticsData.deliveryRate.toFixed(0)}%</span>
+              <span className={styles.qLabel}>Entrega</span>
+            </div>
+            <div className={styles.qStat}>
+              <XCircleIcon size={20} />
+              <span className={styles.qVal}>{analyticsData.cancellationRate.toFixed(0)}%</span>
+              <span className={styles.qLabel}>Cancelam.</span>
+            </div>
+          </div>
+
+          {/* Destaques */}
+          <div className={styles.highlightsRow}>
+            <div className={styles.highlightBox}>
+              <StarIcon size={18} fill="#f9a825" weight="fill" />
+              <div>
+                <span className={styles.hlLabel}>Melhor Cliente</span>
+                <span className={styles.hlValue}>{analyticsData.topCustomer.name}</span>
+                <span className={styles.hlSub}>{analyticsData.topCustomer.orderCount} pedidos · {formatCurrency(analyticsData.topCustomer.totalSpent)}</span>
+              </div>
+            </div>
+            <div className={styles.highlightBox}>
+              <TrendUpIcon size={18} className={styles.hlIconGreen} />
+              <div>
+                <span className={styles.hlLabel}>Mais Vendido</span>
+                <span className={styles.hlValue}>{analyticsData.topProduct.name}</span>
+                <span className={styles.hlSub}>{analyticsData.topProduct.quantitySold} un · {formatCurrency(analyticsData.topProduct.revenue)}</span>
+              </div>
+            </div>
+            <div className={styles.highlightBox}>
+              <TrendDownIcon size={18} className={styles.hlIconRed} />
+              <div>
+                <span className={styles.hlLabel}>Menos Vendido</span>
+                <span className={styles.hlValue}>{analyticsData.leastSoldProduct.name}</span>
+                <span className={styles.hlSub}>{analyticsData.leastSoldProduct.quantitySold} un · {formatCurrency(analyticsData.leastSoldProduct.revenue)}</span>
+              </div>
+            </div>
+          </div>
+        </>
       )}
 
-      {/* Análises Detalhadas */}
-      <div className={styles.analyticsGrid}>
-        {/* Cliente Top */}
-        <div className={styles.analysisCard}>
-          <h3 className={styles.analysisTitle}>
-            <StarIcon size={20} fill="#abb500" weight="fill" />
-            Cliente Mais Frequente
-          </h3>
-          <div className={styles.analysisContent}>
-            <div className={styles.customerInfo}>
-              <div className={styles.customerName}>{analyticsData.topCustomer.name}</div>
-              <div className={styles.customerStats}>
-                <div className={styles.statItem}><span>Pedidos:</span> <strong>{analyticsData.topCustomer.orderCount}</strong></div>
-                <div className={styles.statItem}><span>Total Gasto:</span> <strong>{formatCurrency(analyticsData.topCustomer.totalSpent)}</strong></div>
-              </div>
+      {/* ============ FINANCEIRO ============ */}
+      {activeTab === "financeiro" && (
+        <>
+          <div className={styles.kpiRow}>
+            <div className={`${styles.kpi} ${analyticsData.grossProfit >= 0 ? styles.kpiGreen : styles.kpiRed}`}>
+              <div className={styles.kpiLabel}>Lucro Bruto</div>
+              <div className={styles.kpiValue}>{formatCurrency(analyticsData.grossProfit)}</div>
+            </div>
+            <div className={`${styles.kpi} ${analyticsData.profitMarginPercent >= 20 ? styles.kpiGreen : analyticsData.profitMarginPercent >= 10 ? styles.kpiYellow : styles.kpiRed}`}>
+              <div className={styles.kpiLabel}>Margem de Lucro</div>
+              <div className={styles.kpiValue}>{analyticsData.profitMarginPercent.toFixed(1)}%</div>
+            </div>
+            <div className={`${styles.kpi} ${styles.kpiBlue}`}>
+              <div className={styles.kpiLabel}>Ticket Médio</div>
+              <div className={styles.kpiValue}>{formatCurrency(analyticsData.ticketMedio)}</div>
             </div>
           </div>
-        </div>
 
-        {/* Produto Mais Vendido */}
-        <div className={styles.analysisCard}>
-          <h3 className={styles.analysisTitle}>
-            <TrendUpIcon size={20} />
-            Produto Mais Vendido
-          </h3>
-          <div className={styles.analysisContent}>
-            <div className={styles.productInfo}>
-              <div className={styles.productName}>{analyticsData.topProduct.name}</div>
-              <div className={styles.productStats}>
-                <div className={styles.statItem}><span>Quantidade:</span> <strong>{analyticsData.topProduct.quantitySold} unidades</strong></div>
-                <div className={styles.statItem}><span>Receita:</span> <strong>{formatCurrency(analyticsData.topProduct.revenue)}</strong></div>
-              </div>
+          <div className={styles.chartGrid}>
+            <div className={styles.card}>
+              <h4 className={styles.cardTitle}>Receita Mensal</h4>
+              <div className={styles.chartWrap}><Line options={revenueChartOptions} data={revenueChartData} /></div>
+            </div>
+            <div className={styles.card}>
+              <h4 className={styles.cardTitle}>Despesas Mensais</h4>
+              <div className={styles.chartWrap}><Line options={expensesChartOptions} data={expensesChartData} /></div>
+            </div>
+            <div className={styles.card}>
+              <h4 className={styles.cardTitle}>Receita vs Despesas</h4>
+              <div className={styles.chartWrap}><Bar options={revenueVsExpensesOptions} data={revenueVsExpensesData} /></div>
+            </div>
+            <div className={styles.card}>
+              <h4 className={styles.cardTitle}>Despesas por Categoria</h4>
+              <div className={styles.chartWrap}><Pie options={categoryChartOptions} data={categoryChartData} /></div>
             </div>
           </div>
-        </div>
+        </>
+      )}
 
-        {/* Produto Menos Vendido */}
-        <div className={styles.analysisCard}>
-          <h3 className={styles.analysisTitle}>
-            <TrendDownIcon size={20} />
-            Produto Menos Vendido
-          </h3>
-          <div className={styles.analysisContent}>
-            <div className={styles.productInfo}>
-              <div className={styles.productName}>{analyticsData.leastSoldProduct.name}</div>
-              <div className={styles.productStats}>
-                <div className={styles.statItem}><span>Quantidade:</span> <strong>{analyticsData.leastSoldProduct.quantitySold} unidades</strong></div>
-                <div className={styles.statItem}><span>Receita:</span> <strong>{formatCurrency(analyticsData.leastSoldProduct.revenue)}</strong></div>
-              </div>
+      {/* ============ PRODUÇÃO ============ */}
+      {activeTab === "producao" && (
+        <>
+          <div className={styles.kpiRow}>
+            <div className={`${styles.kpi} ${styles.kpiBlue}`}>
+              <div className={styles.kpiLabel}>Em Produção</div>
+              <div className={styles.kpiValue}>{analyticsData.ordersInProduction}</div>
+            </div>
+            <div className={`${styles.kpi} ${analyticsData.overdueOrders > 0 ? styles.kpiRed : styles.kpiGreen}`}>
+              <div className={styles.kpiLabel}>Atrasados</div>
+              <div className={styles.kpiValue}>{analyticsData.overdueOrders}</div>
+            </div>
+            <div className={`${styles.kpi} ${styles.kpiGreen}`}>
+              <div className={styles.kpiLabel}>Taxa de Entrega</div>
+              <div className={styles.kpiValue}>{analyticsData.deliveryRate.toFixed(1)}%</div>
+            </div>
+            <div className={`${styles.kpi} ${analyticsData.cancellationRate > 10 ? styles.kpiRed : styles.kpiGreen}`}>
+              <div className={styles.kpiLabel}>Taxa Cancelamento</div>
+              <div className={styles.kpiValue}>{analyticsData.cancellationRate.toFixed(1)}%</div>
             </div>
           </div>
-        </div>
 
-        {/* Pedidos Recentes */}
-        <div className={`${styles.analysisCard} ${styles.fullWidth}`}>
-          <h3 className={styles.analysisTitle}>
-            <ShoppingCartIcon size={20} />
-            Visão Geral dos Pedidos
-          </h3>
-          <div className={styles.analysisContent}>
-            <div className={styles.ordersTable}>
-              <div className={styles.tableHeader}>
-                <div className={styles.tableRow}>
-                  <div className={styles.tableCell}>Pedido</div>
-                  <div className={styles.tableCell}>Cliente</div>
-                  <div className={styles.tableCell}>Data</div>
-                  <div className={styles.tableCell}>Itens</div>
-                  <div className={styles.tableCell}>Total</div>
-                  <div className={styles.tableCell}>Status</div>
-                  <div className={styles.tableCell}>Ações</div>
-                </div>
+          <div className={styles.chartGrid}>
+            <div className={styles.card}>
+              <h4 className={styles.cardTitle}>Status dos Pedidos</h4>
+              <div className={styles.chartWrap}><Doughnut options={statusChartOptions} data={statusChartData} /></div>
+            </div>
+            <div className={styles.card}>
+              <h4 className={styles.cardTitle}>Pedidos Mensais</h4>
+              <div className={styles.chartWrap}><Bar options={ordersChartOptions} data={ordersChartData} /></div>
+            </div>
+          </div>
+
+          {/* Tabela de Pedidos */}
+          <div className={styles.card}>
+            <h4 className={styles.cardTitle}>
+              <ShoppingCartIcon size={18} /> Pedidos Recentes
+            </h4>
+            <div className={styles.tableWrap}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>#</th><th>Cliente</th><th>Data</th><th>Itens</th><th>Total</th><th>Status</th><th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {analyticsData.recentOrders.map((order) => (
+                    <tr key={order.id} onClick={() => openOrdersPage(order)} className={styles.tableRowClickable}>
+                      <td><strong>{order.id}</strong></td>
+                      <td>{order.customer?.name || "—"}</td>
+                      <td>{order.orderDate ? formatDisplayDate(order.orderDate.toString()) : "—"}</td>
+                      <td>{order.items?.length || 0}</td>
+                      <td><strong>{formatCurrency(order.total || 0)}</strong></td>
+                      <td>
+                        <span className={`${styles.badge} ${order.status === "DELIVERED" ? styles.badgeGreen : order.status === "CANCELLED" ? styles.badgeRed : styles.badgeYellow}`}>
+                          {order.status === "DELIVERED" ? "Entregue" : order.status === "CANCELLED" ? "Cancelado" : "Em Andamento"}
+                        </span>
+                      </td>
+                      <td><button className={styles.linkBtn} onClick={(e) => { e.stopPropagation(); openOrdersPage(order); }}>Ver →</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ============ PRODUTOS ============ */}
+      {activeTab === "produtos" && (
+        <>
+          <div className={styles.chartGrid}>
+            <div className={styles.card}>
+              <h4 className={styles.cardTitle}>Produtos Mais Vendidos</h4>
+              <div className={styles.chartWrap}><Bar options={productsChartOptions} data={productsChartData} /></div>
+            </div>
+            <div className={styles.card}>
+              <h4 className={styles.cardTitle}>Lucratividade por Produto</h4>
+              <div className={styles.chartWrap}><Bar options={profitabilityOptions} data={profitabilityData} /></div>
+            </div>
+          </div>
+
+          {/* Ranking */}
+          {analyticsData.productProfitability.length > 0 && (
+            <div className={styles.card}>
+              <h4 className={styles.cardTitle}>
+                <CrownIcon size={18} weight="fill" style={{ color: "#f9a825" }} /> Ranking de Lucratividade
+              </h4>
+              <div className={styles.tableWrap}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr><th>#</th><th>Produto</th><th>Vendidos</th><th>Receita</th><th>Custo</th><th>Lucro</th></tr>
+                  </thead>
+                  <tbody>
+                    {analyticsData.productProfitability.slice(0, 5).map((item, idx) => (
+                      <tr key={idx} className={idx === 0 ? styles.rowGold : ""}>
+                        <td><strong>{idx + 1}º</strong></td>
+                        <td className={styles.cellBold}>{item.product}</td>
+                        <td>{item.quantitySold} un</td>
+                        <td>{formatCurrency(item.revenue)}</td>
+                        <td>{formatCurrency(item.cost)}</td>
+                        <td className={item.profit >= 0 ? styles.textGreen : styles.textRed}>
+                          <strong>{formatCurrency(item.profit)}</strong>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              <div className={styles.tableBody}>
-                {analyticsData.recentOrders.map((order) => (
-                  <div key={order.id} className={styles.tableRow} onClick={() => openOrdersPage(order)}>
-                    <div className={styles.tableCell} data-label="Pedido"><strong>#{order.id}</strong></div>
-                    <div className={styles.tableCell} data-label="Cliente"><div className={styles.customerCell}>{order.customer?.name || "Cliente"}</div></div>
-                    <div className={styles.tableCell} data-label="Data">{order.orderDate ? formatDisplayDate(order.orderDate.toString()) : null}</div>
-                    <div className={styles.tableCell} data-label="Itens">{order.items?.length || 0}</div>
-                    <div className={styles.tableCell} data-label="Total"><strong>{formatCurrency(order.total || 0)}</strong></div>
-                    <div className={styles.tableCell} data-label="Status">
-                      <span className={`${styles.statusPill} ${styles[order.status.toLowerCase()]}`}>
-                        {order.status === "DELIVERED" ? "Entregue" : order.status === "CANCELLED" ? "Cancelado" : "Em Andamento"}
-                      </span>
-                    </div>
-                    <div className={styles.tableCell}>
-                      <button className={styles.actionButton} onClick={(e) => { e.stopPropagation(); openOrdersPage(order); }}>Ver Detalhes</button>
-                    </div>
-                  </div>
-                ))}
+            </div>
+          )}
+
+          {/* Destaques de Produto */}
+          <div className={styles.highlightsRow}>
+            <div className={styles.highlightBox}>
+              <TrendUpIcon size={18} className={styles.hlIconGreen} />
+              <div>
+                <span className={styles.hlLabel}>Mais Vendido</span>
+                <span className={styles.hlValue}>{analyticsData.topProduct.name}</span>
+                <span className={styles.hlSub}>{analyticsData.topProduct.quantitySold} unidades · {formatCurrency(analyticsData.topProduct.revenue)}</span>
+              </div>
+            </div>
+            <div className={styles.highlightBox}>
+              <TrendDownIcon size={18} className={styles.hlIconRed} />
+              <div>
+                <span className={styles.hlLabel}>Menos Vendido</span>
+                <span className={styles.hlValue}>{analyticsData.leastSoldProduct.name}</span>
+                <span className={styles.hlSub}>{analyticsData.leastSoldProduct.quantitySold} unidades · {formatCurrency(analyticsData.leastSoldProduct.revenue)}</span>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }

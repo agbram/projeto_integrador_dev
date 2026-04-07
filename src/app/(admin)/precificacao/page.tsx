@@ -18,7 +18,6 @@ import {
   ArrowLeftIcon,
   CheckIcon,
 } from "@phosphor-icons/react";
-import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 import { PageActions } from "@/contexts/PageActions";

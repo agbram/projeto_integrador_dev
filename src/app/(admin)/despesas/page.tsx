@@ -51,18 +51,12 @@ export default function FixedExpensesPage() {
   const currentYear = new Date().getFullYear();
   const MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
-  // 1. Filtra por mês (se recorrente, vale do mês de criação em diante; se única, só no mês exato)
+  // 1. Filtra por mês: a busca agora exige que a despesa REALMENTE exista naquele mês (Baseado na Opção A)
+  // O Backend será responsável por criar as despesas todo dia 1º, então o front só confere o mês e o ano.
   const despesasDoMes = expenses.filter(exp => {
     const [datePart] = exp.date.split('T');
     const [year, month] = datePart.split('-').map(Number);
-    const expDate = new Date(year, month - 1, 1);
-    const filterDate = new Date(currentYear, selectedMonth, 1);
-    
-    if (exp.recurring) {
-      return expDate <= filterDate;
-    } else {
-      return year === currentYear && (month - 1) === selectedMonth;
-    }
+    return year === currentYear && (month - 1) === selectedMonth;
   });
 
   // 2. Aplica o filtro selecionado no TopBar (Todas/Recorrentes/Únicas) e a busca por texto

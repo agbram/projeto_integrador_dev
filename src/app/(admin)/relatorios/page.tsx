@@ -547,15 +547,9 @@ export default function RelatoriosPage() {
     return expenses.filter(exp => {
       const [datePart] = exp.date.split('T');
       const [year, month] = datePart.split('-').map(Number);
-      const expDate = new Date(year, month - 1, 1);
 
       if (selectedMonth !== null) {
-        const filterDate = new Date(currentYear, selectedMonth, 1);
-        if (exp.recurring) {
-          return expDate <= filterDate;
-        } else {
-          return year === currentYear && (month - 1) === selectedMonth;
-        }
+        return year === currentYear && (month - 1) === selectedMonth;
       }
 
       let startDate = new Date();

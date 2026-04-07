@@ -115,6 +115,15 @@ export default function PrecificacaoPage() {
     supplier: "",
   });
 
+  // Modal de confirmação genérico (substitui window.confirm)
+  const [confirmModal, setConfirmModal] = useState<{
+    show: boolean;
+    title: string;
+    message: string;
+    variant: "danger" | "warning" | "success";
+    onConfirm: () => void;
+  }>({ show: false, title: "", message: "", variant: "warning", onConfirm: () => {} });
+
   const {
     setShowAddButton,
     searchQuery,
@@ -260,16 +269,24 @@ export default function PrecificacaoPage() {
   };
 
   // Remover ingrediente do produto
-  const handleRemoveIngredient = async (ingredientId: number) => {
+  const handleRemoveIngredient = (ingredientId: number) => {
     if (!selectProduto) return;
-    if (!window.confirm("Remover este ingrediente?")) return;
-    try {
-      await api.delete(`/pricing/products/${selectProduto.id}/ingredients/${ingredientId}`);
-      await loadProdutoDetalhes(selectProduto.id);
-      toast.success("Ingrediente removido");
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || "Erro ao remover");
-    }
+    setConfirmModal({
+      show: true,
+      title: "Remover Ingrediente",
+      message: "Deseja remover este ingrediente do produto?",
+      variant: "danger",
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, show: false }));
+        try {
+          await api.delete(`/pricing/products/${selectProduto!.id}/ingredients/${ingredientId}`);
+          await loadProdutoDetalhes(selectProduto!.id);
+          toast.success("Ingrediente removido");
+        } catch (error: any) {
+          toast.error(error.response?.data?.error || "Erro ao remover");
+        }
+      },
+    });
   };
 
   // Editar ingrediente do produto (abre modal)
@@ -335,19 +352,26 @@ export default function PrecificacaoPage() {
   };
 
   // Excluir ingrediente da matriz
-  const handleDeleteIngredient = async (ingredientId: number) => {
-    if (!window.confirm("Tem certeza que deseja excluir este ingrediente?")) return;
-    setLoading(true);
-    try {
-      await api.delete(`/pricing/ingredients/${ingredientId}`);
-      toast.success("Ingrediente excluído");
-      await fetchIngredients();
-    } catch (error: any) {
-      const msg = error.response?.data?.error || "Erro ao excluir";
-      toast.error(msg);
-    } finally {
-      setLoading(false);
-    }
+  const handleDeleteIngredient = (ingredientId: number) => {
+    setConfirmModal({
+      show: true,
+      title: "Excluir Ingrediente",
+      message: "Tem certeza que deseja excluir este ingrediente da matriz?",
+      variant: "danger",
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, show: false }));
+        setLoading(true);
+        try {
+          await api.delete(`/pricing/ingredients/${ingredientId}`);
+          toast.success("Ingrediente excluído");
+          await fetchIngredients();
+        } catch (error: any) {
+          toast.error(error.response?.data?.error || "Erro ao excluir");
+        } finally {
+          setLoading(false);
+        }
+      },
+    });
   };
 
   // Simular preço
@@ -379,50 +403,65 @@ export default function PrecificacaoPage() {
   };
 
   // Salvar preço calculado (a partir da simulação)
-  const handleCalculateFromSimulation = async () => {
+  const handleCalculateFromSimulation = () => {
     if (!selectProduto || !calculationResult) {
       toast.error("Faça uma simulação primeiro");
       return;
     }
-    if (!window.confirm("Deseja salvar este preço calculado?")) return;
-    setLoading(true);
-    try {
-      // Usa os mesmos percentuais da simulação (pode ser adaptado)
-      const pricingData = {
-        markupPercent: calculationResult.markup,
-        profitPercent: calculationResult.profitMargin,
-        expensePercent: 20, // ou pegar do formulário se desejar
-        taxPercent: 15,
-        minProfit: 0,
-      };
-      await api.post(`/pricing/products/${selectProduto.id}/calculate`, pricingData);
-      toast.success("Preço salvo com sucesso!");
-      setModalShow(false);
-      setSelectProduto(null);
-      setCalculationResult(null);
-      await Promise.all([fetchProdutosParaCalcular(), fetchProdutosCalculados()]);
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || "Erro ao salvar");
-    } finally {
-      setLoading(false);
-    }
+    setConfirmModal({
+      show: true,
+      title: "Salvar Precificação",
+      message: "Deseja salvar este preço calculado para o produto?",
+      variant: "success",
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, show: false }));
+        setLoading(true);
+        try {
+          const pricingData = {
+            markupPercent: calculationResult!.markup,
+            profitPercent: calculationResult!.profitMargin,
+            expensePercent: 20,
+            taxPercent: 15,
+            minProfit: 0,
+          };
+          await api.post(`/pricing/products/${selectProduto!.id}/calculate`, pricingData);
+          toast.success("Preço salvo com sucesso!");
+          setModalShow(false);
+          setSelectProduto(null);
+          setCalculationResult(null);
+          await Promise.all([fetchProdutosParaCalcular(), fetchProdutosCalculados()]);
+        } catch (error: any) {
+          toast.error(error.response?.data?.error || "Erro ao salvar");
+        } finally {
+          setLoading(false);
+        }
+      },
+    });
   };
 
   // Resetar preço de um produto já calculado
-  const handleResetPrice = async () => {
+  const handleResetPrice = () => {
     if (!selectProduto) return;
-    if (!window.confirm("Resetar o preço deste produto?")) return;
-    setLoading(true);
-    try {
-      await api.post(`/pricing/products/${selectProduto.id}/reset`);
-      toast.success("Preço resetado");
-      setModalShow(false);
-      await Promise.all([fetchProdutosParaCalcular(), fetchProdutosCalculados()]);
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || "Erro ao resetar");
-    } finally {
-      setLoading(false);
-    }
+    setConfirmModal({
+      show: true,
+      title: "Resetar Preço",
+      message: "Tem certeza que deseja resetar o preço deste produto? Ele voltará para a lista de 'Para Precificar'.",
+      variant: "warning",
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, show: false }));
+        setLoading(true);
+        try {
+          await api.post(`/pricing/products/${selectProduto!.id}/reset`);
+          toast.success("Preço resetado");
+          setModalShow(false);
+          await Promise.all([fetchProdutosParaCalcular(), fetchProdutosCalculados()]);
+        } catch (error: any) {
+          toast.error(error.response?.data?.error || "Erro ao resetar");
+        } finally {
+          setLoading(false);
+        }
+      },
+    });
   };
 
   // ==================== RENDERIZAÇÃO DAS LISTAS PRINCIPAIS ====================
@@ -1184,6 +1223,39 @@ export default function PrecificacaoPage() {
       {renderAddIngredientModal()}
       {renderEditIngredientModal()}
       {renderCreateIngredientModal()}
+
+      {/* Modal de Confirmação Genérico (Padrão do Sistema) */}
+      <Modal
+        show={confirmModal.show}
+        onHide={() => setConfirmModal(prev => ({ ...prev, show: false }))}
+        size="sm"
+        centered
+        className={styles.warningPricingModal}
+        contentClassName="globalModalContentRounded"
+      >
+        <Modal.Body className={styles.warningPricingBody}>
+          <div className={styles.warningPricingIconContainer}>
+            <span className={styles.warningPricingIcon}>
+              {confirmModal.variant === "danger" ? "⚠" : confirmModal.variant === "success" ? "✓" : "⚠"}
+            </span>
+          </div>
+          <h5 className={styles.warningPricingTitle}>{confirmModal.title}</h5>
+          <p className={styles.warningPricingMessage}>{confirmModal.message}</p>
+        </Modal.Body>
+        <Modal.Footer className={styles.warningPricingFooter}>
+          <ButtonCancelar
+            variant="outline"
+            onClick={() => setConfirmModal(prev => ({ ...prev, show: false }))}
+            CancelLabel="Cancelar"
+          />
+          <button
+            className={`${styles.confirmActionBtn} ${confirmModal.variant === "danger" ? styles.confirmDanger : confirmModal.variant === "success" ? styles.confirmSuccess : styles.confirmWarning}`}
+            onClick={confirmModal.onConfirm}
+          >
+            Confirmar
+          </button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

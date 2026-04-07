@@ -28,12 +28,13 @@ type Field = {
 type FormProps = {
   title?: string
   fields: Field[]
-  onSubmit: (data: FormData) => void
+  onSubmit?: (data: FormData) => void
   submitLabel?: string
   loading?: boolean
   disabled?: boolean
   showCancel?: boolean
   showDelete?: boolean
+  showSubmit?: boolean
   onCancel?: () => void
   onDelete?: () => void
   onChange?: (name: string, value: string) => void
@@ -50,6 +51,7 @@ export default function Card({
   disabled = false,
   showCancel = false,
   showDelete = false,
+  showSubmit = true,
   onCancel,
   onDelete,
   onChange,
@@ -118,7 +120,9 @@ export default function Card({
     });
     
     console.log('Dados submetidos:', filteredData);
-    onSubmit(filteredData);
+    if (onSubmit) {
+      onSubmit(filteredData);
+    }
   }
 
   const visibleFields = fields.filter(field => {
@@ -239,14 +243,16 @@ export default function Card({
             </button>
           )}
           
-          <button 
-            type="submit" 
-            className={styles.submitButton}
-            disabled={loading || disabled}
-          >
-            <span>{loading ? "Processando..." : submitLabel}</span>
-            <CheckCircle size={20} weight="bold" />
-          </button>
+          {showSubmit && (
+            <button 
+              type="submit" 
+              className={styles.submitButton}
+              disabled={loading || disabled}
+            >
+              <span>{loading ? "Processando..." : submitLabel}</span>
+              <CheckCircle size={20} weight="bold" />
+            </button>
+          )}
         </div>
       </form>
     </div>

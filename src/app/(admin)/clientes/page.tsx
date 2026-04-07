@@ -367,58 +367,102 @@ export default function ClientesPage() {
       <Modal
         show={modalShow}
         onHide={handleCloseModal}
-        size="lg"
+        size="xl"
         centered
         className={styles.modalClientes}
         contentClassName="globalModalContentRounded"
       >
-        <Modal.Body className={styles.modalClientesBody}>
-          {formStep === "check" && (
-            <Card
-              title="Verificar CPF ou CNPJ"
-              fields={[
-                {
-                  name: "document",
-                  label: "CPF ou CNPJ",
-                  type: "text",
-                  value: documentValue,
-                },
-              ]}
-              onChange={(name, value) => {
-                if (name === "document") {
-                  setDocumentValue(applyMask(value));
-                }
-              }}
-              onSubmit={() => verificarDocumento({ document: documentValue })}
-              submitLabel="Próximo"
-              loading={loading}
-              showCancel
-              onCancel={handleCloseModal}
-            />
-          )}
+        <Modal.Body style={{ padding: 0 }}>
+          <div className={styles.stepHeader}>
+            <h2 className={styles.stepTitle}>Cadastro de Cliente</h2>
+            <p className={styles.stepSubtitle}>Verifique o CPF/CNPJ e preencha os dados cadastrais para finalizar</p>
+          </div>
 
-          {formStep === "register" && (
-            <Card
-              title="Cadastro de Cliente"
-              fields={[
-                { name: "name", label: "Nome" },
-                { name: "contact", label: "Contato" },
-                { name: "email", label: "E-mail", type: "email" },
-                { name: "address", label: "Endereço" },
-                {
-                  name: "modality",
-                  label: "Modalidade do Cliente",
-                  type: "select",
-                  options: modalityOptions
-                },
-              ]}
-              onSubmit={handleCadastroSubmit}
-              submitLabel="Cadastrar"
-              loading={loading}
-              showCancel
-              onCancel={handleCloseModal}
-            />
-          )}
+          <div className={styles.splitLayout}>
+            {/* Painel Esquerdo: Verificação */}
+            <div className={styles.leftPanel}>
+              <div className={styles.panelHeader}>
+                <h5>1. Verificação de Documento</h5>
+              </div>
+              <div className={styles.panelContent}>
+                <Card
+                  title=""
+                  fields={[
+                    {
+                      name: "document",
+                      label: "CPF ou CNPJ",
+                      type: "text",
+                      value: documentValue,
+                    },
+                  ]}
+                  onChange={(name, value) => {
+                    if (name === "document") setDocumentValue(applyMask(value));
+                  }}
+                  onSubmit={() => verificarDocumento({ document: documentValue })}
+                  submitLabel={docDataCheck ? "Verificado ✓" : "Verificar"}
+                  loading={loading && formStep === "check"}
+                  showCancel={false}
+                />
+                {docDataCheck && (
+                  <div style={{ 
+                    marginTop: "20px", 
+                    padding: "12px", 
+                    backgroundColor: "rgba(16, 185, 129, 0.1)", 
+                    borderRadius: "8px",
+                    color: "#059669",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    textAlign: "center"
+                  }}>
+                    Documento verificado com sucesso!
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Painel Direito: Cadastro */}
+            <div className={styles.rightPanel}>
+              <div className={styles.panelHeader}>
+                <h5>2. Dados Cadastrais</h5>
+              </div>
+              <div className={styles.panelContent} style={{ 
+                opacity: docDataCheck ? 1 : 0.5, 
+                pointerEvents: docDataCheck ? "auto" : "none",
+                transition: "all 0.3s ease"
+              }}>
+                <Card
+                  title=""
+                  fields={[
+                    { name: "name", label: "Nome" },
+                    { name: "contact", label: "Contato" },
+                    { name: "email", label: "E-mail", type: "email" },
+                    { name: "address", label: "Endereço" },
+                    {
+                      name: "modality",
+                      label: "Modalidade",
+                      type: "select",
+                      options: modalityOptions
+                    },
+                  ]}
+                  onSubmit={handleCadastroSubmit}
+                  submitLabel="Finalizar Cadastro"
+                  loading={loading && formStep === "register"}
+                  showCancel={false}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.modalActions}>
+            <button className={styles.btnActionBack} onClick={handleCloseModal}>
+              Cancelar
+            </button>
+            {!docDataCheck && (
+              <p style={{ margin: 0, fontSize: "14px", color: "#adb5bd", fontWeight: 500 }}>
+                Verifique o documento à esquerda para liberar o cadastro
+              </p>
+            )}
+          </div>
         </Modal.Body>
       </Modal>
 

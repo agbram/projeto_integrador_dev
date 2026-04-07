@@ -34,6 +34,7 @@ export default function FixedExpensesPage() {
   const [modalEditShow, setModalEditShow] = useState(false);
   const [modalDeleteShow, setModalDeleteShow] = useState(false);
   const [monthlyTotal, setMonthlyTotal] = useState<number>(0);
+  const [draftExpense, setDraftExpense] = useState<any>({});
 
   // Extrai as funções necessárias (estáveis)
   const { 
@@ -124,19 +125,20 @@ export default function FixedExpensesPage() {
     };
   }, [loadExpenses]);
 
-  const handleAddSubmit = async (data: any) => {
+  const handleAddSubmit = async () => {
     setLoading(true);
     try {
       const payload = {
-        ...data,
-        value: parseFloat(data.value),
-        date: data.date ? new Date(data.date).toISOString() : new Date().toISOString(),
-        recurring: data.recurring === 'true' || data.recurring === true,
+        ...draftExpense,
+        value: parseFloat(draftExpense.value),
+        date: draftExpense.date ? new Date(draftExpense.date).toISOString() : new Date().toISOString(),
+        recurring: draftExpense.recurring === 'true' || draftExpense.recurring === true,
       };
       await api.post('/fixedExpenses', payload);
       await loadExpenses();
       toast.success('Despesa cadastrada com sucesso!');
       setModalAddShow(false);
+      setDraftExpense({});
     } catch (error: any) {
       console.error('Erro ao cadastrar despesa:', error);
       toast.error(error.response?.data?.message || 'Erro ao cadastrar despesa.');
@@ -145,21 +147,22 @@ export default function FixedExpensesPage() {
     }
   };
 
-  const handleEditSubmit = async (data: any) => {
+  const handleEditSubmit = async () => {
     if (!selectedExpense) return;
     setLoading(true);
     try {
       const payload = {
-        ...data,
-        value: parseFloat(data.value),
-        date: data.date ? new Date(data.date).toISOString() : undefined,
-        recurring: data.recurring === 'true' || data.recurring === true,
+        ...draftExpense,
+        value: parseFloat(draftExpense.value),
+        date: draftExpense.date ? new Date(draftExpense.date).toISOString() : undefined,
+        recurring: draftExpense.recurring === 'true' || draftExpense.recurring === true,
       };
       await api.put(`/fixedExpenses/${selectedExpense.id}`, payload);
       await loadExpenses();
       toast.success('Despesa atualizada com sucesso!');
       setModalEditShow(false);
       setSelectedExpense(undefined);
+      setDraftExpense({});
     } catch (error: any) {
       console.error('Erro ao editar despesa:', error);
       toast.error(error.response?.data?.message || 'Erro ao editar despesa.');
@@ -187,6 +190,14 @@ export default function FixedExpensesPage() {
 
   const openEditModal = (expense: FixedExpense) => {
     setSelectedExpense(expense);
+    setDraftExpense({
+      description: expense.description,
+      value: expense.value,
+      date: expense.date ? expense.date.split('T')[0] : '',
+      recurring: expense.recurring ? 'true' : 'false',
+      category: expense.category,
+      note: expense.note
+    });
     setModalEditShow(true);
   };
 
@@ -248,32 +259,77 @@ export default function FixedExpensesPage() {
       </div>
 
       {/* Modal de adicionar */}
-      <Modal show={modalAddShow} onHide={() => setModalAddShow(false)} size="lg" centered className={styles.modalExpense} contentClassName="globalModalContentRounded">
-        <Modal.Body className={styles.modalExpenseBody}>
-          <Card
-            title="Nova Despesa Fixa"
-            fields={[
-              { name: 'description', label: 'Descrição', type: 'text' },
-              { name: 'value', label: 'Valor (R$)', type: 'number', step: '0.01' },
-              { name: 'date', label: 'Data', type: 'date', value: new Date().toISOString().split('T')[0] },
-              {
-                name: 'recurring',
-                label: 'Recorrente',
-                type: 'select',
-                options: [
-                  { value: 'false', label: 'Não' },
-                  { value: 'true', label: 'Sim' },
-                ],
-              },
-              { name: 'category', label: 'Categoria', type: 'select', options: categoryOptions },
-              { name: 'note', label: 'Observação', type: 'textarea' },
-            ]}
-            onSubmit={handleAddSubmit}
-            submitLabel="Cadastrar"
-            loading={loading}
-            showCancel
-            onCancel={() => setModalAddShow(false)}
-          />
+      <Modal 
+        show={modalAddShow} 
+        onHide={() => setModalAddShow(false)} 
+        size="xl" 
+        centered 
+        className={styles.modalExpense} 
+        contentClassName="globalModalContentRounded"
+      >
+        <Modal.Body style={{ padding: 0 }}>
+          <div className={styles.stepHeader}>
+            <h2 className={styles.stepTitle}>Nova Despesa Fixa</h2>
+            <p className={styles.stepSubtitle}>Cadastre uma nova despesa informando os valores e detalhes de recorrência</p>
+          </div>
+
+          <div className={styles.splitLayout}>
+            {/* Painel Esquerdo: Dados da Despesa */}
+            <div className={styles.leftPanel}>
+              <div className={styles.panelHeader}>
+                <h5>Informações da Despesa</h5>
+              </div>
+              <div className={styles.panelContent}>
+                <Card
+                  title=""
+                  fields={[
+                    { name: 'description', label: 'Descrição', type: 'text' },
+                    { name: 'value', label: 'Valor (R$)', type: 'number', step: '0.01' },
+                    { name: 'date', label: 'Data de Vencimento', type: 'date', value: new Date().toISOString().split('T')[0] },
+                    { name: 'category', label: 'Categoria', type: 'select', options: categoryOptions },
+                  ]}
+                  showSubmit={false}
+                  showCancel={false}
+                  onChange={(name, value) => setDraftExpense((prev: any) => ({ ...prev, [name]: value }))}
+                />
+              </div>
+            </div>
+
+            {/* Painel Direito: Configurações Adicionais */}
+            <div className={styles.rightPanel}>
+              <div className={styles.panelHeader}>
+                <h5>Configurações Extras</h5>
+              </div>
+              <div className={styles.panelContent}>
+                <Card
+                  title=""
+                  fields={[
+                    {
+                      name: 'recurring',
+                      label: 'Despesa Recorrente?',
+                      type: 'select',
+                      options: [
+                        { value: 'false', label: 'Não (Única)' },
+                        { value: 'true', label: 'Sim (Mensal)' },
+                      ],
+                    },
+                    { name: 'note', label: 'Observações/Notas', type: 'textarea' },
+                  ]}
+                  onSubmit={handleAddSubmit}
+                  submitLabel="Finalizar Cadastro"
+                  loading={loading}
+                  showCancel={false}
+                  onChange={(name, value) => setDraftExpense((prev: any) => ({ ...prev, [name]: value }))}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.modalActions}>
+            <button className={styles.btnActionBack} onClick={() => setModalAddShow(false)}>
+              Cancelar
+            </button>
+          </div>
         </Modal.Body>
       </Modal>
 
@@ -281,40 +337,78 @@ export default function FixedExpensesPage() {
       <Modal
         show={modalEditShow}
         onHide={() => { setModalEditShow(false); setSelectedExpense(undefined); }}
-        size="lg"
+        size="xl"
         centered
         className={styles.modalExpense}
         contentClassName="globalModalContentRounded"
       >
-        <Modal.Body className={styles.modalBodyEdit}>
-          <Card
-            key={selectedExpense?.id}
-            title="Editar Despesa"
-            fields={[
-              { name: 'description', value: selectedExpense?.description || '', label: 'Descrição', type: 'text' },
-              { name: 'value', value: selectedExpense?.value || '', label: 'Valor (R$)', type: 'number', step: '0.01' },
-              { name: 'date', value: selectedExpense?.date ? selectedExpense.date.split('T')[0] : '', label: 'Data', type: 'date' },
-              {
-                name: 'recurring',
-                value: selectedExpense?.recurring ? 'true' : 'false',
-                label: 'Recorrente',
-                type: 'select',
-                options: [
-                  { value: 'false', label: 'Não' },
-                  { value: 'true', label: 'Sim' },
-                ],
-              },
-              { name: 'category', value: selectedExpense?.category || '', label: 'Categoria', type: 'select', options: categoryOptions },
-              { name: 'note', value: selectedExpense?.note || '', label: 'Observação', type: 'textarea' },
-            ]}
-            showDelete
-            onDelete={() => { setModalEditShow(false); setModalDeleteShow(true); }}
-            showCancel
-            onCancel={() => { setModalEditShow(false); setSelectedExpense(undefined); }}
-            onSubmit={handleEditSubmit}
-            submitLabel="Salvar Alterações"
-            loading={loading}
-          />
+        <Modal.Body style={{ padding: 0 }}>
+          <div className={styles.stepHeader}>
+            <h2 className={styles.stepTitle}>Editar Despesa</h2>
+            <p className={styles.stepSubtitle}>Ajuste os valores ou configurações da despesa selecionada</p>
+          </div>
+
+          <div className={styles.splitLayout}>
+            {/* Painel Esquerdo: Dados */}
+            <div className={styles.leftPanel}>
+              <div className={styles.panelHeader}>
+                <h5>Informações Básicas</h5>
+              </div>
+              <div className={styles.panelContent}>
+                <Card
+                  key={`edit-left-${selectedExpense?.id}`}
+                  title=""
+                  fields={[
+                    { name: 'description', value: selectedExpense?.description || '', label: 'Descrição', type: 'text' },
+                    { name: 'value', value: selectedExpense?.value || '', label: 'Valor (R$)', type: 'number', step: '0.01' },
+                    { name: 'date', value: selectedExpense?.date ? selectedExpense.date.split('T')[0] : '', label: 'Data de Vencimento', type: 'date' },
+                    { name: 'category', value: selectedExpense?.category || '', label: 'Categoria', type: 'select', options: categoryOptions },
+                  ]}
+                  showSubmit={false}
+                  showCancel={false}
+                  onChange={(name, value) => setDraftExpense((prev: any) => ({ ...prev, [name]: value }))}
+                />
+              </div>
+            </div>
+
+            {/* Painel Direito: Detalhes e Ações */}
+            <div className={styles.rightPanel}>
+              <div className={styles.panelHeader}>
+                <h5>Detalhes e Ações</h5>
+              </div>
+              <div className={styles.panelContent}>
+                <Card
+                  key={`edit-right-${selectedExpense?.id}`}
+                  title=""
+                  fields={[
+                    {
+                      name: 'recurring',
+                      value: selectedExpense?.recurring ? 'true' : 'false',
+                      label: 'Despesa Recorrente?',
+                      type: 'select',
+                      options: [
+                        { value: 'false', label: 'Não (Única)' },
+                        { value: 'true', label: 'Sim (Mensal)' },
+                      ],
+                    },
+                    { name: 'note', value: selectedExpense?.note || '', label: 'Observações/Notas', type: 'textarea' },
+                  ]}
+                  showDelete
+                  onDelete={() => { setModalEditShow(false); setModalDeleteShow(true); }}
+                  onSubmit={handleEditSubmit}
+                  submitLabel="Salvar Alterações"
+                  loading={loading}
+                  onChange={(name, value) => setDraftExpense((prev: any) => ({ ...prev, [name]: value }))}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.modalActions}>
+            <button className={styles.btnActionBack} onClick={() => { setModalEditShow(false); setSelectedExpense(undefined); }}>
+              Voltar
+            </button>
+          </div>
         </Modal.Body>
       </Modal>
 

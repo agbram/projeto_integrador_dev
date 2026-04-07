@@ -20,6 +20,7 @@ export default function ProdutosPage() {
   const [produtos, setProdutos] = useState<Product[]>([]);
   const [selectProduto, setSelectProduto] = useState<Product>();
   const [warningDeleteModalShow, setWarningDeleteModalShow] = useState(false);
+  const [draftProduct, setDraftProduct] = useState<any>({});
   const { 
     setShowAddButton, 
     setHandleAdd, 
@@ -64,7 +65,13 @@ export default function ProdutosPage() {
 
   useEffect(() => {
     setShowAddButton(true);
-    setHandleAdd(() => { setModalShow(true); });
+    setHandleAdd(() => { 
+      setDraftProduct({
+        category: 'BOLOS',
+        yield: ''
+      });
+      setModalShow(true); 
+    });
 
     setShowFilterButton(true);
     setFilterOptions([
@@ -117,16 +124,16 @@ export default function ProdutosPage() {
     };
   }, []);
 
-  const handleSubmit = async (data: FormData) => {
+  const handleSubmit = async () => {
     setLoading(true);
     try {
       const formattedData = {
-        name: data.name,
-        description: data.description || null,
-        category: data.category,
+        name: draftProduct.name,
+        description: draftProduct.description || null,
+        category: draftProduct.category,
         isActive: true,
-        yield: data.yield ? parseFloat(data.yield.toString()) : null,
-        fotoData: data.fotoData ? await fileToBase64(data.fotoData as File) : undefined,
+        yield: draftProduct.yield ? parseFloat(draftProduct.yield.toString()) : null,
+        fotoData: draftProduct.fotoData ? await fileToBase64(draftProduct.fotoData as File) : undefined,
       };
 
       const response = await api.post("/products", formattedData);
@@ -135,6 +142,7 @@ export default function ProdutosPage() {
 
       toast.success("Produto cadastrado com sucesso! Agora vá para a página de Precificação para adicionar ingredientes e calcular o preço.");
       setModalShow(false);
+      setDraftProduct({});
     } catch (error: any) {
       console.error("Erro ao cadastrar produto:", error);
       toast.error(error.response?.data?.error || "Erro ao cadastrar produto. Tente novamente.");
@@ -143,16 +151,16 @@ export default function ProdutosPage() {
     }
   };
 
-  const handleSalvarAlteracoes = async (data: any) => {
+  const handleSalvarAlteracoes = async () => {
     setLoading(true);
     try {
       const formattedData = {
-        name: data.name,
-        description: data.description || null,
-        category: data.category,
+        name: draftProduct.name,
+        description: draftProduct.description || null,
+        category: draftProduct.category,
         isActive: true,
-        yield: (data.yield !== "" && data.yield !== null && data.yield !== undefined) ? Number(data.yield) : null,
-        fotoData: data.fotoData ? await fileToBase64(data.fotoData as File) : undefined,
+        yield: (draftProduct.yield !== "" && draftProduct.yield !== null && draftProduct.yield !== undefined) ? Number(draftProduct.yield) : null,
+        fotoData: draftProduct.fotoData ? await fileToBase64(draftProduct.fotoData as File) : undefined,
       };
 
       console.log("Editando produto:", formattedData);
@@ -165,6 +173,7 @@ export default function ProdutosPage() {
 
       toast.success("Produto atualizado com sucesso!");
       setModalEditShow(false);
+      setDraftProduct({});
     } catch (error: any) {
       console.error("Erro ao editar produto:", error);
       toast.error(error.response?.data?.error || "Erro ao editar produto. Tente novamente.");
@@ -300,6 +309,12 @@ export default function ProdutosPage() {
                     className={`${styles.btnAction} ${styles.btnEditar}`}
                     onClick={() => {
                       setSelectProduto(produto);
+                      setDraftProduct({
+                        name: produto.name,
+                        description: produto.description,
+                        category: produto.category,
+                        yield: produto.yield?.toString(),
+                      });
                       setModalEditShow(true);
                     }}
                   >
@@ -327,38 +342,75 @@ export default function ProdutosPage() {
       <Modal
         show={modalShow}
         onHide={() => setModalShow(false)}
-        size="lg"
+        size="xl"
         centered
         className={styles.modalProdutos}
         contentClassName="globalModalContentRounded"
       >
-        <Modal.Body className={styles.modalProdutosBody}>
-          <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>Cadastro de Produto</h2>
-          <div className={styles.instructionBox}>
-            <p><strong>Como funciona o cadastro:</strong></p>
-            <ol>
-              <li>Cadastre os dados básicos do produto</li>
-              <li>O produto será criado sem preço (status: "Para Precificar")</li>
-              <li>Na página de Precificação, adicione os ingredientes</li>
-              <li>O sistema calculará automaticamente o custo e preço de venda</li>
-            </ol>
+        <Modal.Body style={{ padding: 0 }}>
+          <div className={styles.stepHeader}>
+            <h2 className={styles.stepTitle}>Cadastro de Produto</h2>
+            <p className={styles.stepSubtitle}>Informe os dados básicos para iniciar a precificação do produto</p>
           </div>
-          
-          <Card
-            title=""
-            fields={[
-              { name: "name", label: "Nome do Produto *", placeholder: "Ex: Bolo de Chocolate" },
-              { name: "description", label: "Descrição", placeholder: "Descrição detalhada do produto", type: "textarea" },
-              { name: "category", label: "Categoria *", type: "select", options: categoryOptions },
-              { name: "yield", label: "Rendimento (unidades)", type: "number", step: "1", placeholder: "Ex: 10 unidades" },
-              { name: "fotoData", label: "Imagem do Produto", type: "file" },
-            ]}
-            onSubmit={handleSubmit}
-            submitLabel="Cadastrar Produto"
-            loading={loading}
-            showCancel
-            onCancel={() => setModalShow(false)}
-          />
+
+          <div className={styles.splitLayout}>
+            {/* Painel Esquerdo: Instruções e Identificação */}
+            <div className={styles.leftPanel}>
+              <div className={styles.panelHeader}>
+                <h5>1. Identificação</h5>
+              </div>
+              <div className={styles.panelContent}>
+                <div className={styles.instructionBox}>
+                  <p><strong>Como funciona:</strong></p>
+                  <ol>
+                    <li>Cadastre os dados básicos primeiro</li>
+                    <li>O produto iniciará como "Para Precificar"</li>
+                    <li>Adicione ingredientes na Matriz de Precificação</li>
+                    <li>O sistema calculará o preço final automaticamente</li>
+                  </ol>
+                </div>
+                
+                <Card
+                  title=""
+                  fields={[
+                    { name: "name", label: "Nome do Produto", placeholder: "Ex: Bolo de Chocolate" },
+                    { name: "description", label: "Descrição Curta", placeholder: "Breve descrição do produto", type: "textarea" },
+                  ]}
+                  showSubmit={false}
+                  showCancel={false}
+                  onChange={(name, value) => setDraftProduct((prev: any) => ({ ...prev, [name]: value }))}
+                />
+              </div>
+            </div>
+
+            {/* Painel Direito: Configurações e Imagem */}
+            <div className={styles.rightPanel}>
+              <div className={styles.panelHeader}>
+                <h5>2. Detalhes Técnicos</h5>
+              </div>
+              <div className={styles.panelContent}>
+                <Card
+                  title=""
+                  fields={[
+                    { name: "category", label: "Categoria do Produto", type: "select", options: categoryOptions },
+                    { name: "yield", label: "Rendimento Estimado", type: "number", step: "1", placeholder: "Ex: 10 unidades" },
+                    { name: "fotoData", label: "Imagem (Opcional)", type: "file" },
+                  ]}
+                  onSubmit={handleSubmit}
+                  submitLabel="Finalizar Cadastro"
+                  loading={loading}
+                  showCancel={false}
+                  onChange={(name, value) => setDraftProduct((prev: any) => ({ ...prev, [name]: value }))}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.modalActions}>
+            <button className={styles.btnActionBack} onClick={() => setModalShow(false)}>
+              Cancelar
+            </button>
+          </div>
         </Modal.Body>
       </Modal>
 
@@ -367,69 +419,98 @@ export default function ProdutosPage() {
         show={modalEditShow}
         onHide={handleCloseEditModal}
         centered
-        size="lg"
+        size="xl"
         className={styles.modalProdutos}
         contentClassName="globalModalContentRounded"
       >
-        <Modal.Body className={styles.modalBodyEdit}>
-          <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>Editar Produto</h2>
-          {selectProduto && (
-            <>
-              <div className={styles.productStatusInfo}>
-                <p>
-                  <strong>Status de precificação:</strong> 
-                  <span className={`${styles.statusBadge} ${
-                    selectProduto.priceStatus === 'CALCULATED' ? styles.calculated : styles.pending
-                  }`}>
-                    {selectProduto.priceStatus === 'CALCULATED' ? 'Preço calculado' : 'Aguardando precificação'}
-                  </span>
-                </p>
-                
-                {selectProduto.priceStatus === 'CALCULATED' && (
-                  <div className={styles.currentPriceInfo}>
+        <Modal.Body style={{ padding: 0 }}>
+          <div className={styles.stepHeader}>
+            <h2 className={styles.stepTitle}>Editar Produto</h2>
+            <p className={styles.stepSubtitle}>Atualize as informações técnicas ou imagem do produto selecionado</p>
+          </div>
+
+          <div className={styles.splitLayout}>
+            {/* Painel Esquerdo: Identificação */}
+            <div className={styles.leftPanel}>
+              <div className={styles.panelHeader}>
+                <h5>Identificação</h5>
+              </div>
+              <div className={styles.panelContent}>
+                {selectProduto && (
+                   <div className={styles.productStatusInfo}>
                     <p>
-                      Preço de Venda
-                      <strong>R$ {selectProduto.salePrice?.toFixed(2)}</strong>
-                    </p>
-                    <p>
-                      Custo Estimado
-                      <strong>R$ {selectProduto.costPrice?.toFixed(2)}</strong>
+                      <strong>Status:</strong> 
+                      <span className={`${styles.statusBadge} ${
+                        selectProduto.priceStatus === 'CALCULATED' ? styles.calculated : styles.pending
+                      }`}>
+                        {selectProduto.priceStatus === 'CALCULATED' ? 'Precificado' : 'Aguardando precificação'}
+                      </span>
                     </p>
                     
-                    <button 
-                      className={styles.btnGoToPricing}
-                      onClick={() => {
-                        handleCloseEditModal();
-                        goToPricing(selectProduto.id);
-                      }}
-                    >
-                      <CalculatorIcon size={16} weight="bold" />
-                      Acessar Matriz de Precificação
-                    </button>
+                    {selectProduto.priceStatus === 'CALCULATED' && (
+                      <div className={styles.currentPriceInfo}>
+                        <p>Venda <strong>R$ {selectProduto.salePrice?.toFixed(2)}</strong></p>
+                        <p>Custo <strong>R$ {selectProduto.costPrice?.toFixed(2)}</strong></p>
+                        
+                        <button 
+                          className={styles.btnGoToPricing}
+                          onClick={() => {
+                            handleCloseEditModal();
+                            goToPricing(selectProduto.id);
+                          }}
+                        >
+                          <CalculatorIcon size={16} weight="bold" />
+                          Ver Matriz de Precificação
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
+                
+                <Card
+                  key={`edit-left-${selectProduto?.id}`}
+                  title=""
+                  fields={[
+                    { name: "name", label: "Nome do Produto", value: selectProduto?.name || "", placeholder: "Nome do produto" },
+                    { name: "description", label: "Descrição", value: selectProduto?.description || "", placeholder: "Descrição do produto", type: "textarea" },
+                  ]}
+                  showSubmit={false}
+                  showCancel={false}
+                  onChange={(name, value) => setDraftProduct((prev: any) => ({ ...prev, [name]: value }))}
+                />
               </div>
-              
-              <Card
-                key={selectProduto?.id}
-                title=""
-                fields={[
-                  { name: "name", label: "Nome do Produto *", value: selectProduto?.name || "", placeholder: "Nome do produto" },
-                  { name: "description", label: "Descrição", value: selectProduto?.description || "", placeholder: "Descrição do produto", type: "textarea" },
-                  { name: "category", label: "Categoria *", type: "select", options: categoryOptions, value: selectProduto?.category || "BOLOS" },
-                  { name: "yield", label: "Rendimento (unidades)", type: "number", step: "1", value: selectProduto?.yield?.toString() || "", placeholder: "Ex: 10" },
-                  { name: "fotoData", label: "Alterar imagem", type: "file" },
-                ]}
-                showDelete
-                onDelete={handleWarningDelete}
-                showCancel
-                onCancel={handleCloseEditModal}
-                onSubmit={handleSalvarAlteracoes}
-                submitLabel="Salvar Alterações"
-                loading={loading}
-              />
-            </>
-          )}
+            </div>
+
+            {/* Painel Direito: Configurações */}
+            <div className={styles.rightPanel}>
+              <div className={styles.panelHeader}>
+                <h5>Configurações Técnicas</h5>
+              </div>
+              <div className={styles.panelContent}>
+                <Card
+                  key={`edit-right-${selectProduto?.id}`}
+                  title=""
+                  fields={[
+                    { name: "category", label: "Categoria", type: "select", options: categoryOptions, value: selectProduto?.category || "BOLOS" },
+                    { name: "yield", label: "Rendimento (unidades)", type: "number", step: "1", value: selectProduto?.yield?.toString() || "", placeholder: "Ex: 10" },
+                    { name: "fotoData", label: "Alterar imagem do produto", type: "file" },
+                  ]}
+                  showDelete
+                  onDelete={handleWarningDelete}
+                  onSubmit={handleSalvarAlteracoes}
+                  submitLabel="Salvar Alterações"
+                  loading={loading}
+                  onChange={(name, value) => setDraftProduct((prev: any) => ({ ...prev, [name]: value }))}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.modalActions}>
+            <button className={styles.btnActionBack} onClick={handleCloseEditModal}>
+              Voltar
+            </button>
+          </div>
         </Modal.Body>
       </Modal>
 

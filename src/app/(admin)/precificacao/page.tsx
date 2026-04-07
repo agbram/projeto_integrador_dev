@@ -705,61 +705,61 @@ export default function PrecificacaoPage() {
                 </div>
 
                 <div className={styles.summaryContentScroll}>
-                  <div style={{ marginBottom: "24px" }}>
-                    <Card
-                      title=""
-                      fields={[
-                        {
-                          name: "strategy",
-                          label: "Estratégia",
-                          type: "select",
-                          options: [
-                            { value: "markup", label: "Markup sobre custo" },
-                            { value: "margin", label: "Margem de lucro" },
-                          ],
-                        },
-                        {
-                          name: "markupPercent",
-                          label: "Markup (%)",
-                          type: "number",
-                          placeholder: "Ex: 50",
-                          condition: (data: any) => data.strategy === "markup",
-                          step: "0.1",
-                        },
-                        {
-                          name: "profitPercent",
-                          label: "Margem de Lucro (%)",
-                          type: "number",
-                          placeholder: "Ex: 30",
-                          condition: (data: any) => data.strategy === "margin",
-                          step: "0.1",
-                        },
-                        {
-                          name: "expensePercent",
-                          label: "Despesas Operacionais (%)",
-                          type: "number",
-                          step: "0.1",
-                        },
-                        {
-                          name: "taxPercent",
-                          label: "Impostos (%)",
-                          type: "number",
-                          step: "0.1",
-                        },
-                        {
-                          name: "minProfit",
-                          label: "Lucro Mínimo (R$)",
-                          type: "number",
-                          placeholder: "Ex: 5.00",
-                          step: "0.01",
-                        },
-                      ]}
-                      onSubmit={handleSimulatePrice}
-                      submitLabel="Simular"
-                      loading={loading}
-                      showCancel={false}
-                    />
-                  </div>
+                        <div className={styles.simulationCardWrapper}>
+                          <Card
+                            title=""
+                            fields={[
+                              {
+                                name: "strategy",
+                                label: "Estratégia",
+                                type: "select",
+                                options: [
+                                  { value: "markup", label: "Markup sobre custo" },
+                                  { value: "margin", label: "Margem de lucro" },
+                                ],
+                              },
+                              {
+                                name: "markupPercent",
+                                label: "Markup (%)",
+                                type: "number",
+                                placeholder: "Ex: 50",
+                                condition: (data: any) => data.strategy === "markup",
+                                step: "0.1",
+                              },
+                              {
+                                name: "profitPercent",
+                                label: "Margem de Lucro (%)",
+                                type: "number",
+                                placeholder: "Ex: 30",
+                                condition: (data: any) => data.strategy === "margin",
+                                step: "0.1",
+                              },
+                              {
+                                name: "expensePercent",
+                                label: "Despesas Operacionais (%)",
+                                type: "number",
+                                step: "0.1",
+                              },
+                              {
+                                name: "taxPercent",
+                                label: "Impostos (%)",
+                                type: "number",
+                                step: "0.1",
+                              },
+                              {
+                                name: "minProfit",
+                                label: "Lucro Mínimo (R$)",
+                                type: "number",
+                                placeholder: "Ex: 5.00",
+                                step: "0.01",
+                              },
+                            ]}
+                            onSubmit={handleSimulatePrice}
+                            submitLabel="Simular"
+                            loading={loading}
+                            showCancel={false}
+                          />
+                        </div>
 
                   {calculationResult && (
                     <div className={styles.resultSummary}>
@@ -839,9 +839,13 @@ export default function PrecificacaoPage() {
       className={styles.modalPrecificacao}
       contentClassName="globalModalContentRounded"
     >
-      <Modal.Body className={styles.modalPrecificacaoBody}>
-        <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>Adicionar Ingrediente</h2>
-        <div className={styles.addIngredientModalContent}>
+      <Modal.Body style={{ padding: 0 }}>
+        <div className={styles.stepHeader}>
+          <h2 className={styles.stepTitle}>Adicionar Ingrediente</h2>
+          <p className={styles.stepSubtitle}>Busque um ingrediente cadastrado ou crie um novo na matriz de insumos</p>
+        </div>
+        <div className={styles.panelContent}>
+          <div className={styles.addIngredientModalContent}>
           <div className={styles.searchBox}>
             <MagnifyingGlassIcon size={20} />
             <input
@@ -952,7 +956,7 @@ export default function PrecificacaoPage() {
           <div className={styles.orSeparator}>
             <span>ou</span>
           </div>
-          <button
+          <div
             className={styles.btnCreateNew}
             onClick={() => {
               setModalAddIngredientShow(false);
@@ -960,10 +964,11 @@ export default function PrecificacaoPage() {
             }}
           >
             <PlusIcon size={14} /> Cadastrar novo ingrediente
-          </button>
+          </div>
         </div>
-      </Modal.Body>
-      <Modal.Footer>
+      </div>
+    </Modal.Body>
+      <Modal.Footer className={styles.modalActions}>
         <ButtonCancelar variant="outline" onClick={() => setModalAddIngredientShow(false)} CancelLabel="Cancelar" />
         <button
           className={styles.btnAddIngredientSubmit}
@@ -989,46 +994,54 @@ export default function PrecificacaoPage() {
       className={styles.modalPrecificacao}
       contentClassName="globalModalContentRounded"
     >
-      <Modal.Body className={styles.modalPrecificacaoBody}>
-        <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>Editar Ingrediente</h2>
-        {editingProductIngredient && (
-          <div className={styles.editIngredientForm}>
-            <p>
-              <strong>{editingProductIngredient.ingredient.name}</strong> (R$ {editingProductIngredient.ingredient.unitCost.toFixed(2)}/{editingProductIngredient.ingredient.unit})
-            </p>
-            <div className={styles.formGroup}>
-              <label>Quantidade</label>
-              <div className={styles.inputWithUnit}>
+      <Modal.Body style={{ padding: 0 }}>
+        <div className={styles.stepHeader}>
+          <h2 className={styles.stepTitle}>Editar Ingrediente</h2>
+          <p className={styles.stepSubtitle}>Ajuste a quantidade ou unidade deste ingrediente no produto</p>
+        </div>
+        <div className={styles.panelContent}>
+          {editingProductIngredient && (
+            <div className={styles.editIngredientForm}>
+              <div style={{ marginBottom: "16px", padding: "12px", background: "rgba(212, 123, 146, 0.05)", borderRadius: "8px", borderLeft: "4px solid #d47b92" }}>
+                <strong style={{ color: "#2e1c1c" }}>{editingProductIngredient.ingredient.name}</strong>
+                <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#6c757d" }}>
+                  Custo base: R$ {editingProductIngredient.ingredient.unitCost.toFixed(2)} / {editingProductIngredient.ingredient.unit}
+                </p>
+              </div>
+              <div className={styles.formGroup}>
+                <label>Quantidade</label>
+                <div className={styles.inputWithUnit}>
+                  <input
+                    type="number"
+                    step="0.001"
+                    value={editFormData.quantity}
+                    onChange={(e) => setEditFormData({ ...editFormData, quantity: e.target.value })}
+                  />
+                  <select
+                    value={editFormData.unit}
+                    onChange={(e) => setEditFormData({ ...editFormData, unit: e.target.value })}
+                  >
+                    <option value="g">g</option>
+                    <option value="kg">kg</option>
+                    <option value="ml">ml</option>
+                    <option value="L">L</option>
+                    <option value="un">un</option>
+                  </select>
+                </div>
+              </div>
+              <div className={styles.formGroup}>
+                <label>Notas</label>
                 <input
-                  type="number"
-                  step="0.001"
-                  value={editFormData.quantity}
-                  onChange={(e) => setEditFormData({ ...editFormData, quantity: e.target.value })}
+                  type="text"
+                  value={editFormData.notes}
+                  onChange={(e) => setEditFormData({ ...editFormData, notes: e.target.value })}
                 />
-                <select
-                  value={editFormData.unit}
-                  onChange={(e) => setEditFormData({ ...editFormData, unit: e.target.value })}
-                >
-                  <option value="g">g</option>
-                  <option value="kg">kg</option>
-                  <option value="ml">ml</option>
-                  <option value="L">L</option>
-                  <option value="un">un</option>
-                </select>
               </div>
             </div>
-            <div className={styles.formGroup}>
-              <label>Notas</label>
-              <input
-                type="text"
-                value={editFormData.notes}
-                onChange={(e) => setEditFormData({ ...editFormData, notes: e.target.value })}
-              />
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </Modal.Body>
-      <Modal.Footer>
+      <Modal.Footer className={styles.modalActions}>
         <ButtonCancelar variant="outline" onClick={() => setModalEditIngredientShow(false)} CancelLabel="Cancelar" />
         <button
           className={styles.btnSave}
@@ -1051,60 +1064,65 @@ export default function PrecificacaoPage() {
       className={styles.modalPrecificacao}
       contentClassName="globalModalContentRounded"
     >
-      <Modal.Body className={styles.modalPrecificacaoBody}>
-        <h2 style={{ fontSize: "24px", fontWeight: 700, color: "var(--color-primary)", margin: "0 0 16px 0", letterSpacing: "-0.01em" }}>Cadastrar Novo Insumo</h2>
-        <div className={styles.newIngredientForm}>
-          <div className={styles.formGroup}>
-            <label>Nome *</label>
-            <input
-              type="text"
-              value={newIngredient.name}
-              onChange={(e) => setNewIngredient({ ...newIngredient, name: e.target.value })}
-            />
-          </div>
-          <div className={styles.formRow}>
+      <Modal.Body style={{ padding: 0 }}>
+        <div className={styles.stepHeader}>
+          <h2 className={styles.stepTitle}>Novo Insumo</h2>
+          <p className={styles.stepSubtitle}>Cadastre um novo ingrediente na matriz geral do sistema</p>
+        </div>
+        <div className={styles.panelContent}>
+          <div className={styles.newIngredientForm}>
             <div className={styles.formGroup}>
-              <label>Unidade *</label>
-              <select
-                value={newIngredient.unit}
-                onChange={(e) => setNewIngredient({ ...newIngredient, unit: e.target.value })}
-              >
-                <option value="g">g</option>
-                <option value="kg">kg</option>
-                <option value="ml">ml</option>
-                <option value="L">L</option>
-                <option value="un">un</option>
-              </select>
+              <label>Nome *</label>
+              <input
+                type="text"
+                value={newIngredient.name}
+                onChange={(e) => setNewIngredient({ ...newIngredient, name: e.target.value })}
+              />
+            </div>
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label>Unidade *</label>
+                <select
+                  value={newIngredient.unit}
+                  onChange={(e) => setNewIngredient({ ...newIngredient, unit: e.target.value })}
+                >
+                  <option value="g">g</option>
+                  <option value="kg">kg</option>
+                  <option value="ml">ml</option>
+                  <option value="L">L</option>
+                  <option value="un">un</option>
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label>Custo Unitário *</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={newIngredient.unitCost}
+                  onChange={(e) => setNewIngredient({ ...newIngredient, unitCost: e.target.value })}
+                />
+              </div>
             </div>
             <div className={styles.formGroup}>
-              <label>Custo Unitário *</label>
+              <label>Categoria</label>
               <input
-                type="number"
-                step="0.01"
-                value={newIngredient.unitCost}
-                onChange={(e) => setNewIngredient({ ...newIngredient, unitCost: e.target.value })}
+                type="text"
+                value={newIngredient.category}
+                onChange={(e) => setNewIngredient({ ...newIngredient, category: e.target.value })}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Fornecedor</label>
+              <input
+                type="text"
+                value={newIngredient.supplier}
+                onChange={(e) => setNewIngredient({ ...newIngredient, supplier: e.target.value })}
               />
             </div>
           </div>
-          <div className={styles.formGroup}>
-            <label>Categoria</label>
-            <input
-              type="text"
-              value={newIngredient.category}
-              onChange={(e) => setNewIngredient({ ...newIngredient, category: e.target.value })}
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label>Fornecedor</label>
-            <input
-              type="text"
-              value={newIngredient.supplier}
-              onChange={(e) => setNewIngredient({ ...newIngredient, supplier: e.target.value })}
-            />
-          </div>
         </div>
       </Modal.Body>
-      <Modal.Footer>
+      <Modal.Footer className={styles.modalActions}>
         <ButtonCancelar variant="outline" onClick={() => setModalCreateIngredientShow(false)} CancelLabel="Cancelar" />
         <button
           className={styles.btnAddIngredientSubmit}

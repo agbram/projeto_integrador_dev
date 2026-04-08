@@ -25,6 +25,7 @@ import Order from "@/models/order";
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 import { useSearchParams } from "next/navigation";
 import { PageActions } from "@/contexts/PageActions";
+import { useNotifications } from "@/contexts/NotificationContext";
 import toast from 'react-hot-toast'; // <-- importação do toast
 
 export default function PedidosPage() {
@@ -68,6 +69,7 @@ export default function PedidosPage() {
     setSearchQuery
   } = useContext(PageActions);
   const [activeFilter, setActiveFilter] = useState<string>("all");
+  const { refreshCounts } = useNotifications();
 
   // Advanced Date Filters States
   const [filterMode, setFilterMode] = useState<"all" | "day" | "week" | "month">("all");
@@ -810,6 +812,7 @@ export default function PedidosPage() {
       setOrderItems([]);
       setDiscount(0);
       fetchOrders();
+      refreshCounts();
       toast.success("Pedido cadastrado com sucesso!"); // <-- substituído
       handleCloseModal();
     } catch (error: any) {

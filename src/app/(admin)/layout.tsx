@@ -7,6 +7,7 @@ import PrivateRouter from "@/components/PrivateRouter";
 import PagesWallpaper from "@/components/PagesWallpaper";
 import Header from "@/components/Navigation/Header";
 import { PageActionProvider } from "@/contexts/PageActions";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 import { ToastContainer } from "@/components/ToastContainer";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -24,16 +25,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <PrivateRouter>
             <PageActionProvider>
+              <NotificationProvider>
+                {/* HeaderSizer é client e atualiza --header-height */}
+                <Header />
 
-              {/* HeaderSizer é client e atualiza --header-height */}
-              <Header />
+                <PagesWallpaper />
 
-              <PagesWallpaper />
-
-              <div className="pageWrapper">
-                {children}
-              </div>
-              <ToastContainer />
+                <div className="pageWrapper">
+                  {children}
+                </div>
+                <ToastContainer />
+              </NotificationProvider>
             </PageActionProvider>
           </PrivateRouter>
         </AuthProvider>

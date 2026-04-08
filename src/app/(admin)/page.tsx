@@ -10,6 +10,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./styles.module.css";
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 import { PageActions } from "@/contexts/PageActions";
+import { useNotifications } from "@/contexts/NotificationContext";
 import toast from "react-hot-toast"; // <-- importação do toast
 
 // Tipos para as tarefas de produção
@@ -69,6 +70,7 @@ export default function ProductionPage() {
     searchQuery,
     setSearchQuery
   } = useContext(PageActions);
+  const { refreshCounts } = useNotifications();
 
   useEffect(() => {
     setShowAddButton(false);
@@ -129,6 +131,7 @@ export default function ProductionPage() {
       );
       
       fetchProductionDashboard();
+      refreshCounts();
       
     } catch (error: any) {
       console.error("Erro na sincronização inteligente:", error);
@@ -154,6 +157,7 @@ export default function ProductionPage() {
       toast.success("Sincronização completa realizada. Todos os pedidos foram reprocessados.");
       
       fetchProductionDashboard();
+      refreshCounts();
       
     } catch (error: any) {
       console.error("Erro na sincronização completa:", error);
@@ -173,6 +177,7 @@ export default function ProductionPage() {
       await api.patch(`/task/${taskId}/status`, { status: "IN_PRODUCTION" });
       toast.success("Produção iniciada com sucesso!");
       fetchProductionDashboard();
+      refreshCounts();
     } catch (error: any) {
       console.error("Erro ao iniciar produção:", error);
       toast.error(
@@ -206,6 +211,7 @@ export default function ProductionPage() {
       
       toast.success("Progresso atualizado com sucesso!");
       fetchProductionDashboard();
+      refreshCounts();
       setModalDetailShow(false);
       setSelectedTask(null);
     } catch (error: any) {
@@ -224,6 +230,7 @@ export default function ProductionPage() {
       await api.patch(`/task/${taskId}/status`, { status: "COMPLETED" });
       toast.success("Tarefa marcada como concluída!");
       fetchProductionDashboard();
+      refreshCounts();
     } catch (error: any) {
       console.error("Erro ao concluir tarefa:", error);
       toast.error("Erro ao concluir tarefa. Tente novamente.");

@@ -11,6 +11,7 @@ import ButtonCancelar from "@/components/Buttons/ButtonCancel";
 import fileToBase64 from "@/utils/fileToBase64";
 import Product from "@/models/Product";
 import { PageActions } from "@/contexts/PageActions";
+import { useNotifications } from "@/contexts/NotificationContext";
 import { CalculatorIcon, ImagesIcon, PencilSimpleIcon } from "@phosphor-icons/react";
 import toast from "react-hot-toast"; // <-- importação adicionada
 export default function ProdutosPage() {
@@ -30,6 +31,7 @@ export default function ProdutosPage() {
     searchQuery,
     setSearchQuery 
   } = useContext(PageActions);
+  const { refreshCounts } = useNotifications();
   const [activeFilter, setActiveFilter] = useState<string>("all");
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -139,6 +141,7 @@ export default function ProdutosPage() {
       const response = await api.post("/products", formattedData);
       console.log("Produto cadastrado:", response.data);
       await fetchProdutos();
+      refreshCounts();
 
       toast.success("Produto cadastrado com sucesso! Agora vá para a página de Precificação para adicionar ingredientes e calcular o preço.");
       setModalShow(false);

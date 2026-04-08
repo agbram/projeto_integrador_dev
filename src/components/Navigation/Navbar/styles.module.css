@@ -211,6 +211,32 @@
   font-size: 0.95rem;
 }
 
+/* Badge de notificação */
+.badgeContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.badge {
+  position: absolute;
+  top: -12px;
+  right: -18px;
+  background-color: #ff4444;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  z-index: 10;
+  border: 1.5px solid #2e1c1c; /* Borda para separar da pílula */
+}
+
 @media (max-width: 767px) {
 
   .mobileMenu {

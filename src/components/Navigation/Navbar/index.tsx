@@ -17,12 +17,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./styles.module.css";
 import HamburgerButton from "@/components/HamburgerButton";
+import { useNotifications } from "@/contexts/NotificationContext";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const rawPathname = usePathname();
   const pathname = rawPathname ?? "/";
   const isActive = (path: string) => pathname === path;
+  const { counts } = useNotifications();
 
   // Fecha menu com esc e trava scroll do body quando aberto
   useEffect(() => {
@@ -77,7 +79,12 @@ export default function Navbar() {
                       className={`${isActive("/") ? styles.fufilledIcon : ""}`}
                     />
                   </span>
-                  <span className={styles.linkText}>Homepage</span>
+                  <div className={styles.badgeContainer}>
+                    <span className={styles.linkText}>Homepage</span>
+                    {!isActive("/") && counts.production > 0 && (
+                      <span className={styles.badge}>{counts.production}</span>
+                    )}
+                  </div>
                 </Nav.Link>
               </Nav.Item>
 
@@ -97,7 +104,12 @@ export default function Navbar() {
                       }`}
                     />
                   </span>
-                  <span className={styles.linkText}>Precificação</span>
+                  <div className={styles.badgeContainer}>
+                    <span className={styles.linkText}>Precificação</span>
+                    {!isActive("/precificacao") && counts.pricing > 0 && (
+                      <span className={styles.badge}>{counts.pricing}</span>
+                    )}
+                  </div>
                 </Nav.Link>
               </Nav.Item>
 
@@ -197,7 +209,12 @@ export default function Navbar() {
                       }`}
                     />
                   </span>
-                  <span className={styles.linkText}>Pedidos</span>
+                  <div className={styles.badgeContainer}>
+                    <span className={styles.linkText}>Pedidos</span>
+                    {!isActive("/pedidos") && counts.orders > 0 && (
+                      <span className={styles.badge}>{counts.orders}</span>
+                    )}
+                  </div>
                 </Nav.Link>
               </Nav.Item>
             </Nav>
@@ -244,7 +261,33 @@ export default function Navbar() {
                   weight={isActive("/") ? "fill" : "regular"}
                 />
               </span>
-              <span className={styles.sideNavText}>Homepage</span>
+              <div className={styles.badgeContainer}>
+                <span className={styles.sideNavText}>Homepage</span>
+                {!isActive("/") && counts.production > 0 && (
+                  <span className={styles.badge}>{counts.production}</span>
+                )}
+              </div>
+            </Link>
+
+            <Link
+              href="/precificacao"
+              className={`${styles.sideNavLink} ${
+                isActive("/precificacao") ? styles.activeLink : ""
+              }`}
+              onClick={() => setOpen(false)}
+            >
+              <span className={styles.sideNavIcon} aria-hidden>
+                <TagIcon
+                  size={18}
+                  weight={isActive("/precificacao") ? "fill" : "regular"}
+                />
+              </span>
+              <div className={styles.badgeContainer}>
+                <span className={styles.sideNavText}>Precificação</span>
+                {!isActive("/precificacao") && counts.pricing > 0 && (
+                  <span className={styles.badge}>{counts.pricing}</span>
+                )}
+              </div>
             </Link>
 
             <Link
@@ -324,7 +367,12 @@ export default function Navbar() {
                   weight={isActive("/pedidos") ? "fill" : "regular"}
                 />
               </span>
-              <span className={styles.sideNavText}>Pedidos</span>
+              <div className={styles.badgeContainer}>
+                <span className={styles.sideNavText}>Pedidos</span>
+                {!isActive("/pedidos") && counts.orders > 0 && (
+                  <span className={styles.badge}>{counts.orders}</span>
+                )}
+              </div>
             </Link>
           </div>
         </nav>

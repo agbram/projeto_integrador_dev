@@ -91,8 +91,6 @@
 }
 
 .stepHeader {
-  padding: 24px 32px;
-  background: #fff;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -112,12 +110,17 @@
   margin: 0 0 24px;
 }
 
+.modalBody {
+  padding: 24px 32px;
+  background: #fff;
+  border-radius: 12px;
+}
+
 .splitLayout {
   display: flex;
   gap: 24px;
   align-items: flex-start;
   margin-top: 16px;
-  padding: 0 32px;
 }
 
 .leftPanel, .rightPanel {
@@ -142,6 +145,10 @@
   align-items: center;
 }
 
+.rightPanel .panelHeader {
+  background: rgba(212, 123, 146, 0.05); /* Rosa suave para o lado direito */
+}
+
 .panelHeader h5 {
   margin: 0;
   font-size: 11px;
@@ -149,6 +156,10 @@
   text-transform: uppercase;
   color: #2e1c1c;
   letter-spacing: 0.05em;
+}
+
+.rightPanel .panelHeader h5 {
+  color: #d47b92; /* Titulo rosa no lado direito */
 }
 
 .panelContent {
@@ -165,7 +176,6 @@
   justify-content: space-between;
   align-items: center;
   margin-top: 24px;
-  padding: 0 32px 32px;
   gap: 16px;
 }
 

@@ -347,7 +347,7 @@ export default function ProdutosPage() {
         className={styles.modalProdutos}
         contentClassName="globalModalContentRounded"
       >
-        <Modal.Body style={{ padding: 0 }}>
+        <Modal.Body className={styles.modalBody}>
           <div className={styles.stepHeader}>
             <h2 className={styles.stepTitle}>Cadastro de Produto</h2>
             <p className={styles.stepSubtitle}>Informe os dados básicos para iniciar a precificação do produto</p>
@@ -423,7 +423,7 @@ export default function ProdutosPage() {
         className={styles.modalProdutos}
         contentClassName="globalModalContentRounded"
       >
-        <Modal.Body style={{ padding: 0 }}>
+        <Modal.Body className={styles.modalBody}>
           <div className={styles.stepHeader}>
             <h2 className={styles.stepTitle}>Editar Produto</h2>
             <p className={styles.stepSubtitle}>Atualize as informações técnicas ou imagem do produto selecionado</p>

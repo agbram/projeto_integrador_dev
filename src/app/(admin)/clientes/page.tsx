@@ -372,7 +372,7 @@ export default function ClientesPage() {
         className={styles.modalClientes}
         contentClassName="globalModalContentRounded"
       >
-        <Modal.Body style={{ padding: 0 }}>
+        <Modal.Body className={styles.modalBody}>
           <div className={styles.stepHeader}>
             <h2 className={styles.stepTitle}>Cadastro de Cliente</h2>
             <p className={styles.stepSubtitle}>Verifique o CPF/CNPJ e preencha os dados cadastrais para finalizar</p>

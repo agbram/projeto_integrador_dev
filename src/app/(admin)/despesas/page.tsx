@@ -267,7 +267,7 @@ export default function FixedExpensesPage() {
         className={styles.modalExpense} 
         contentClassName="globalModalContentRounded"
       >
-        <Modal.Body style={{ padding: 0 }}>
+        <Modal.Body className={styles.modalBody}>
           <div className={styles.stepHeader}>
             <h2 className={styles.stepTitle}>Nova Despesa Fixa</h2>
             <p className={styles.stepSubtitle}>Cadastre uma nova despesa informando os valores e detalhes de recorrência</p>

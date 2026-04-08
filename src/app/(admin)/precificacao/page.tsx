@@ -1185,21 +1185,21 @@ export default function PrecificacaoPage() {
             onClick={() => setActiveTab("para-calcular")}
           >
             <CalculatorIcon size={20} />
-            Para Precificar ({produtosParaCalcular.length})
+            Para Precificar
           </button>
           <button
             className={`${styles.tabButton} ${activeTab === "calculados" ? styles.tabActive : ""}`}
             onClick={() => setActiveTab("calculados")}
           >
             <ScalesIcon size={20} />
-            Já Calculados ({produtosCalculados.length})
+            Já Calculados
           </button>
           <button
             className={`${styles.tabButton} ${activeTab === "insumos" ? styles.tabActive : ""}`}
             onClick={() => setActiveTab("insumos")}
           >
             <GearIcon size={20} />
-            Insumos ({ingredients.length})
+            Insumos
           </button>
         </div>
 

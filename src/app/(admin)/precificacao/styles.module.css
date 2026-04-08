@@ -823,8 +823,29 @@
 }
 
 .btnReset:hover {
-  background: #c0392b; /* Cor de perigo ao resetar */
+  background: #DD0502; /* Cor de perigo ao resetar */
   transform: translateY(-1px);
+}
+
+.btnActionReset {
+  background: #fff;
+  color: #DD0502;
+  border: 1.5px solid #DD0502;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.btnActionReset:hover {
+  background: #DD0502;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(192, 57, 43, 0.2);
 }
 
 /* ============================================ */
@@ -2604,4 +2625,4 @@
 .simulationCardWrapper [class*="buttonsRow"] {
   width: 100% !important;
   display: flex !important;
-}
+}

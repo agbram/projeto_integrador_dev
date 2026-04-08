@@ -17,6 +17,7 @@ import {
   GearIcon,
   ArrowLeftIcon,
   CheckIcon,
+  ArrowsCounterClockwise,
 } from "@phosphor-icons/react";
 import styles from "./styles.module.css";
 import ButtonCancelar from "@/components/Buttons/ButtonCancel";
@@ -800,7 +801,7 @@ export default function PrecificacaoPage() {
 
           <div className={styles.modalPricingActions}>
             <button
-              className={styles.btnActionBack}
+              className={selectProduto.priceStatus === "CALCULATED" ? styles.btnActionReset : styles.btnActionBack}
               onClick={() => {
                 if (selectProduto.priceStatus === "CALCULATED") {
                    handleResetPrice();
@@ -809,7 +810,11 @@ export default function PrecificacaoPage() {
                 }
               }}
             >
-              <ArrowLeftIcon size={18} weight="bold" />
+              {selectProduto.priceStatus === "CALCULATED" ? (
+                <ArrowsCounterClockwise size={18} weight="bold" />
+              ) : (
+                <ArrowLeftIcon size={18} weight="bold" />
+              )}
               {selectProduto.priceStatus === "CALCULATED" ? "Resetar Preço" : "Cancelar"}
             </button>
             
@@ -839,7 +844,7 @@ export default function PrecificacaoPage() {
       className={styles.modalPrecificacao}
       contentClassName="globalModalContentRounded"
     >
-      <Modal.Body style={{ padding: 0 }}>
+      <Modal.Body className={styles.modalPricingBody}>
         <div className={styles.stepHeader}>
           <h2 className={styles.stepTitle}>Adicionar Ingrediente</h2>
           <p className={styles.stepSubtitle}>Busque um ingrediente cadastrado ou crie um novo na matriz de insumos</p>
@@ -876,12 +881,12 @@ export default function PrecificacaoPage() {
                     onClick={() => setSelectedIngredient(ing)}
                   >
                     <div>
-                      <strong>{ing.name}</strong>
-                      <small>
-                        {ing.category} • {ing.supplier || "Sem fornecedor"}
+                      <strong style={{ marginRight: '12px' }}>{ing.name}</strong>
+                      <small style={{ color: '#6c757d' }}>
+                        Categoria: {ing.category || "Sem categoria"} &nbsp;&nbsp; Fornecedor: {ing.supplier || "Sem fornecedor"}
                       </small>
                     </div>
-                    <div>
+                    <div style={{ color: '#d47b92', fontWeight: 600 }}>
                       R$ {ing.unitCost.toFixed(2)}/{ing.unit}
                     </div>
                   </div>
@@ -901,12 +906,12 @@ export default function PrecificacaoPage() {
                     onClick={() => setSelectedIngredient(ing)}
                   >
                     <div>
-                      <strong>{ing.name}</strong>
-                      <small>
-                        {ing.category} • {ing.supplier || "Sem fornecedor"}
+                      <strong style={{ marginRight: '12px' }}>{ing.name}</strong>
+                      <small style={{ color: '#6c757d' }}>
+                        Categoria: {ing.category || "Sem categoria"} &nbsp;&nbsp; Fornecedor: {ing.supplier || "Sem fornecedor"}
                       </small>
                     </div>
-                    <div>
+                    <div style={{ color: '#d47b92', fontWeight: 600 }}>
                       R$ {ing.unitCost.toFixed(2)}/{ing.unit}
                     </div>
                   </div>
@@ -967,8 +972,7 @@ export default function PrecificacaoPage() {
           </div>
         </div>
       </div>
-    </Modal.Body>
-      <Modal.Footer className={styles.modalActions}>
+      <div className={styles.modalPricingActions}>
         <ButtonCancelar variant="outline" onClick={() => setModalAddIngredientShow(false)} CancelLabel="Cancelar" />
         <button
           className={styles.btnAddIngredientSubmit}
@@ -977,9 +981,10 @@ export default function PrecificacaoPage() {
         >
           Adicionar
         </button>
-      </Modal.Footer>
-    </Modal>
-  );
+      </div>
+    </Modal.Body>
+  </Modal>
+);
 
   // Modal para editar ingrediente do produto
   const renderEditIngredientModal = () => (
@@ -994,7 +999,7 @@ export default function PrecificacaoPage() {
       className={styles.modalPrecificacao}
       contentClassName="globalModalContentRounded"
     >
-      <Modal.Body style={{ padding: 0 }}>
+      <Modal.Body className={styles.modalPricingBody}>
         <div className={styles.stepHeader}>
           <h2 className={styles.stepTitle}>Editar Ingrediente</h2>
           <p className={styles.stepSubtitle}>Ajuste a quantidade ou unidade deste ingrediente no produto</p>
@@ -1040,17 +1045,17 @@ export default function PrecificacaoPage() {
             </div>
           )}
         </div>
+        <div className={styles.modalPricingActions}>
+          <ButtonCancelar variant="outline" onClick={() => setModalEditIngredientShow(false)} CancelLabel="Cancelar" />
+          <button
+            className={styles.btnSaveIngredient}
+            onClick={handleSaveProductIngredient}
+            disabled={loading}
+          >
+            Salvar Alterações
+          </button>
+        </div>
       </Modal.Body>
-      <Modal.Footer className={styles.modalActions}>
-        <ButtonCancelar variant="outline" onClick={() => setModalEditIngredientShow(false)} CancelLabel="Cancelar" />
-        <button
-          className={styles.btnSave}
-          onClick={handleSaveProductIngredient}
-          disabled={loading}
-        >
-          Salvar
-        </button>
-      </Modal.Footer>
     </Modal>
   );
 
@@ -1064,7 +1069,7 @@ export default function PrecificacaoPage() {
       className={styles.modalPrecificacao}
       contentClassName="globalModalContentRounded"
     >
-      <Modal.Body style={{ padding: 0 }}>
+      <Modal.Body className={styles.modalPricingBody}>
         <div className={styles.stepHeader}>
           <h2 className={styles.stepTitle}>Novo Insumo</h2>
           <p className={styles.stepSubtitle}>Cadastre um novo ingrediente na matriz geral do sistema</p>
@@ -1121,17 +1126,17 @@ export default function PrecificacaoPage() {
             </div>
           </div>
         </div>
+        <div className={styles.modalPricingActions}>
+          <ButtonCancelar variant="outline" onClick={() => setModalCreateIngredientShow(false)} CancelLabel="Cancelar" />
+          <button
+            className={styles.btnAddIngredientSubmit}
+            onClick={handleCreateIngredient}
+            disabled={loading}
+          >
+            Cadastrar Insumo
+          </button>
+        </div>
       </Modal.Body>
-      <Modal.Footer className={styles.modalActions}>
-        <ButtonCancelar variant="outline" onClick={() => setModalCreateIngredientShow(false)} CancelLabel="Cancelar" />
-        <button
-          className={styles.btnAddIngredientSubmit}
-          onClick={handleCreateIngredient}
-          disabled={loading}
-        >
-          Cadastrar
-        </button>
-      </Modal.Footer>
     </Modal>
   );
 

@@ -1,7 +1,6 @@
 
 "use client";
 import { useState, useEffect } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 import Nav from "react-bootstrap/Nav";
 import {
   PackageIcon,
@@ -91,23 +90,23 @@ export default function Navbar() {
               <Nav.Item>
                 <Nav.Link
                   as={Link}
-                  href="/precificacao"
-                  eventKey="/precificacao"
-                  className={isActive("/precificacao") ? styles.activeLink : ""}
+                  href="/pedidos"
+                  eventKey="/pedidos"
+                  className={isActive("/pedidos") ? styles.activeLink : ""}
                 >
                   <span className={styles.Icon} aria-hidden>
-                    <TagIcon
+                    <ShoppingCartIcon
                       size={20}
-                      weight={isActive("/precificacao") ? "fill" : "regular"}
+                      weight={isActive("/pedidos") ? "fill" : "regular"}
                       className={`${
-                        isActive("/precificacao") ? styles.fufilledIcon : ""
+                        isActive("/pedidos") ? styles.fufilledIcon : ""
                       }`}
                     />
                   </span>
                   <div className={styles.badgeContainer}>
-                    <span className={styles.linkText}>Precificação</span>
-                    {!isActive("/precificacao") && counts.pricing > 0 && (
-                      <span className={styles.badge}>{counts.pricing}</span>
+                    <span className={styles.linkText}>Pedidos</span>
+                    {!isActive("/pedidos") && counts.orders > 0 && (
+                      <span className={styles.badge}>{counts.orders}</span>
                     )}
                   </div>
                 </Nav.Link>
@@ -136,6 +135,33 @@ export default function Navbar() {
               <Nav.Item>
                 <Nav.Link
                   as={Link}
+                  href="/precificacao"
+                  eventKey="/precificacao"
+                  className={isActive("/precificacao") ? styles.activeLink : ""}
+                >
+                  <span className={styles.Icon} aria-hidden>
+                    <TagIcon
+                      size={20}
+                      weight={isActive("/precificacao") ? "fill" : "regular"}
+                      className={`${
+                        isActive("/precificacao") ? styles.fufilledIcon : ""
+                      }`}
+                    />
+                  </span>
+                  <div className={styles.badgeContainer}>
+                    <span className={styles.linkText}>Precificação</span>
+                    {!isActive("/precificacao") && counts.pricing > 0 && (
+                      <span className={styles.badge}>{counts.pricing}</span>
+                    )}
+                  </div>
+                </Nav.Link>
+              </Nav.Item>
+
+
+
+              <Nav.Item>
+                <Nav.Link
+                  as={Link}
                   href="/clientes"
                   eventKey="/clientes"
                   className={isActive("/clientes") ? styles.activeLink : ""}
@@ -150,26 +176,6 @@ export default function Navbar() {
                     />
                   </span>
                   <span className={styles.linkText}>Clientes</span>
-                </Nav.Link>
-              </Nav.Item>
-
-              <Nav.Item>
-                <Nav.Link
-                  as={Link}
-                  href="/relatorios"
-                  eventKey="/relatorios"
-                  className={isActive("/relatorios") ? styles.activeLink : ""}
-                >
-                  <span className={styles.Icon} aria-hidden>
-                    <ChartBarIcon
-                      size={20}
-                      weight={isActive("/relatorios") ? "fill" : "regular"}
-                      className={`${
-                        isActive("/relatorios") ? styles.fufilledIcon : ""
-                      }`}
-                    />
-                  </span>
-                  <span className={styles.linkText}>Relatórios</span>
                 </Nav.Link>
               </Nav.Item>
 
@@ -196,27 +202,24 @@ export default function Navbar() {
               <Nav.Item>
                 <Nav.Link
                   as={Link}
-                  href="/pedidos"
-                  eventKey="/pedidos"
-                  className={isActive("/pedidos") ? styles.activeLink : ""}
+                  href="/relatorios"
+                  eventKey="/relatorios"
+                  className={isActive("/relatorios") ? styles.activeLink : ""}
                 >
                   <span className={styles.Icon} aria-hidden>
-                    <ShoppingCartIcon
+                    <ChartBarIcon
                       size={20}
-                      weight={isActive("/pedidos") ? "fill" : "regular"}
+                      weight={isActive("/relatorios") ? "fill" : "regular"}
                       className={`${
-                        isActive("/pedidos") ? styles.fufilledIcon : ""
+                        isActive("/relatorios") ? styles.fufilledIcon : ""
                       }`}
                     />
                   </span>
-                  <div className={styles.badgeContainer}>
-                    <span className={styles.linkText}>Pedidos</span>
-                    {!isActive("/pedidos") && counts.orders > 0 && (
-                      <span className={styles.badge}>{counts.orders}</span>
-                    )}
-                  </div>
+                  <span className={styles.linkText}>Relatórios</span>
                 </Nav.Link>
-              </Nav.Item>
+              </Nav.Item>              
+
+
             </Nav>
           </div>
         </div>

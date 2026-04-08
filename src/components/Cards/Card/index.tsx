@@ -40,6 +40,7 @@ type FormProps = {
   onChange?: (name: string, value: any) => void
   additionalInfo?: React.ReactNode
   defaultValues?: FormData
+  fullWidthSubmit?: boolean
 }
 
 export default function Card({ 
@@ -56,7 +57,8 @@ export default function Card({
   onDelete,
   onChange,
   additionalInfo,
-  defaultValues = {}
+  defaultValues = {},
+  fullWidthSubmit = false
 }: FormProps) {
   const [formData, setFormData] = useState<FormData>(() => {
     const initialData: FormData = {};
@@ -246,7 +248,7 @@ export default function Card({
           {showSubmit && (
             <button 
               type="submit" 
-              className={styles.submitButton}
+              className={`${styles.submitButton} ${fullWidthSubmit ? styles.fullWidth : ""}`}
               disabled={loading || disabled}
             >
               <span>{loading ? "Processando..." : submitLabel}</span>

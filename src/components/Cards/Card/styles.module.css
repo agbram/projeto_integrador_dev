@@ -181,6 +181,11 @@
   transform: none;
 }
 
+.fullWidth {
+  width: 100%;
+  flex: 1;
+}
+
 @media (max-width: 480px) {
   .buttonsRow {
     flex-direction: column-reverse;

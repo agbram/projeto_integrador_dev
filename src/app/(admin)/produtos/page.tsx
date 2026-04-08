@@ -401,6 +401,7 @@ export default function ProdutosPage() {
                   ]}
                   onSubmit={handleSubmit}
                   submitLabel="Finalizar Cadastro"
+                  fullWidthSubmit={true}
                   loading={loading}
                   showCancel={false}
                   onChange={(name, value) => setDraftProduct((prev: any) => ({ ...prev, [name]: value }))}
@@ -502,6 +503,7 @@ export default function ProdutosPage() {
                   onDelete={handleWarningDelete}
                   onSubmit={handleSalvarAlteracoes}
                   submitLabel="Salvar Alterações"
+                  fullWidthSubmit={true}
                   loading={loading}
                   onChange={(name, value) => setDraftProduct((prev: any) => ({ ...prev, [name]: value }))}
                 />

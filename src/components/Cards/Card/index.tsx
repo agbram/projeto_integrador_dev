@@ -37,7 +37,7 @@ type FormProps = {
   showSubmit?: boolean
   onCancel?: () => void
   onDelete?: () => void
-  onChange?: (name: string, value: string) => void
+  onChange?: (name: string, value: any) => void
   additionalInfo?: React.ReactNode
   defaultValues?: FormData
 }
@@ -98,7 +98,7 @@ export default function Card({
     setFormData(prev => ({ ...prev, [name]: newValue }));
 
     if (onChange) {
-      onChange(name, value);
+      onChange(name, newValue);
     }
   }
 

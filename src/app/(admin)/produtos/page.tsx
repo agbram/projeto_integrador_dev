@@ -194,11 +194,12 @@ export default function ProdutosPage() {
   const handleDesativaProduct = async () => {
     setLoading(true);
     try {
-      const response = await api.delete(`/products/${selectProduto?.id}`);
+      // Usa PUT ao invés de DELETE para realizar o Soft Delete (Desativação)
+      const response = await api.put(`/products/${selectProduto?.id}`, { isActive: false });
       console.log("Produto desativado com sucesso:", response.data);
 
       setProdutos(prev => prev.map(produto =>
-        produto.id === selectProduto?.id ? response.data : produto
+        produto.id === selectProduto?.id ? { ...produto, isActive: false } : produto
       ));
 
       setWarningDeleteModalShow(false);
